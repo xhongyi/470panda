@@ -1,0 +1,20 @@
+1 RS feed rob_avail[1:0] to ROB indicates how many entries are available.
+
+2a ROB uses rs_avail[1:0] and its own entries information to decide how many instructions to dispatch. Then it broadcast how many instructions to dispatch by sending value to rs_mt_fl_dispatch_num[1:0].
+fB3QB8GT9Am3
+2b ROB analyzes what kind of instructions it's dispatching and send their architectural register tags to MT by  mt_ar_a1[4:0]...mt_ar_b2[4:0]
+
+2c ROB increment its tail pointer.
+
+3a FL then get the value of rob_inst_valid[1:0] and synthesize it with rob_retire_num[1:0] and rob_retire_tag[1:0][6:0] to allocate new free reg to rob_rs_mt_a[6:0] and rob_rs_mt_b[6:0]
+
+3b MT read in rob_ar_a[4:0]--rob_ar_b2[4:0](all six of the destination registers and operands) and decide whether there are internal dependency between the two instructions such as r1 = r1 + r1; r2 = r1 + r2. If there is no dependancy then we just send their map table value out to RS by rs_a1[6:0]--rs_b2(all four operands)
+
+4a ROB, RS, MT all get the value from fl by fl_a[6:0] and fl_b[6:0]. They would then use rob_dispatch_num[1:0] to update and allocate new entries for those new tags:
+	ROB: update T and Told
+	MT: update mappings
+	RS: put the free list value in to T (fl_a, fl_b)
+
+4b If there is internal dependancy between the two instructions(see 3b) then we use a mux to change the corresponding rs_tagx_b(only the second instruction could have a RAW dependancy) to the tag came from FL.
+
+5 RS copy down all the tags(mt_a1, mt_a2, mt_b1, mt_b2) and ready to go.
