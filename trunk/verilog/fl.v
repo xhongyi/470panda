@@ -33,22 +33,40 @@ input [6:0] rob_retire_a, rob_retire_b;
 output rob_rs_mt_a, rob_rs_t_b;
 
 reg [6:0] free_entries[63:0];
+reg [6:0] rob_retire_a, rob_retire_b;
 reg [2:0] shift;		//0:no shift; 1:1-in-shift; 2:2-in-shift; 3:1-out-shift; 4:2-out-shift
 integer i;
 
 always @* begin
-  if (rob_dispatch_num == rob_retire)
-    shift = 3'd0;
-  else if ((rob_dispatch + 2'd2) == rob_retire)
-    shift = 3'd1;
+  shift = 3'd0
+  rob_rs_mt_a = 7'd0;
+  rob_rs_mt_b = 7'd0;
+  if (rob_dispatch_num == rob_retire_num) begin
+    if (rob_dispatch_num == 2'd1)
+      rob_rs_mt_a = rob_retire_a;
+    else if (rob_dispatch_num = 2'd2) begin
+      rob_rs_mt_a = rob_retire_a;
+      rob_rs_mt_b = rob_retire_b;
+    end
+  end
   else if ((rob_dispatch + 2'd1) == rob_retire)
+    shift = 3'd1;
+  else if ((rob_dispatch + 2'd2) == rob_retire)
     shift = 3'd2;
-  else if (rob_dispatch == (rob_retire + 2'd1))
+  else if (rob_dispatch == (rob_retire + 2'd1)) begin
     shift = 3'd3;
-  else if (rob_dispatch == (rob_retire + 2'd2))
+    if (rob_dispatch == 2'd1)
+      rob_rs_mt_a = free_entries[0];
+    else if (rob_dispatch == 2'd2) begin
+      rob_rs_mt_a = rob_retire_a;
+      rob_rs_mt_b = free_entries[0];
+    end
+  end
+  else if (rob_dispatch == (rob_retire + 2'd2)) begin
     shift = 3'd4;
-  else
-    shift = 3'd0;
+    rob_rs_mt_a = free_entries[0];
+    rob_rs_mt_b = free_entries[1];
+  end
 end
 
 always @(posedge clock) begin
@@ -72,6 +90,7 @@ always @(posedge clock) begin
       end
     end
     else if (shift == 3'd3) begin
+      rob_rs_mt_a = 
       free_entries[63] <= 7'd0;
       for (i=0; i<=31; i=i+1) begin
         free_entries[i] <= free_entries[i+1];
@@ -80,7 +99,7 @@ always @(posedge clock) begin
     else if (shift == 3'd4) begin
       free_entries[63] <= 7'd0;
       free_entries[62] <= 7'd0;
-      for (i=0; i<=31; i=i+1) begin
+      for (i=0; i<=30; i=i+1) begin
         free_entries[i] <= free_entries[i+1];
       end
     end
