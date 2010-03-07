@@ -25,8 +25,14 @@ module mt (// Inputs
 					 rob_ar_b2,
 
 					 cdb_broadcast,
-					 cdb_pr_tags,
-					 cdb_ar_tags,
+					 cdb_pr_tag0,
+					 cdb_pr_tag1,
+					 cdb_pr_tag2,
+					 cdb_pr_tag3,
+					 cdb_ar_tag0,
+					 cdb_ar_tag1,
+					 cdb_ar_tag2,
+					 cdb_ar_tag3,
 
 					 //Outputs
 					 rob_p0told,
@@ -58,6 +64,7 @@ module mt (// Inputs
 	input					rob_ar_a2_valid;
 	input					rob_ar_b2_valid;
 
+
 	input		[4:0]	rob_ar_a;
 	input		[4:0]	rob_ar_b;
 	input		[4:0]	rob_ar_a1;
@@ -67,8 +74,14 @@ module mt (// Inputs
 
 
 	input		[`CDB_WIDTH-1:0]	cdb_broadcast;
-	input		[6:0]	cdb_pr_tags[`CDB_WIDTH-1:0];
-	input		[4:0]	cdb_ar_tags[`CDB_WIDTH-1:0];
+	input		[6:0]	cdb_pr_tag0;
+	input		[6:0]	cdb_pr_tag1;
+	input		[6:0]	cdb_pr_tag2;
+	input		[6:0]	cdb_pr_tag3;
+	input		[4:0]	cdb_ar_tag0;
+	input		[4:0]	cdb_ar_tag1;
+	input		[4:0]	cdb_ar_tag2;
+	input		[4:0]	cdb_ar_tag3;
 
 
 	output	[6:0]	rob_p0told;
@@ -99,17 +112,17 @@ module mt (// Inputs
 
 	always @*
 	begin
-		next_read_bits = ready_bits;
+		next_ready_bits = ready_bits;
 
 		// Assume CDB_WIDTH is 4
-		if (cdb_broadcast[0] && pr_tags[cdb_ar_tags[0]] == cdb_pr_tags[0])
-			next_ready_bits[cdb_ar_tags[0]] = 1'b1;
-		if (cdb_broadcast[1] && pr_tags[cdb_ar_tags[1]] == cdb_pr_tags[1])
-			next_ready_bits[cdb_ar_tags[1]] = 1'b1;
-		if (cdb_broadcast[2] && pr_tags[cdb_ar_tags[2]] == cdb_pr_tags[2])
-			next_ready_bits[cdb_ar_tags[2]] = 1'b1;
-		if (cdb_broadcast[3] && pr_tags[cdb_ar_tags[3]] == cdb_pr_tags[3])
-			next_ready_bits[cdb_ar_tags[3]] = 1'b1;
+		if (cdb_broadcast[0] && pr_tags[cdb_ar_tag0] == cdb_pr_tag0)
+			next_ready_bits[cdb_ar_tag0] = 1'b1;
+		if (cdb_broadcast[1] && pr_tags[cdb_ar_tag1] == cdb_pr_tag1)
+			next_ready_bits[cdb_ar_tag1] = 1'b1;
+		if (cdb_broadcast[2] && pr_tags[cdb_ar_tag2] == cdb_pr_tag2)
+			next_ready_bits[cdb_ar_tag2] = 1'b1;
+		if (cdb_broadcast[3] && pr_tags[cdb_ar_tag3] == cdb_pr_tag3)
+			next_ready_bits[cdb_ar_tag3] = 1'b1;
 
 		if (rob_dispatch_num > 0 && rob_ar_a_valid)
 			next_ready_bits[rob_ar_a] = 1'b0;
@@ -178,3 +191,5 @@ module mt (// Inputs
 			pr_tags[rob_ar_b] <= `SD pr_tags_next1;
 		end
 	end
+
+endmodule
