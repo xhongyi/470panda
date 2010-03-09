@@ -1,0 +1,54 @@
+Chronologic VCS simulator copyright 1991-2005
+Contains Synopsys proprietary information.
+Compiler version Y-2006.06_Full64; Runtime version Y-2006.06_Full64;  Mar  8 19:30 2010
+
+Time:   0 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a:  0 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 1
+Time:   5 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a:  0 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 1
+Time:  10 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a:  0 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 1
+Time:  15 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a:  0 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 1
+Time:  20 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a:  0 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  25 -clock:1 done:1 dispatch_num:1 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 32 cre_b:  0 rob_rs_mt_a: 32 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  30 -clock:0 done:1 dispatch_num:1 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 32 cre_b:  0 rob_rs_mt_a: 32 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  35 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 32 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  40 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 32 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  45 -clock:1 done:1 dispatch_num:2 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 33 cre_b: 34 rob_rs_mt_a: 33 rob_rs_mt_b: 34, correct:1, reset: 0
+Time:  50 -clock:0 done:1 dispatch_num:2 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 33 cre_b: 34 rob_rs_mt_a: 33 rob_rs_mt_b: 34, correct:1, reset: 0
+Time:  55 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 33 cre_b: 34 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  60 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  0 rob_retire_b:  0 cre_a: 33 cre_b: 34 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  65 -clock:1 done:0 dispatch_num:0 retire_num:1 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  70 -clock:0 done:0 dispatch_num:0 retire_num:1 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  75 -clock:1 done:1 dispatch_num:1 retire_num:0 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  5 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  80 -clock:0 done:1 dispatch_num:1 retire_num:0 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  5 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  85 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  90 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  5 rob_retire_b:  0 cre_a:  5 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time:  95 -clock:1 done:0 dispatch_num:0 retire_num:2 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 100 -clock:0 done:0 dispatch_num:0 retire_num:2 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 105 -clock:1 done:1 dispatch_num:2 retire_num:0 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  6 rob_rs_mt_b:  7, correct:1, reset: 0
+Time: 110 -clock:0 done:1 dispatch_num:2 retire_num:0 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  6 rob_rs_mt_b:  7, correct:1, reset: 0
+Time: 115 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 120 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  6 rob_retire_b:  7 cre_a:  6 cre_b:  7 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 125 -clock:1 done:1 dispatch_num:1 retire_num:1 rob_retire_a:  8 rob_retire_b:  0 cre_a:  8 cre_b:  0 rob_rs_mt_a:  8 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 130 -clock:0 done:1 dispatch_num:1 retire_num:1 rob_retire_a:  8 rob_retire_b:  0 cre_a:  8 cre_b:  0 rob_rs_mt_a:  8 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 135 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  8 rob_retire_b:  0 cre_a:  8 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 140 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  8 rob_retire_b:  0 cre_a:  8 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 145 -clock:1 done:1 dispatch_num:2 retire_num:2 rob_retire_a:  9 rob_retire_b: 10 cre_a:  9 cre_b: 10 rob_rs_mt_a:  9 rob_rs_mt_b: 10, correct:1, reset: 0
+Time: 150 -clock:0 done:1 dispatch_num:2 retire_num:2 rob_retire_a:  9 rob_retire_b: 10 cre_a:  9 cre_b: 10 rob_rs_mt_a:  9 rob_rs_mt_b: 10, correct:1, reset: 0
+Time: 155 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  9 rob_retire_b: 10 cre_a:  9 cre_b: 10 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 160 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a:  9 rob_retire_b: 10 cre_a:  9 cre_b: 10 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 165 -clock:1 done:1 dispatch_num:1 retire_num:2 rob_retire_a: 11 rob_retire_b: 12 cre_a: 12 cre_b:  0 rob_rs_mt_a: 12 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 170 -clock:0 done:1 dispatch_num:1 retire_num:2 rob_retire_a: 11 rob_retire_b: 12 cre_a: 12 cre_b:  0 rob_rs_mt_a: 12 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 175 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 12 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 180 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 12 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 185 -clock:1 done:1 dispatch_num:1 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 11 cre_b:  0 rob_rs_mt_a: 11 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 190 -clock:0 done:1 dispatch_num:1 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 11 cre_b:  0 rob_rs_mt_a: 11 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 195 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 11 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 200 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 11 rob_retire_b: 12 cre_a: 11 cre_b:  0 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 205 -clock:1 done:1 dispatch_num:2 retire_num:1 rob_retire_a: 13 rob_retire_b:  0 cre_a: 13 cre_b: 35 rob_rs_mt_a: 13 rob_rs_mt_b: 35, correct:1, reset: 0
+Time: 210 -clock:0 done:1 dispatch_num:2 retire_num:1 rob_retire_a: 13 rob_retire_b:  0 cre_a: 13 cre_b: 35 rob_rs_mt_a: 13 rob_rs_mt_b: 35, correct:1, reset: 0
+Time: 215 -clock:1 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 13 rob_retire_b:  0 cre_a: 13 cre_b: 35 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+Time: 220 -clock:0 done:0 dispatch_num:0 retire_num:0 rob_retire_a: 13 rob_retire_b:  0 cre_a: 13 cre_b: 35 rob_rs_mt_a:  0 rob_rs_mt_b:  0, correct:1, reset: 0
+$finish at simulation time                  225
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 225
+CPU Time:      0.000 seconds;       Data structure size:   0.0Mb
+Mon Mar  8 19:30:03 2010
