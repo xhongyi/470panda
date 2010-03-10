@@ -16,41 +16,41 @@ module free_list (//inputs
 		  reset,
 		  rob_dispatch_num,
 		  rob_retire_num,
-		  rob_retire_a,
-		  rob_retire_b,
+		  rob_retire_tag_0,
+		  rob_retire_tag_1,
 		
 	  	  //outputs
-	 	  rob_rs_mt_a, //new registers
-		  rob_rs_mt_b,
+	 	  rob_rs_mt_pr0, //new registers
+		  rob_rs_mt_pr1,
 		  //debug output
   		 );
 
 input clock, reset;
 input [1:0] rob_dispatch_num;
 input [1:0] rob_retire_num;
-input [6:0] rob_retire_a, rob_retire_b;
+input [6:0] rob_retire_tag_0, rob_retire_tag_1;
 
-output [6:0]rob_rs_mt_a, rob_rs_mt_b;
+output [6:0]rob_rs_mt_pr0, rob_rs_mt_pr1;
 
 reg [6:0] free_entries [63:0];
-reg [6:0] rob_rs_mt_a, rob_rs_mt_b;
+reg [6:0] rob_rs_mt_pr0, rob_rs_mt_pr1;
 reg [2:0] shift;		//0:no shift; 1:1-in-shift; 2:2-in-shift; 3:1-out-shift; 4:2-out-shift
 integer i;
 
 always @* begin
     shift = 3'd0;
-    rob_rs_mt_a = 7'd0;
-    rob_rs_mt_b = 7'd0;
+    rob_rs_mt_pr0 = 7'd0;
+    rob_rs_mt_pr1 = 7'd0;
   if (rob_dispatch_num == 2'd1 && rob_retire_num  == 2'd1)
   begin
     shift = 3'd0;
-    rob_rs_mt_a = rob_retire_a;
+    rob_rs_mt_pr0 = rob_retire_tag_0;
   end
   else if (rob_dispatch_num == 2'd2 && rob_retire_num == 2'd2)
   begin
     shift = 3'd0;
-    rob_rs_mt_a = rob_retire_a;
-    rob_rs_mt_b = rob_retire_b;
+    rob_rs_mt_pr0 = rob_retire_tag_0;
+    rob_rs_mt_pr1 = rob_retire_tag_1;
   end
   else if (rob_dispatch_num == 2'd0 && rob_retire_num == 2'd1)
   begin
@@ -63,24 +63,24 @@ always @* begin
   else if (rob_dispatch_num == 2'd1 && rob_retire_num == 2'd0)
   begin
     shift = 3'd3;
-    rob_rs_mt_a = free_entries[0];
+    rob_rs_mt_pr0 = free_entries[0];
   end
   else if ((rob_dispatch_num == 2'd2) && (rob_retire_num == 2'd0))
   begin
     shift = 3'd4;
-    rob_rs_mt_a = free_entries[0];
-    rob_rs_mt_b = free_entries[1];
+    rob_rs_mt_pr0 = free_entries[0];
+    rob_rs_mt_pr1 = free_entries[1];
   end
   else if (rob_dispatch_num == 2'd1 && rob_retire_num == 2'd2)
   begin
     shift = 3'd1;
-    rob_rs_mt_a = rob_retire_b;
+    rob_rs_mt_pr0 = rob_retire_tag_1;
   end
   else if (rob_dispatch_num == 2'd2 && rob_retire_num == 2'd1)
   begin
     shift = 3'd3;
-    rob_rs_mt_a = rob_retire_a;
-    rob_rs_mt_b = free_entries[0];
+    rob_rs_mt_pr0 = rob_retire_tag_0;
+    rob_rs_mt_pr1 = free_entries[0];
   end
 end
 
@@ -92,14 +92,14 @@ always @(posedge clock) begin
   end
   else begin
     if (shift == 3'd1) begin
-      free_entries[0] <= rob_retire_a;
+      free_entries[0] <= rob_retire_tag_0;
       for (i=1; i<=31; i=i+1) begin
         free_entries[i] <= free_entries[i-1];
       end
     end
     else if (shift == 3'd2) begin
-      free_entries[0] <= rob_retire_a;
-      free_entries[1] <= rob_retire_b;
+      free_entries[0] <= rob_retire_tag_0;
+      free_entries[1] <= rob_retire_tag_1;
       for (i=2; i<=31; i=i+1) begin
         free_entries[i] <= free_entries[i-2];
       end
