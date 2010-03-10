@@ -153,6 +153,33 @@ module mt_test;
 
 	initial
 	begin
+	 rob_dispatch_num,
+	 fl_pr0,
+	 fl_pr1,
+
+	 rob_ar_a_valid,
+	 rob_ar_b_valid,
+	 rob_ar_a1_valid,
+	 rob_ar_b1_valid,
+	 rob_ar_a2_valid,
+	 rob_ar_b2_valid,
+
+	 rob_ar_a,
+	 rob_ar_b,
+	 rob_ar_a1,
+	 rob_ar_b1,
+	 rob_ar_a2,
+	 rob_ar_b2,
+
+	 cdb_broadcast,
+	 cdb_pr_tag0,
+	 cdb_pr_tag1,
+	 cdb_pr_tag2,
+	 cdb_pr_tag3,
+	 cdb_ar_tag0,
+	 cdb_ar_tag1,
+	 cdb_ar_tag2,
+	 cdb_ar_tag3,
 		$finish;
 	end
 
