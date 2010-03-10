@@ -202,6 +202,7 @@ reg [6:0] fl_retire_tag_b;
 wire [5:0] head_plus_one;
 wire [5:0] tail_plus_one;
 wire [5:0] tail_plus_two;
+wire [64:0] previous_pc;
  //Internal State
 reg [31:0] inst [63:0]; //64 instructions, 32 bits each.
 reg [63:0] pc   [63:0]; //64 instructions, 64 bits each.
@@ -222,7 +223,7 @@ reg [6:0] next_told [63:0];
 reg [5:0] next_head;
 reg [5:0] next_tail;
 reg [5:0] next_fetch_tail;
-
+reg [63:0] next_tail_pc;
 decoder decoder_1 (
 					
 					.instr(inst0),
@@ -256,6 +257,7 @@ integer index, jindex;
 
 assign full = ((fetch_tail==6'd63 && head==6'd0)|(head==fetch_tail+6'd1));
 assign almost_full = ((fetch_tail==6'd62&&head==6'd0)&&(fetch_tail==6'd63&&head==6'd1)&&(head==fetch_tail+6'd2));
+assign previous_pc = pc0 - 64'h4;
 
 assign  head_plus_one = (head==6'd63) ? 6'b0 : head + 6'b1;
 assign  tail_plus_one = (tail == 6'd63)? 6'd0 : tail + 6'd1;
@@ -274,7 +276,7 @@ begin
 	if(full)
 	begin//do not fetch instruction
 		next_fetch_tail = fetch_tail;
-		//tail_pc = pc[fetch_tail];
+		next_tail_pc = previous_pc;
 	end
 	else if (almost_full)
 	begin
@@ -292,7 +294,7 @@ begin
 	    	next_pc  [fetch_tail+6'd1] = pc0;
 			next_fetch_tail = fetch_tail + 6'd1;
 		end
-	
+	next_tail_pc = pc0;
 	end//of almost full
 
 	else
@@ -322,6 +324,7 @@ begin
 			next_fetch_tail = fetch_tail + 6'd2;
 		
 		end
+	next_tail_pc = pc1;
     end //of else (far from full)
 	//end of fetch
 	//Start of dispatch	
@@ -356,6 +359,7 @@ begin
 			next_tail = (tail == 6'd62) ? 6'd0 : (tail == 6'd63) ? 6'd1 : tail + 6'd2;
 		end
 	endcase
+	$display("head is: %h tail is %h fetch tail is: %h",head, tail, fetch_tail);
 	//end of dispatch
 	//complete
 	//checklist:
@@ -418,6 +422,7 @@ begin
 	else
 	begin
 		//do nothing
+		next_head = head;
 		fl_retire_num = 2'b00;
 	end
 	
@@ -428,12 +433,15 @@ always @(posedge clock)
 begin //of sequential logic
 	if(reset)
 	begin
+		 head <= `SD 64'h0;
+		 tail <= `SD 64'h0;
+		 fetch_tail <= `SD 64'h0;
 		 tail_pc <= `SD 64'b0;
 		//initialization
 	end
 	else
 	begin
-			tail_pc <= `SD pc[fetch_tail];
+			tail_pc <= `SD next_tail_pc;
 			fetch_tail <= `SD next_fetch_tail;
 			head <= `SD next_head;
 			tail <= `SD next_tail;
