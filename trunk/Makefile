@@ -28,7 +28,7 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	    \
-							testbench/mt_test.v
+							testbench/mt_test_1.v
 
 SIMFILES =	verilog/mt.v	\
 
