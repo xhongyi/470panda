@@ -282,3 +282,5 @@
 `define JSR_INST	2'h1
 `define RET_INST	2'h2
 `define JSR_CO_INST	2'h3
+
+`define CDB_WIDTH	4

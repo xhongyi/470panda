@@ -14,6 +14,8 @@ module mt (// Inputs
 
 					 rob_ar_a_valid,
 					 rob_ar_b_valid,
+					 rob_ar_a1_valid,
+					 rob_ar_b1_valid,
 					 rob_ar_a2_valid,
 					 rob_ar_b2_valid,
 
@@ -61,6 +63,8 @@ module mt (// Inputs
 	// If a2 or b2 is not valid, the default value for pr is 0
 	input					rob_ar_a_valid;
 	input					rob_ar_b_valid;
+	input					rob_ar_a1_valid;
+	input					rob_ar_b1_valid;
 	input					rob_ar_a2_valid;
 	input					rob_ar_b2_valid;
 
