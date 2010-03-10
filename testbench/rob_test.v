@@ -33,8 +33,8 @@ reg [6:0] cdb_pr_tag_3;
 
 wire [63:0] tail_pc;
 
-wire [4:0] mt_ar_a;
-wire [4:0] mt_ar_b;
+wire [4:0] rs_mt_ar_a;
+wire [4:0] rs_mt_ar_b;
 wire [4:0] mt_ar_a1;
 wire [4:0] mt_ar_b1;
 wire [4:0] mt_ar_a2;
@@ -81,12 +81,14 @@ rob    testee (//inputs
 			//fetch
 			tail_pc,
 			//dispatch
-			mt_ar_a,
-			mt_ar_b,
+			rs_mt_ar_a,
+			rs_mt_ar_b,
 			mt_ar_a1,
 			mt_ar_b1,
 			mt_ar_a2,
 			mt_ar_b2,
+			rs_mt_ar_a_valid,
+			rs_mt_ar_b_valid,
 			mt_ar_a1_valid,
 			mt_ar_a2_valid,
 			mt_ar_b1_valid,
@@ -127,7 +129,7 @@ end
 initial begin
 
   //$vcdpluson;
-  $monitor("Time:%4.0f inst0: %h inst1: %h pc0: %h pc1: %h fl_pr0: %h fl_pr1: %h rs_avail: %h mt_p0told: %h mt_p1told: %h cdb_pr_ready: %h cdb_pr_tag_0: %h cdb_pr_tag_1: %h cdb_pr_tag_2: %h cdb_pr_tag_3: %h tail_pc: %h mt_ar_a: %h mt_ar_b: %h mt_ar_a1: %h mt_ar_b1: %h mt_ar_a2: %h mt_ar_b2: %h mt_ar_ar_a1_valid: %h mt_ar_a2_valid: %h mt_ar_b1_valid: %h mt_ar_b2_valid: %h rs_immediate0: %h rs_immediate1: %h rs_opcode0: %h rs_opcode1: %h rs_mt_fl_dispatch_num: %h fl_retire_tag_a: %h fl_retire_tag_b: %h fl_retire_num: %h",$time,inst0, inst1, pc0, pc1, fl_pr0, fl_pr1, rs_avail, mt_p0told, mt_p1told, cdb_pr_ready, cdb_pr_tag_0, cdb_pr_tag_1, cdb_pr_tag_2, cdb_pr_tag_3, tail_pc, mt_ar_a,mt_ar_b, mt_ar_a1, mt_ar_b1, mt_ar_a2, mt_ar_b2, mt_ar_a1_valid, mt_ar_a2_valid, mt_ar_b1_valid, mt_ar_b2_valid, rs_immediate0, rs_immediate1, rs_opcode0, rs_opcode1, rs_mt_fl_dispatch_num,fl_retire_tag_a, fl_retire_tag_b, fl_retire_num);
+  $monitor("Time:%4.0f inst0: %h inst1: %h pc0: %h pc1: %h fl_pr0: %h fl_pr1: %h rs_avail: %h mt_p0told: %h mt_p1told: %h cdb_pr_ready: %h cdb_pr_tag_0: %h cdb_pr_tag_1: %h cdb_pr_tag_2: %h cdb_pr_tag_3: %h tail_pc: %h mt_ar_a: %h mt_ar_b: %h mt_ar_a1: %h mt_ar_b1: %h mt_ar_a2: %h mt_ar_b2: %h mt_ar_ar_a1_valid: %h mt_ar_a2_valid: %h mt_ar_b1_valid: %h mt_ar_b2_valid: %h rs_immediate0: %h rs_immediate1: %h rs_opcode0: %h rs_opcode1: %h rs_mt_fl_dispatch_num: %h fl_retire_tag_a: %h fl_retire_tag_b: %h fl_retire_num: %h",$time,inst0, inst1, pc0, pc1, fl_pr0, fl_pr1, rs_avail, mt_p0told, mt_p1told, cdb_pr_ready, cdb_pr_tag_0, cdb_pr_tag_1, cdb_pr_tag_2, cdb_pr_tag_3, tail_pc, rs_mt_ar_a,rs_mt_ar_b, mt_ar_a1, mt_ar_b1, mt_ar_a2, mt_ar_b2, mt_ar_a1_valid, mt_ar_a2_valid, mt_ar_b1_valid, mt_ar_b2_valid, rs_immediate0, rs_immediate1, rs_opcode0, rs_opcode1, rs_mt_fl_dispatch_num,fl_retire_tag_a, fl_retire_tag_b, fl_retire_num);
  inst0 = 0;
  inst1 = 0;
  pc0 = 0;
