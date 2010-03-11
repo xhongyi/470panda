@@ -125,25 +125,25 @@ module mt_test;
 		
 
 		correct = 0;
-		if (rob_ar_a_valid && rob_p0told != cr_rob_p0told)
+		if (rob_ar_a_valid && rob_p0told !== cr_rob_p0told)
 			$display("*** rob_p0told is %b and it should be %b", rob_p0told, cr_rob_p0told);
-		else if (rob_ar_b_valid && rob_p1told != cr_rob_p1told)
+		else if (rob_ar_b_valid && rob_p1told !== cr_rob_p1told)
 			$display("*** rob_p1told is %b and it should be %b", rob_p1told, cr_rob_p1told);
-		else if (rob_ar_a1_valid && rs_pr_a1 != cr_rs_pr_a1)
+		else if (rob_ar_a1_valid && rs_pr_a1 !== cr_rs_pr_a1)
 			$display("*** rs_pr_a1 is %b and it should be %b", rs_pr_a1, cr_rs_pr_a1);
-		else if (rob_ar_a2_valid && rs_pr_a2 != cr_rs_pr_a2)
+		else if (rob_ar_a2_valid && rs_pr_a2 !== cr_rs_pr_a2)
 			$display("*** rs_pr_a2 is %b and it should be %b", rs_pr_a2, cr_rs_pr_a2);
-		else if (rob_ar_b1_valid && rs_pr_b1 != cr_rs_pr_b1)
+		else if (rob_ar_b1_valid && rs_pr_b1 !== cr_rs_pr_b1)
 			$display("*** rs_pr_b1 is %b and it should be %b", rs_pr_b1, cr_rs_pr_b1);
-		else if (rob_ar_b2_valid && rs_pr_b2 != cr_rs_pr_b2)
+		else if (rob_ar_b2_valid && rs_pr_b2 !== cr_rs_pr_b2)
 			$display("*** rs_pr_b2 is %b and it should be %b", rs_pr_b2, cr_rs_pr_b2);
-		else if (rob_ar_a1_valid && rs_pr_a1_ready != cr_rs_pr_a1_ready)
+		else if (rob_ar_a1_valid && rs_pr_a1_ready !== cr_rs_pr_a1_ready)
 			$display("*** rs_pr_a1_ready is %b and it should be %b", rs_pr_a1_ready, cr_rs_pr_a1_ready);
-		else if (rob_ar_a2_valid && rs_pr_a2_ready != cr_rs_pr_a2_ready)
+		else if (rob_ar_a2_valid && rs_pr_a2_ready !== cr_rs_pr_a2_ready)
 			$display("*** rs_pr_a2_ready is %b and it should be %b", rs_pr_a2_ready, cr_rs_pr_a2_ready);
-		else if (rob_ar_b1_valid && rs_pr_b1_ready != cr_rs_pr_b1_ready)
+		else if (rob_ar_b1_valid && rs_pr_b1_ready !== cr_rs_pr_b1_ready)
 			$display("*** rs_pr_b1_ready is %b and it should be %b", rs_pr_b1_ready, cr_rs_pr_b1_ready);
-		else if (rob_ar_b2_valid && rs_pr_b2_ready != cr_rs_pr_b2_ready)
+		else if (rob_ar_b2_valid && rs_pr_b2_ready !== cr_rs_pr_b2_ready)
 			$display("*** rs_pr_b2_ready is %b and it should be %b", rs_pr_b2_ready, cr_rs_pr_b2_ready);
 		else
 
