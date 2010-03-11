@@ -346,54 +346,9 @@ module mt_test;
 		@(posedge clock)//#35
 		//Normal two dispatch and no complete
 		//Note that the values here may be of future use
-		rob_dispatch_num = 0;
-		fl_pr0 = 32;
-		fl_pr1 = 33;
-
-		rob_ar_a_valid = 1;
-		rob_ar_b_valid = 1;
-		rob_ar_a1_valid = 1;
-		rob_ar_b1_valid = 1;
-		rob_ar_a2_valid = 1;
-		rob_ar_b2_valid = 1;
-
-		rob_ar_a = 3;
-		rob_ar_b = 4;
-		rob_ar_a1 = 5;
-		rob_ar_b1 = 6;
-		rob_ar_a2 = 7;
-		rob_ar_b2 = 8;
-
-		cdb_broadcast = 0;
-		cdb_pr_tags[0] = 0;
-		cdb_pr_tags[1] = 0;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = 0;
-		cdb_ar_tags[1] = 0;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = 3;
-		cr_rob_p1told = 4;
-		cr_rs_pr_a1 = 5;
-		cr_rs_pr_b1 = 6;
-		cr_rs_pr_a2 = 7;
-		cr_rs_pr_b2 = 8;
-
-		cr_rs_pr_a1_ready = 1;
-		cr_rs_pr_a2_ready = 1;
-		cr_rs_pr_b1_ready = 1;
-		cr_rs_pr_b2_ready = 1;
-
-
-		@(posedge clock)//#35
-		//Normal one dispatch and no complete
-		//Note that the values here may be of future use
 		rob_dispatch_num = 1;
 		fl_pr0 = 34;
-		fl_pr1 = 35;
+		fl_pr1 = 33;
 
 		rob_ar_a_valid = 1;
 		rob_ar_b_valid = 0;
@@ -402,12 +357,12 @@ module mt_test;
 		rob_ar_a2_valid = 1;
 		rob_ar_b2_valid = 0;
 
-		rob_ar_a = 9;
-		rob_ar_b = 10;
-		rob_ar_a1 = 11;
-		rob_ar_b1 = 12;
-		rob_ar_a2 = 13;
-		rob_ar_b2 = 14;
+		rob_ar_a = 5;
+		rob_ar_b = 0;
+		rob_ar_a1 = 3;
+		rob_ar_b1 = 0;
+		rob_ar_a2 = 4;
+		rob_ar_b2 = 0;
 
 		cdb_broadcast = 0;
 		cdb_pr_tags[0] = 0;
@@ -420,156 +375,18 @@ module mt_test;
 		cdb_ar_tags[3] = 0;
 
 		// The correct output values
-		cr_rob_p0told = 9;
-		cr_rob_p1told = 33;
-		cr_rs_pr_a1 = 11;
+		cr_rob_p0told = 5;
+		cr_rob_p1told = 0;
+		cr_rs_pr_a1 = 32;
 		cr_rs_pr_b1 = 0;
-		cr_rs_pr_a2 = 13;
+		cr_rs_pr_a2 = 33;
 		cr_rs_pr_b2 = 0;
 
 		cr_rs_pr_a1_ready = 1;
 		cr_rs_pr_a2_ready = 1;
-		cr_rs_pr_b1_ready = 0;
-		cr_rs_pr_b2_ready = 0;
-
-
-		@(posedge clock)//#45
-		//Two dispatch on previous register, no complete
-		// r3, r4 is tested
-		//Note that the values here may be of future use
-		rob_dispatch_num = 2;
-		fl_pr0 = 36;
-		fl_pr1 = 37;
-
-		rob_ar_a_valid = 1;
-		rob_ar_b_valid = 1;
-		rob_ar_a1_valid = 1;
-		rob_ar_b1_valid = 1;
-		rob_ar_a2_valid = 1;
-		rob_ar_b2_valid = 1;
-
-		rob_ar_a = 15;
-		rob_ar_b = 16;
-		rob_ar_a1 = 3;
-		rob_ar_b1 = 4;
-		rob_ar_a2 = 5;
-		rob_ar_b2 = 6;
-
-		cdb_broadcast = 0;
-		cdb_pr_tags[0] = 0;
-		cdb_pr_tags[1] = 0;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = 3;
-		cdb_ar_tags[1] = 4;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = 15;
-		cr_rob_p1told = 16;
-		cr_rs_pr_a1 = 3;
-		cr_rs_pr_b1 = 4;
-		cr_rs_pr_a2 = 5;
-		cr_rs_pr_b2 = 6;
-
-		cr_rs_pr_a1_ready = 0;
-		cr_rs_pr_a2_ready = 1;
-		cr_rs_pr_b1_ready = 0;
-		cr_rs_pr_b2_ready = 1;
-		
-		@(posedge clock)
-		//No dispatch on previous registers, two completes
-		// r3, r4 is complete
-		//Note that the values here may be of future use
-		rob_dispatch_num = 0;
-		fl_pr0 = 36;
-		fl_pr1 = 37;
-
-		rob_ar_a_valid = 0;
-		rob_ar_b_valid = 0;
-		rob_ar_a1_valid = 0;
-		rob_ar_b1_valid = 0;
-		rob_ar_a2_valid = 0;
-		rob_ar_b2_valid = 0;
-
-		rob_ar_a = 15;
-		rob_ar_b = 16;
-		rob_ar_a1 = 3;
-		rob_ar_b1 = 4;
-		rob_ar_a2 = 5;
-		rob_ar_b2 = 6;
-
-		cdb_broadcast = 2;
-		cdb_pr_tags[0] = 32;
-		cdb_pr_tags[1] = 33;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = 3;
-		cdb_ar_tags[1] = 4;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = 36;
-		cr_rob_p1told = 37;
-		cr_rs_pr_a1 = 32;
-		cr_rs_pr_b1 = 33;
-		cr_rs_pr_a2 = 5;
-		cr_rs_pr_b2 = 6;
-
-		cr_rs_pr_a1_ready = 0;
-		cr_rs_pr_a2_ready = 1;
-		cr_rs_pr_b1_ready = 0;
-		cr_rs_pr_b2_ready = 1;
-
-		@(posedge clock)
-		begin
-		//Dispatch two on the registers just completed, no complete
-		// r3, r4 has been complete
-		//Note that the values here may be of future use
-		rob_dispatch_num = 2;
-		fl_pr0 = 38;
-		fl_pr1 = 39;
-
-		rob_ar_a_valid = 1;
-		rob_ar_b_valid = 1;
-		rob_ar_a1_valid = 1;
-		rob_ar_b1_valid = 1;
-		rob_ar_a2_valid = 1;
-		rob_ar_b2_valid = 1;
-
-		rob_ar_a = 17;
-		rob_ar_b = 18;
-		rob_ar_a1 = 3;
-		rob_ar_b1 = 4;
-		rob_ar_a2 = 5;
-		rob_ar_b2 = 6;
-
-		cdb_broadcast = 0;
-		cdb_pr_tags[0] = 5;
-		cdb_pr_tags[1] = 6;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = 5;
-		cdb_ar_tags[1] = 6;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = 17;
-		cr_rob_p1told = 18;
-
-		cr_rs_pr_a1 = 32;
-		cr_rs_pr_b1 = 33;
-		cr_rs_pr_a2 = 5;
-		cr_rs_pr_b2 = 6;
-
-		cr_rs_pr_a1_ready = 1;
-		cr_rs_pr_a2_ready = 1;
 		cr_rs_pr_b1_ready = 1;
 		cr_rs_pr_b2_ready = 1;
-		end
+
 		@(negedge clock)
 		$finish;
 	end
