@@ -216,14 +216,14 @@ module mt_test;
 		fl_pr0 = 5;
 		fl_pr1 = 0;
 
-		rob_ar_a_valid = 1;
+		rob_ar_a_valid = 0;
 		rob_ar_b_valid = 0;
 		rob_ar_a1_valid = 0;
 		rob_ar_b1_valid = 0;
 		rob_ar_a2_valid = 0;
 		rob_ar_b2_valid = 0;
 
-		rob_ar_a = 2;
+		rob_ar_a = 0;
 		rob_ar_b = 0;
 		rob_ar_a1 = 0;
 		rob_ar_b1 = 0;
@@ -241,7 +241,7 @@ module mt_test;
 		cdb_ar_tags[3] = 0;
 
 		// The correct output values
-		cr_rob_p0told = 2;
+		cr_rob_p0told = 0;
 		cr_rob_p1told = 0;
 
 		cr_rs_pr_a1_ready = 0;
@@ -257,7 +257,6 @@ module mt_test;
 		cr_rs_pr_b2 = 0;
 
 		@(posedge clock)//#15
-		reset = 0;
 		rob_dispatch_num = 0;
 		fl_pr0 = 5;
 		fl_pr1 = 0;
@@ -298,6 +297,8 @@ module mt_test;
 		cr_rs_pr_a2_ready = 0;
 		cr_rs_pr_b1_ready = 0;
 		cr_rs_pr_b2_ready = 0;
+		@(negedge clock)
+		reset = 0;
 
 		@(posedge clock)//#25
 		//Normal two dispatch and no complete
