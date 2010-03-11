@@ -101,11 +101,6 @@ module mt (// Inputs
 	output				rs_pr_b2_ready;
 
 	reg			[6:0]	pr_tags[31:0];
-
-	// Non-sense
-	wire		[6:0]	pr_tag0 = pr_tags[0];
-	wire		[6:0]	pr_tag1 = pr_tags[1];
-
 	reg		 [31:0]	ready_bits;
 
 	reg		 [31:0]	next_ready_bits;
