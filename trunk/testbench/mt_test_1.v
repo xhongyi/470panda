@@ -257,7 +257,7 @@ module mt_test;
 		cr_rs_pr_b2 = 0;
 
 		@(posedge clock)//#15
-
+		reset = 0;
 		rob_dispatch_num = 0;
 		fl_pr0 = 5;
 		fl_pr1 = 0;
