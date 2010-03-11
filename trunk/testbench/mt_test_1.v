@@ -729,6 +729,55 @@ module mt_test;
 		cr_rs_pr_b1_ready = 1;
 		cr_rs_pr_b2_ready = 1;
 		end	
+
+		@(negedge clock)//#135
+		begin
+		//Dispatch two same registers
+		//One of the operands is the same with the same dest
+		//Note that the values here may be of future use
+		//r19 is now p40
+		rob_dispatch_num = 2;
+		fl_pr0 = 49;
+		fl_pr1 = 50;
+
+		rob_ar_a_valid = 1;
+		rob_ar_b_valid = 1;
+		rob_ar_a1_valid = 1;
+		rob_ar_b1_valid = 1;
+		rob_ar_a2_valid = 1;
+		rob_ar_b2_valid = 1;
+
+		rob_ar_a = 17;
+		rob_ar_b = 18;
+		rob_ar_a1 = 5;
+		rob_ar_b1 = 6;
+		rob_ar_a2 = 23;
+		rob_ar_b2 = 24;
+
+		cdb_broadcast = 4'b0000;
+		cdb_pr_tags[0] = 47;
+		cdb_pr_tags[1] = 48;
+		cdb_pr_tags[2] = 0;
+		cdb_pr_tags[3] = 0;
+		cdb_ar_tags[0] = 5;
+		cdb_ar_tags[1] = 6;
+		cdb_ar_tags[2] = 0;
+		cdb_ar_tags[3] = 0;
+
+		// The correct output values
+		cr_rob_p0told = 38;
+		cr_rob_p1told = 39;
+
+		cr_rs_pr_a1 = 45;
+		cr_rs_pr_b1 = 46;
+		cr_rs_pr_a2 = 23;
+		cr_rs_pr_b2 = 24;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a2_ready = 1;
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b2_ready = 1;
+		end	
 		@(negedge clock)
 		$finish;
 	end
