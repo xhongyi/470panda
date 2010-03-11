@@ -142,9 +142,9 @@ module mt (// Inputs
 	assign rs_pr_a1_ready = ready_bits[rob_ar_a1];
 	assign rs_pr_a2_ready = ready_bits[rob_ar_a2];
 
-	assign rs_pr_b1 = (rob_ar_a_valid && rob_ar_b1 == rob_ar_a)? pr_tags_next0: 
+	assign rs_pr_b1 = (rob_ar_a_valid && rob_ar_b1 == rob_ar_a)? fl_pr0: 
 																															 pr_tags[rob_ar_b1];
-	assign rs_pr_b2 = (rob_ar_a_valid && rob_ar_b2 == rob_ar_a)? pr_tags_next0: 
+	assign rs_pr_b2 = (rob_ar_a_valid && rob_ar_b2 == rob_ar_a)? fl_pr0: 
 																												  		 pr_tags[rob_ar_b2];
 	assign rs_pr_b1_ready = (rob_ar_a_valid && rob_ar_b1 == rob_ar_a)? 1'b0: 
 																															 ready_bits[rob_ar_b1];
