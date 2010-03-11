@@ -118,12 +118,12 @@ module mt_test;
 	end
 
 	// Compare the results with the correct ones
-	always @(negedge clock)
+	always @(posedge clock)
 	begin
 		$monitor("Time: %4.0f\n\nInput\n reset: %d\n rob_dispatch_num: %d\n fl_pr0: %d\n fl_pr1: %d\n rob_ar_a_valid: %d\n rob_ar_a1_valid: %d\n rob_ar_a2_valid: %d\n rob_ar_b_valid: %d\n rob_ar_b1_valid: %d\n rob_ar_b2_valid: %d\n rob_ar_a: %d\n rob_ar_a1: %d\n rob_ar_a2: %d\n rob_ar_b: %d\n rob_ar_b1: %d\n rob_ar_b2: %d\n cdb_broadcast: %d\n cdb_pr_tags[0]: %d\n cdb_pr_tags[1]: %d\n cdb_pr_tags[2]: %d\n cdb_pr_tags[3]: %d\n cdb_ar_tags[0]: %d\n cdb_ar_tags[1]: %d\n cdb_ar_tags[2]: %d\n cdb_ar_tags[3]: %d\n\nOutput\n rs_pr_a1_ready: %d\n rs_pr_a1: %d\n rs_pr_a2_ready: %d\n rs_pr_a2: %d\n rs_pr_b1_ready: %d\n rs_pr_b1: %d\n rs_pr_b2_ready: %d\n rs_pr_b2: %d\n rob_p0told: %d\n rob_p1told: %d\n\n", $time, reset, rob_dispatch_num, fl_pr0, fl_pr1, rob_ar_a_valid, rob_ar_a1_valid, rob_ar_a2_valid, rob_ar_b_valid, rob_ar_b1_valid, rob_ar_b2_valid, rob_ar_a, rob_ar_a1, rob_ar_a2, rob_ar_b, rob_ar_b1, rob_ar_b2, cdb_broadcast, cdb_pr_tags[0], cdb_pr_tags[1], cdb_pr_tags[2], cdb_pr_tags[3], cdb_ar_tags[0], cdb_ar_tags[1], cdb_ar_tags[2], cdb_ar_tags[3], rs_pr_a1_ready, rs_pr_a1, rs_pr_a2_ready, rs_pr_a2, rs_pr_b1_ready, rs_pr_b1, rs_pr_b2_ready, rs_pr_b2, rob_p0told, rob_p1told);
 
 
-		#3		
+		#8
 		if (rob_ar_a_valid && rob_p0told != cr_rob_p0told)
 		begin
 			$display("*** rob_p0told is %b and it should be %b", rob_p0told, cr_rob_p0told);
@@ -237,14 +237,15 @@ module mt_test;
 		cr_rs_pr_b2_ready = 0;
 		cr_rs_pr_b2 = 0;
 
-@(posedge clock)
-@(posedge clock)
+@(negedge clock)
+@(negedge clock)
 reset = 0;
+@(negedge clock)
 
 for (i = 0; i <= 31; i = i+4)
 begin
-	@(posedge clock)
-
+	@(negedge clock)
+	#2
 		rob_dispatch_num = 2;
 		fl_pr0 = 0;
 		fl_pr1 = 0;
@@ -292,8 +293,7 @@ end
 
 for (i = 0; i <= 31; i = i+4)
 begin
-	@(posedge clock)
-
+	@(negedge clock)
 		rob_dispatch_num = 2;
 		fl_pr0 = 0;
 		fl_pr1 = 0;
@@ -341,7 +341,7 @@ end
 
 for (i = 0; i <= 31; i = i+2)
 begin
-	@(posedge clock)
+	@(negedge clock)
 		rob_dispatch_num = 2;
 		fl_pr0 = i+32;
 		fl_pr1 = i+33;
@@ -386,7 +386,8 @@ begin
 		cr_rs_pr_b2_ready = 0;
 		cr_rs_pr_b2 = 0;
 
-	@(posedge clock)
+	@(negedge clock)
+	#2
 		rob_dispatch_num = 1;
 		fl_pr0 = 0;
 		fl_pr1 = 0;
