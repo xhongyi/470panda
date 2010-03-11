@@ -386,49 +386,7 @@ module mt_test;
 		cr_rs_pr_a2_ready = 0;
 		cr_rs_pr_b1_ready = 0;
 		cr_rs_pr_b2_ready = 0;
-		@(posedge clock)//#45
-		//Normal two dispatch and no complete
-		//Note that the values here may be of future use
-		rob_dispatch_num = 1;
-		fl_pr0 = 34;
-		fl_pr1 = 33;
 
-		rob_ar_a_valid = 1;
-		rob_ar_b_valid = 0;
-		rob_ar_a1_valid = 1;
-		rob_ar_b1_valid = 0;
-		rob_ar_a2_valid = 1;
-		rob_ar_b2_valid = 0;
-
-		rob_ar_a = 5;
-		rob_ar_b = 0;
-		rob_ar_a1 = 3;
-		rob_ar_b1 = 0;
-		rob_ar_a2 = 4;
-		rob_ar_b2 = 0;
-
-		cdb_broadcast = 0;
-		cdb_pr_tags[0] = 0;
-		cdb_pr_tags[1] = 0;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = 0;
-		cdb_ar_tags[1] = 0;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = 5;
-		cr_rob_p1told = 0;
-		cr_rs_pr_a1 = 32;
-		cr_rs_pr_b1 = 0;
-		cr_rs_pr_a2 = 33;
-		cr_rs_pr_b2 = 0;
-
-		cr_rs_pr_a1_ready = 0;
-		cr_rs_pr_a2_ready = 0;
-		cr_rs_pr_b1_ready = 0;
-		cr_rs_pr_b2_ready = 0;
 
 		@(negedge clock)
 		$finish;
