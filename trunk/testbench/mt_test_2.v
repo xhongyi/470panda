@@ -116,7 +116,7 @@ module mt_test;
 	end
 
 	// Compare the results with the correct ones
-	always @(posedge clock)
+	always @(negedge clock)
 	begin
 		$monitor("Time: %4.0f\n\nInput\n reset: %b\n rob_dispatch_num: %b\n fl_pr0: %b\n fl_pr1: %b\n rob_ar_a_valid: %b\n rob_ar_a1_valid: %b\n rob_ar_a2_valid: %b\n rob_ar_b_valid: %b\n rob_ar_b1_valid: %b\n rob_ar_b2_valid: %b\n rob_ar_a: %b\n rob_ar_a1: %b\n rob_ar_a2: %b\n rob_ar_b: %b\n rob_ar_b1: %b\n rob_ar_b2: %b\n cdb_broadcast: %b\n cdb_pr_tags[0]: %b\n cdb_pr_tags[1]: %b\n cdb_pr_tags[2]: %b\n cdb_pr_tags[3]: %b\n cdb_ar_tags[0]: %b\n cdb_ar_tags[1]: %b\n cdb_ar_tags[2]: %b\n cdb_ar_tags[3]: %b\n\nOutput\n rs_pr_a1_ready: %b\n rs_pr_a1: %b\n rs_pr_a2_ready: %b\n rs_pr_a2: %b\n rs_pr_b1_ready: %b\n rs_pr_b1: %b\n rs_pr_b2_ready: %b\n rs_pr_b2: %b\n rob_p0told: %b\n rob_p1told: %b\n\n", $time, reset, rob_dispatch_num, fl_pr0, fl_pr1, rob_ar_a_valid, rob_ar_a1_valid, rob_ar_a2_valid, rob_ar_b_valid, rob_ar_b1_valid, rob_ar_b2_valid, rob_ar_a, rob_ar_a1, rob_ar_a2, rob_ar_b, rob_ar_b1, rob_ar_b2, cdb_broadcast, cdb_pr_tags[0], cdb_pr_tags[1], cdb_pr_tags[2], cdb_pr_tags[3], cdb_ar_tags[0], cdb_ar_tags[1], cdb_ar_tags[2], cdb_ar_tags[3], rs_pr_a1_ready, rs_pr_a1, rs_pr_a2_ready, rs_pr_a2, rs_pr_b1_ready, rs_pr_b1, rs_pr_b2_ready, rs_pr_b2, rob_p0told, rob_p1told);
 
@@ -382,10 +382,53 @@ module mt_test;
 		cr_rs_pr_a2 = 33;
 		cr_rs_pr_b2 = 0;
 
-		cr_rs_pr_a1_ready = 1;
-		cr_rs_pr_a2_ready = 1;
-		cr_rs_pr_b1_ready = 1;
-		cr_rs_pr_b2_ready = 1;
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b2_ready = 0;
+		@(posedge clock)//#45
+		//Normal two dispatch and no complete
+		//Note that the values here may be of future use
+		rob_dispatch_num = 1;
+		fl_pr0 = 34;
+		fl_pr1 = 33;
+
+		rob_ar_a_valid = 1;
+		rob_ar_b_valid = 0;
+		rob_ar_a1_valid = 1;
+		rob_ar_b1_valid = 0;
+		rob_ar_a2_valid = 1;
+		rob_ar_b2_valid = 0;
+
+		rob_ar_a = 5;
+		rob_ar_b = 0;
+		rob_ar_a1 = 3;
+		rob_ar_b1 = 0;
+		rob_ar_a2 = 4;
+		rob_ar_b2 = 0;
+
+		cdb_broadcast = 0;
+		cdb_pr_tags[0] = 0;
+		cdb_pr_tags[1] = 0;
+		cdb_pr_tags[2] = 0;
+		cdb_pr_tags[3] = 0;
+		cdb_ar_tags[0] = 0;
+		cdb_ar_tags[1] = 0;
+		cdb_ar_tags[2] = 0;
+		cdb_ar_tags[3] = 0;
+
+		// The correct output values
+		cr_rob_p0told = 5;
+		cr_rob_p1told = 0;
+		cr_rs_pr_a1 = 32;
+		cr_rs_pr_b1 = 0;
+		cr_rs_pr_a2 = 33;
+		cr_rs_pr_b2 = 0;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b2_ready = 0;
 
 		@(negedge clock)
 		$finish;
