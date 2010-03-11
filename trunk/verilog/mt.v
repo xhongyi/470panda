@@ -152,6 +152,14 @@ module mt (// Inputs
 	assign rs_pr_b2_ready = (rob_ar_a_valid && rob_ar_b2 == rob_ar_a)? 1'b0: 
 																															 ready_bits[rob_ar_b2];
 
+	genvar i;
+	generate
+	for (i = 0; i < 32; i = i+1)
+	begin : foo
+		wire [6:0]	tmp_pr_tag = pr_tags[i];
+	end
+	endgenerate
+
 	always @(posedge clock)
 	begin
 		if (reset) begin
