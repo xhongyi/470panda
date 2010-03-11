@@ -113,7 +113,7 @@ module mt_test;
 	// Generate System Clock
 	always
 	begin
-		#(`VERILOG_CLOCK_PERIOD/2.0);
+		#5
 		clock = ~clock;
 	end
 
@@ -122,34 +122,58 @@ module mt_test;
 	begin
 		$monitor("Time: %4.0f\n\nInput\n reset: %d\n rob_dispatch_num: %d\n fl_pr0: %d\n fl_pr1: %d\n rob_ar_a_valid: %d\n rob_ar_a1_valid: %d\n rob_ar_a2_valid: %d\n rob_ar_b_valid: %d\n rob_ar_b1_valid: %d\n rob_ar_b2_valid: %d\n rob_ar_a: %d\n rob_ar_a1: %d\n rob_ar_a2: %d\n rob_ar_b: %d\n rob_ar_b1: %d\n rob_ar_b2: %d\n cdb_broadcast: %d\n cdb_pr_tags[0]: %d\n cdb_pr_tags[1]: %d\n cdb_pr_tags[2]: %d\n cdb_pr_tags[3]: %d\n cdb_ar_tags[0]: %d\n cdb_ar_tags[1]: %d\n cdb_ar_tags[2]: %d\n cdb_ar_tags[3]: %d\n\nOutput\n rs_pr_a1_ready: %d\n rs_pr_a1: %d\n rs_pr_a2_ready: %d\n rs_pr_a2: %d\n rs_pr_b1_ready: %d\n rs_pr_b1: %d\n rs_pr_b2_ready: %d\n rs_pr_b2: %d\n rob_p0told: %d\n rob_p1told: %d\n\n", $time, reset, rob_dispatch_num, fl_pr0, fl_pr1, rob_ar_a_valid, rob_ar_a1_valid, rob_ar_a2_valid, rob_ar_b_valid, rob_ar_b1_valid, rob_ar_b2_valid, rob_ar_a, rob_ar_a1, rob_ar_a2, rob_ar_b, rob_ar_b1, rob_ar_b2, cdb_broadcast, cdb_pr_tags[0], cdb_pr_tags[1], cdb_pr_tags[2], cdb_pr_tags[3], cdb_ar_tags[0], cdb_ar_tags[1], cdb_ar_tags[2], cdb_ar_tags[3], rs_pr_a1_ready, rs_pr_a1, rs_pr_a2_ready, rs_pr_a2, rs_pr_b1_ready, rs_pr_b1, rs_pr_b2_ready, rs_pr_b2, rob_p0told, rob_p1told);
 
-		#(`VERILOG_CLOCK_PERIOD/4.0);
 
-		
-
-		correct = 0;
+		#3		
 		if (rob_ar_a_valid && rob_p0told != cr_rob_p0told)
-			$display("*** rob_p0told is %d and it should be %d", rob_p0told, cr_rob_p0told);
+		begin
+			$display("*** rob_p0told is %b and it should be %b", rob_p0told, cr_rob_p0told);
+			correct = 0;
+		end
 		else if (rob_ar_b_valid && rob_p1told != cr_rob_p1told)
-			$display("*** rob_p1told is %d and it should be %d", rob_p1told, cr_rob_p1told);
+		begin
+			$display("*** rob_p1told is %b and it should be %b", rob_p1told, cr_rob_p1told);
+			correct = 0;
+		end
 		else if (rob_ar_a1_valid && rs_pr_a1 != cr_rs_pr_a1)
-			$display("*** rs_pr_a1 is %d and it should be %d", rs_pr_a1, cr_rs_pr_a1);
+		begin
+			$display("*** rs_pr_a1 is %b and it should be %b", rs_pr_a1, cr_rs_pr_a1);
+			correct = 0;
+		end
 		else if (rob_ar_a2_valid && rs_pr_a2 != cr_rs_pr_a2)
-			$display("*** rs_pr_a2 is %d and it should be %d", rs_pr_a2, cr_rs_pr_a2);
+		begin
+			$display("*** rs_pr_a2 is %b and it should be %b", rs_pr_a2, cr_rs_pr_a2);
+			correct = 0;
+		end
 		else if (rob_ar_b1_valid && rs_pr_b1 != cr_rs_pr_b1)
-			$display("*** rs_pr_b1 is %d and it should be %d", rs_pr_b1, cr_rs_pr_b1);
+		begin
+			$display("*** rs_pr_b1 is %b and it should be %b", rs_pr_b1, cr_rs_pr_b1);
+			correct = 0;
+		end
 		else if (rob_ar_b2_valid && rs_pr_b2 != cr_rs_pr_b2)
-			$display("*** rs_pr_b2 is %d and it should be %d", rs_pr_b2, cr_rs_pr_b2);
+		begin
+			$display("*** rs_pr_b2 is %b and it should be %b", rs_pr_b2, cr_rs_pr_b2);
+			correct = 0;
+		end
 		else if (rob_ar_a1_valid && rs_pr_a1_ready != cr_rs_pr_a1_ready)
-			$display("*** rs_pr_a1_ready is %d and it should be %d", rs_pr_a1_ready, cr_rs_pr_a1_ready);
+		begin
+			$display("*** rs_pr_a1_ready is %b and it should be %b", rs_pr_a1_ready, cr_rs_pr_a1_ready);
+			correct = 0;
+		end
 		else if (rob_ar_a2_valid && rs_pr_a2_ready != cr_rs_pr_a2_ready)
-			$display("*** rs_pr_a2_ready is %d and it should be %d", rs_pr_a2_ready, cr_rs_pr_a2_ready);
+		begin
+			$display("*** rs_pr_a2_ready is %b and it should be %b", rs_pr_a2_ready, cr_rs_pr_a2_ready);
+			correct = 0;
+		end
 		else if (rob_ar_b1_valid && rs_pr_b1_ready != cr_rs_pr_b1_ready)
-			$display("*** rs_pr_b1_ready is %d and it should be %d", rs_pr_b1_ready, cr_rs_pr_b1_ready);
+		begin
+			$display("*** rs_pr_b1_ready is %b and it should be %b", rs_pr_b1_ready, cr_rs_pr_b1_ready);
+			correct = 0;
+		end
 		else if (rob_ar_b2_valid && rs_pr_b2_ready != cr_rs_pr_b2_ready)
-			$display("*** rs_pr_b2_ready is %d and it should be %d", rs_pr_b2_ready, cr_rs_pr_b2_ready);
-		else
-
-			correct = 1;
+		begin
+			$display("*** rs_pr_b2_ready is %b and it should be %b", rs_pr_b2_ready, cr_rs_pr_b2_ready);
+			correct = 0;
+		end
 
 		if (~correct)
 		begin
@@ -161,6 +185,7 @@ module mt_test;
 
 	initial
 	begin
+		correct = 1;
 		clock = 0;
 
 		// Initializing
