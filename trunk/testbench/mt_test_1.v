@@ -380,9 +380,9 @@ module mt_test;
 		cr_rob_p0told = 34;
 		cr_rob_p1told = 33;
 		cr_rs_pr_a1 = 11;
-		cr_rs_pr_b1 = 12;
+		cr_rs_pr_b1 = 0;
 		cr_rs_pr_a2 = 13;
-		cr_rs_pr_b2 = 14;
+		cr_rs_pr_b2 = 0;
 
 		cr_rs_pr_a1_ready = 1;
 		cr_rs_pr_a2_ready = 1;
