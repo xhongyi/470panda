@@ -135,8 +135,7 @@ module mt (// Inputs
 	end
 
 	assign rob_p0told = pr_tags[rob_ar_a];
-	assign rob_p1told = (rob_ar_a_valid && rob_ar_b == rob_ar_a) ? pr_tags_next0:
-																																 pr_tags[rob_ar_b];
+	assign rob_p1told = (rob_ar_a_valid && rob_ar_b == rob_ar_a) ? pr_tags_next0: pr_tags[rob_ar_b];
 
 	assign rs_pr_a1 = pr_tags[rob_ar_a1];
 	assign rs_pr_a2 = pr_tags[rob_ar_a2];
