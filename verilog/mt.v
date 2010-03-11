@@ -110,7 +110,7 @@ module mt (// Inputs
 								(rob_dispatch_num == 2'd2 && rob_ar_b_valid && (rob_ar_a == rob_ar_b)) ? fl_pr1 : fl_pr0;
 	wire 		[6:0]	pr_tags_next1 = 
 								(rob_dispatch_num == 2'd2 && rob_ar_b_valid) ? fl_pr1 : 
-																															 pr_tags[rob_ar_a];
+																															 pr_tags[rob_ar_b];
 	wire 		[4:0]	pr_tags_idx_next0 = rob_ar_a;
 	wire 		[4:0]	pr_tags_idx_next1 = rob_ar_b;
 
