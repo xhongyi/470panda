@@ -126,52 +126,52 @@ module mt_test;
 		#8
 		if (rob_ar_a_valid && rob_p0told != cr_rob_p0told)
 		begin
-			$display("*** rob_p0told is %b and it should be %b", rob_p0told, cr_rob_p0told);
+			$display("*** rob_p0told is %d and it should be %d", rob_p0told, cr_rob_p0told);
 			correct = 0;
 		end
 		else if (rob_ar_b_valid && rob_p1told != cr_rob_p1told)
 		begin
-			$display("*** rob_p1told is %b and it should be %b", rob_p1told, cr_rob_p1told);
+			$display("*** rob_p1told is %d and it should be %d", rob_p1told, cr_rob_p1told);
 			correct = 0;
 		end
 		else if (rob_ar_a1_valid && rs_pr_a1 != cr_rs_pr_a1)
 		begin
-			$display("*** rs_pr_a1 is %b and it should be %b", rs_pr_a1, cr_rs_pr_a1);
+			$display("*** rs_pr_a1 is %d and it should be %d", rs_pr_a1, cr_rs_pr_a1);
 			correct = 0;
 		end
 		else if (rob_ar_a2_valid && rs_pr_a2 != cr_rs_pr_a2)
 		begin
-			$display("*** rs_pr_a2 is %b and it should be %b", rs_pr_a2, cr_rs_pr_a2);
+			$display("*** rs_pr_a2 is %d and it should be %d", rs_pr_a2, cr_rs_pr_a2);
 			correct = 0;
 		end
 		else if (rob_ar_b1_valid && rs_pr_b1 != cr_rs_pr_b1)
 		begin
-			$display("*** rs_pr_b1 is %b and it should be %b", rs_pr_b1, cr_rs_pr_b1);
+			$display("*** rs_pr_b1 is %d and it should be %d", rs_pr_b1, cr_rs_pr_b1);
 			correct = 0;
 		end
 		else if (rob_ar_b2_valid && rs_pr_b2 != cr_rs_pr_b2)
 		begin
-			$display("*** rs_pr_b2 is %b and it should be %b", rs_pr_b2, cr_rs_pr_b2);
+			$display("*** rs_pr_b2 is %d and it should be %d", rs_pr_b2, cr_rs_pr_b2);
 			correct = 0;
 		end
 		else if (rob_ar_a1_valid && rs_pr_a1_ready != cr_rs_pr_a1_ready)
 		begin
-			$display("*** rs_pr_a1_ready is %b and it should be %b", rs_pr_a1_ready, cr_rs_pr_a1_ready);
+			$display("*** rs_pr_a1_ready is %d and it should be %d", rs_pr_a1_ready, cr_rs_pr_a1_ready);
 			correct = 0;
 		end
 		else if (rob_ar_a2_valid && rs_pr_a2_ready != cr_rs_pr_a2_ready)
 		begin
-			$display("*** rs_pr_a2_ready is %b and it should be %b", rs_pr_a2_ready, cr_rs_pr_a2_ready);
+			$display("*** rs_pr_a2_ready is %d and it should be %d", rs_pr_a2_ready, cr_rs_pr_a2_ready);
 			correct = 0;
 		end
 		else if (rob_ar_b1_valid && rs_pr_b1_ready != cr_rs_pr_b1_ready)
 		begin
-			$display("*** rs_pr_b1_ready is %b and it should be %b", rs_pr_b1_ready, cr_rs_pr_b1_ready);
+			$display("*** rs_pr_b1_ready is %d and it should be %d", rs_pr_b1_ready, cr_rs_pr_b1_ready);
 			correct = 0;
 		end
 		else if (rob_ar_b2_valid && rs_pr_b2_ready != cr_rs_pr_b2_ready)
 		begin
-			$display("*** rs_pr_b2_ready is %b and it should be %b", rs_pr_b2_ready, cr_rs_pr_b2_ready);
+			$display("*** rs_pr_b2_ready is %d and it should be %d", rs_pr_b2_ready, cr_rs_pr_b2_ready);
 			correct = 0;
 		end
 
@@ -245,7 +245,6 @@ reset = 0;
 for (i = 0; i <= 31; i = i+4)
 begin
 	@(negedge clock)
-	#2
 		rob_dispatch_num = 2;
 		fl_pr0 = 0;
 		fl_pr1 = 0;
@@ -338,7 +337,7 @@ begin
 		cr_rs_pr_b2_ready = 1;
 		cr_rs_pr_b2 = i+3;
 end
-
+//////////////////////////////////////////////////////////////////////////////////////////////
 for (i = 0; i <= 31; i = i+2)
 begin
 	@(negedge clock)
@@ -387,7 +386,6 @@ begin
 		cr_rs_pr_b2 = 0;
 
 	@(negedge clock)
-	#2
 		rob_dispatch_num = 1;
 		fl_pr0 = 0;
 		fl_pr1 = 0;
@@ -432,6 +430,250 @@ begin
 		cr_rs_pr_b2_ready = 0;
 		cr_rs_pr_b2 = 0;
 end
+////////////////////////////////////////////////////////////////////////////////////////////
+for (i = 0; i <= 31; i = i+4)
+begin
+	@(negedge clock)
+		rob_dispatch_num = 0;
+		fl_pr0 = 0;
+		fl_pr1 = 0;
+
+		rob_ar_a_valid = 0;
+		rob_ar_b_valid = 0;
+		rob_ar_a1_valid = 0;
+		rob_ar_a2_valid = 0;
+		rob_ar_b1_valid = 0;
+		rob_ar_b2_valid = 0;
+
+		rob_ar_a = 0;
+		rob_ar_b = 0;
+		rob_ar_a1 = 0;
+		rob_ar_a2 = 0;
+		rob_ar_b1 = 0;
+		rob_ar_b2 = 0;
+
+		cdb_broadcast = 15;
+		cdb_pr_tags[0] = i+32;
+		cdb_pr_tags[1] = i+33;
+		cdb_pr_tags[2] = i+34;
+		cdb_pr_tags[3] = i+35;
+		cdb_ar_tags[0] = i;
+		cdb_ar_tags[1] = i+1;
+		cdb_ar_tags[2] = i+2;
+		cdb_ar_tags[3] = i+3;
+
+		// The correct output values
+		cr_rob_p0told = 0;
+		cr_rob_p1told = 0;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a1 = 0;
+
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_a2 = 0;
+
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b1 = 0;
+
+		cr_rs_pr_b2_ready = 0;
+		cr_rs_pr_b2 = 0;
+end
+
+for (i = 0; i <= 31; i = i+2)
+begin
+	@(negedge clock)
+		rob_dispatch_num = 1;
+		fl_pr0 = 0;
+		fl_pr1 = 0;
+
+		rob_ar_a_valid = 0;
+		rob_ar_b_valid = 0;
+		rob_ar_a1_valid = 1;
+		rob_ar_a2_valid = 1;
+		rob_ar_b1_valid = 0;
+		rob_ar_b2_valid = 0;
+
+		rob_ar_a = 0;
+		rob_ar_b = 0;
+		rob_ar_a1 = i;
+		rob_ar_a2 = i+1;
+		rob_ar_b1 = 0;
+		rob_ar_b2 = 0;
+
+		cdb_broadcast = 0;
+		cdb_pr_tags[0] = 0;
+		cdb_pr_tags[1] = 0;
+		cdb_pr_tags[2] = 0;
+		cdb_pr_tags[3] = 0;
+		cdb_ar_tags[0] = 0;
+		cdb_ar_tags[1] = 0;
+		cdb_ar_tags[2] = 0;
+		cdb_ar_tags[3] = 0;
+
+		// The correct output values
+		cr_rob_p0told = 0;
+		cr_rob_p1told = 0;
+
+		cr_rs_pr_a1_ready = 1;
+		cr_rs_pr_a1 = i+32;
+
+		cr_rs_pr_a2_ready = 1;
+		cr_rs_pr_a2 = i+33;
+
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b1 = 0;
+
+		cr_rs_pr_b2_ready = 0;
+		cr_rs_pr_b2 = 0;
+end
+//////////////////////////////////////////////////////////////////////////////////////////
+for (i = 0; i <= 31; i = i+2)
+begin
+	@(negedge clock)
+		rob_dispatch_num = 2;
+		fl_pr0 = i;
+		fl_pr1 = i+1;
+
+		rob_ar_a_valid = 1;
+		rob_ar_b_valid = 1;
+		rob_ar_a1_valid = 0;
+		rob_ar_a2_valid = 0;
+		rob_ar_b1_valid = 0;
+		rob_ar_b2_valid = 0;
+
+		rob_ar_a = i;
+		rob_ar_b = i+1;
+		rob_ar_a1 = 0;
+		rob_ar_a2 = 0;
+		rob_ar_b1 = 0;
+		rob_ar_b2 = 0;
+
+		cdb_broadcast = 0;
+		cdb_pr_tags[0] = 0;
+		cdb_pr_tags[1] = 0;
+		cdb_pr_tags[2] = 0;
+		cdb_pr_tags[3] = 0;
+		cdb_ar_tags[0] = 0;
+		cdb_ar_tags[1] = 0;
+		cdb_ar_tags[2] = 0;
+		cdb_ar_tags[3] = 0;
+
+		// The correct output values
+		cr_rob_p0told = i+32;
+		cr_rob_p1told = i+33;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a1 = 0;
+
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_a2 = 0;
+
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b1 = 0;
+
+		cr_rs_pr_b2_ready = 0;
+		cr_rs_pr_b2 = 0;
+end
+
+for (i = 0; i <= 31; i = i+4)
+begin
+	@(negedge clock)
+		rob_dispatch_num = 0;
+		fl_pr0 = 0;
+		fl_pr1 = 0;
+
+		rob_ar_a_valid = 0;
+		rob_ar_b_valid = 0;
+		rob_ar_a1_valid = 0;
+		rob_ar_a2_valid = 0;
+		rob_ar_b1_valid = 0;
+		rob_ar_b2_valid = 0;
+
+		rob_ar_a = 0;
+		rob_ar_b = 0;
+		rob_ar_a1 = 0;
+		rob_ar_a2 = 0;
+		rob_ar_b1 = 0;
+		rob_ar_b2 = 0;
+
+		cdb_broadcast = 15;
+		cdb_pr_tags[0] = i+32;
+		cdb_pr_tags[1] = i+33;
+		cdb_pr_tags[2] = i+34;
+		cdb_pr_tags[3] = i+35;
+		cdb_ar_tags[0] = i;
+		cdb_ar_tags[1] = i+1;
+		cdb_ar_tags[2] = i+2;
+		cdb_ar_tags[3] = i+3;
+
+		// The correct output values
+		cr_rob_p0told = 0;
+		cr_rob_p1told = 0;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a1 = 0;
+
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_a2 = 0;
+
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b1 = 0;
+
+		cr_rs_pr_b2_ready = 0;
+		cr_rs_pr_b2 = 0;
+end
+
+for (i = 0; i <= 31; i = i+4)
+begin
+	@(negedge clock)
+		rob_dispatch_num = 2;
+		fl_pr0 = 0;
+		fl_pr1 = 0;
+
+		rob_ar_a_valid = 0;
+		rob_ar_b_valid = 0;
+		rob_ar_a1_valid = 1;
+		rob_ar_a2_valid = 1;
+		rob_ar_b1_valid = 1;
+		rob_ar_b2_valid = 1;
+
+		rob_ar_a = 0;
+		rob_ar_b = 0;
+		rob_ar_a1 = i;
+		rob_ar_a2 = i+1;
+		rob_ar_b1 = i+2;
+		rob_ar_b2 = i+3;
+
+		cdb_broadcast = 0;
+		cdb_pr_tags[0] = 0;
+		cdb_pr_tags[1] = 0;
+		cdb_pr_tags[2] = 0;
+		cdb_pr_tags[3] = 0;
+		cdb_ar_tags[0] = 0;
+		cdb_ar_tags[1] = 0;
+		cdb_ar_tags[2] = 0;
+		cdb_ar_tags[3] = 0;
+
+		// The correct output values
+		cr_rob_p0told = 0;
+		cr_rob_p1told = 0;
+
+		cr_rs_pr_a1_ready = 0;
+		cr_rs_pr_a1 = i;
+
+		cr_rs_pr_a2_ready = 0;
+		cr_rs_pr_a2 = i+1;
+
+		cr_rs_pr_b1_ready = 0;
+		cr_rs_pr_b1 = i+2;
+
+		cr_rs_pr_b2_ready = 0;
+		cr_rs_pr_b2 = i+3;
+end
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 		@(negedge clock)
 		$finish;
 	end
