@@ -27,19 +27,21 @@ all:    simv
 # Modify starting here
 #####
 
+MODULE		= 	id
+
 TESTBENCH = 	sys_defs.vh	    \
-							testbench/mt_test_2.v
+#testbench/$(MODULE)_test.v
 
-SIMFILES =	verilog/mt.v	\
+SIMFILES =	verilog/$(MODULE).v	\
 
-SYNFILES = synth/mt.vg
+SYNFILES = synth/$(MODULE).vg
 
 # For visual debugger
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 		testbench/visual_c_hooks.c
 
-synth/mt.vg:        $(SIMFILES) synth/mt.tcl #synth/cachemem128x64.vg
-	cd synth && dc_shell-t -f ./mt.tcl | tee mt_synth.out 
+synth/$(MODULE).vg:        $(SIMFILES) synth/$(MODULE).tcl #synth/cachemem128x64.vg
+	cd synth && dc_shell-t -f ./$(MODULE).tcl | tee $(MODULE)_synth.out 
 
 synth/cachemem128x64.vg:  verilog/cachemem.v
 	cd synth && dc_shell-t -f ./icache.tcl | tee cachemem128x64_synth.out
@@ -72,7 +74,7 @@ clean:
 	rm -rf vis_simv vis_simv.daidir
 	rm -rf syn_simv syn_simv.daidir syn_program.out
 	rm -rf int_simv int_simv.daidir syn_int_simv syn_int_simv.daidir
-	rm -rf synsimv synsimv.daidir csrc vcdplus.vpd vcs.key synprog.out mt.out writeback.out vc_hdrs.h
+	rm -rf synsimv synsimv.daidir csrc vcdplus.vpd vcs.key synprog.out $(MODULE).out writeback.out vc_hdrs.h
 
 nuke:	clean
 	rm -f synth/*.vg synth/*.rep synth/*.db synth/*.chk synth/command.log
