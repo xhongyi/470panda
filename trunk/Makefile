@@ -27,7 +27,7 @@ all:    simv
 # Modify starting here
 #####
 
-MODULE		= 	id
+MODULE		= 	mt
 
 TESTBENCH = 	sys_defs.vh	    \
 #testbench/$(MODULE)_test.v
