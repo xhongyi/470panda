@@ -328,6 +328,11 @@ module id (
 				if_NPC0,
 				if_NPC1,
 
+				if_branch_taken0,
+				if_branch_taken1,
+				if_pred_addr0,
+				if_pred_addr1,
+
 				rob_cap, // rob capacity
 				rs_cap, // rs capacity
 
@@ -337,6 +342,11 @@ module id (
 				rs_NPC1,
 				rs_IR0,
 				rs_IR1,
+
+				rs_branch_taken0,
+				rs_branch_taken1,
+				rs_pred_addr0,
+				rs_pred_addr1,
 
 				rs_mt_ra_idx0,
 				rs_mt_ra_idx1,
@@ -389,6 +399,11 @@ input					if_valid_inst1;
 input	 [63:0] if_NPC0;
 input	 [63:0]	if_NPC1;
 
+input					if_branch_taken0;
+input 				if_branch_taken1;
+input	 [63:0]	if_pred_addr0;
+input	 [63:0]	if_pred_addr1;
+
 input		[1:0]	rob_cap; // rob capacity
 input		[1:0]	rs_cap; // rs capacity
 
@@ -396,6 +411,11 @@ output [63:0]	rs_NPC0;
 output [63:0]	rs_NPC1;
 output [31:0]	rs_IR0;
 output [31:0]	rs_IR1;
+
+output					rs_branch_taken0;
+output 					rs_branch_taken1;
+output	 [63:0]	rs_pred_addr0;
+output	 [63:0]	rs_pred_addr1;
 
 output	[4:0]	rs_mt_ra_idx0;
 output	[4:0]	rs_mt_ra_idx1;
@@ -445,6 +465,8 @@ reg	 [31:0]	ir0;
 reg		[4:0]	ra_idx0;
 reg		[4:0]	rb_idx0;
 reg		[4:0]	rc_idx0;
+reg					branch_taken0;
+reg	 [63:0]	pred_addr0;
 reg		[1:0]	opa_select0;
 reg		[1:0]	opb_select0;
 reg		[4:0]	dest_idx0;
@@ -464,6 +486,8 @@ reg	 [31:0]	ir1;
 reg		[4:0]	ra_idx1;
 reg		[4:0]	rb_idx1;
 reg		[4:0]	rc_idx1;
+reg					branch_taken1;
+reg	 [63:0]	pred_addr1;
 reg		[1:0]	opa_select1;
 reg		[1:0]	opb_select1;
 reg		[4:0]	dest_idx1;
@@ -672,6 +696,8 @@ begin
 		ra_idx0					<= `SD `ZERO_REG;
 		rb_idx0					<= `SD `ZERO_REG;
 		rc_idx0					<= `SD `ZERO_REG;
+		branch_taken0		<= `SD 0;
+		pred_addr0			<= `SD 0;
 		opa_select0			<= `SD 0;
 		opb_select0			<= `SD 0;
 		dest_idx0				<= `SD `ZERO_REG;
@@ -689,6 +715,8 @@ begin
 		ra_idx1					<= `SD `ZERO_REG;
 		rb_idx1					<= `SD `ZERO_REG;
 		rc_idx1					<= `SD `ZERO_REG;
+		branch_taken1		<= `SD 0;
+		pred_addr1			<= `SD 0;
 		opa_select1			<= `SD 0;
 		opb_select1			<= `SD 0;
 		dest_idx1				<= `SD `ZERO_REG;
@@ -708,6 +736,8 @@ begin
 		ra_idx0					<= `SD next_ra_idx0;
 		rb_idx0 				<= `SD next_rb_idx0;
 		rc_idx0 				<= `SD next_rc_idx0;
+		branch_taken0		<= `SD if_branch_taken0;
+		pred_addr0			<= `SD if_pred_addr0;
 		opa_select0 		<= `SD next_opa_select0;
 		opb_select0 		<= `SD next_opb_select0;
 		dest_idx0 			<= `SD next_dest_idx0;
@@ -727,6 +757,8 @@ begin
 		ra_idx1					<= `SD next_ra_idx1;
 		rb_idx1 				<= `SD next_rb_idx1;
 		rc_idx1 				<= `SD next_rc_idx1;
+		branch_taken1		<= `SD if_branch_taken1;
+		pred_addr1			<= `SD if_pred_addr1;
 		opa_select1 		<= `SD next_opa_select1;
 		opb_select1 		<= `SD next_opb_select1;
 		dest_idx1 			<= `SD next_dest_idx1;
@@ -748,6 +780,8 @@ begin
 		ra_idx0 				<= `SD ra_idx1;
 		rb_idx0 				<= `SD rb_idx1;
 		rc_idx0 				<= `SD rc_idx1;
+		branch_taken0		<= `SD branch_taken1;
+		pred_addr0			<= `SD pred_addr1;
 		opa_select0 		<= `SD opa_select1;
 		opb_select0	 		<= `SD opb_select1;
 		dest_idx0 			<= `SD dest_idx1;
@@ -767,6 +801,8 @@ begin
 		ra_idx1					<= `SD next_ra_idx0;
 		rb_idx1 				<= `SD next_rb_idx0;
 		rc_idx1 				<= `SD next_rc_idx0;
+		branch_taken1		<= `SD if_branch_taken0;
+		pred_addr1			<= `SD if_pred_addr0;
 		opa_select1 		<= `SD next_opa_select0;
 		opb_select1 		<= `SD next_opb_select0;
 		dest_idx1 			<= `SD next_dest_idx0;
