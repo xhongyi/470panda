@@ -283,4 +283,14 @@
 `define RET_INST	2'h2
 `define JSR_CO_INST	2'h3
 
-`define CDB_WIDTH	4
+
+/*****************************************
+ * 
+ * New defined
+ *
+ *****************************************/
+`define CDB_WIDTH		4
+
+`define	ALU_SIM			2'b00;
+`define ALU_MUL			2'b01;
+`define	ALU_MEM			2'b10;
