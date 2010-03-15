@@ -810,6 +810,11 @@ begin
 					end
 			end
 	end
+	else
+	begin
+		alu_mem_valid_inst0		= 0;
+		alu_mem_valid_inst1		= 0;
+	end
 
 
 
@@ -893,7 +898,7 @@ begin
 			alu_mul_rd_mem0				= rd_mem[ready_mul_idx[0]];
 			alu_mul_wr_mem0				= wr_mem[ready_mul_idx[0]];
 			alu_mul_cond_branch0	= cond_branch[ready_mul_idx[0]];
-			alu_mul_uncond_branch0		= uncond_branch[ready_mul_idx[0]];
+			alu_mul_uncond_branch0= uncond_branch[ready_mul_idx[0]];
 			alu_mul_halt0					= halt[ready_mul_idx[0]];
 			alu_mul_illegal_inst0	= illegal_inst[ready_mul_idx[0]];
 			alu_mul_valid_inst0		= valid_inst[ready_mul_idx[0]];
@@ -914,6 +919,12 @@ begin
 				next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 			end
 		end
+		else
+		begin
+			alu_mem_valid_inst0		= 0;
+			alu_mem_valid_inst1		= 0;
+		end
+
 	end
 	else if (alu_mul_avail[0])
 	begin
@@ -954,6 +965,12 @@ begin
 					next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 				end
 		end
+	else
+	begin
+		alu_mem_valid_inst0		= 0;
+		alu_mem_valid_inst1		= 0;
+	end
+
 	end
 	else if (alu_mul_avail[1])
 	begin
@@ -994,6 +1011,17 @@ begin
 						next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 					end
 			end
+			else
+			begin
+				alu_mem_valid_inst0		= 0;
+				alu_mem_valid_inst1		= 0;
+			end
+
+	end
+	else
+	begin
+		alu_mem_valid_inst0		= 0;
+		alu_mem_valid_inst1		= 0;
 	end
 
 
@@ -1100,6 +1128,11 @@ begin
 				next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 			end
 		end
+			else
+			begin
+				alu_mem_valid_inst0		= 0;
+				alu_mem_valid_inst1		= 0;
+			end
 	end
 	else if (alu_mem_avail[0])
 	begin
@@ -1140,6 +1173,11 @@ begin
 					next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 				end
 		end
+			else
+			begin
+				alu_mem_valid_inst0		= 0;
+				alu_mem_valid_inst1		= 0;
+			end
 	end
 	else if (alu_mem_avail[1])
 	begin
@@ -1180,6 +1218,16 @@ begin
 						next_avail_entry_idx[i-1] = next_avail_entry_idx[i];
 					end
 			end
+			else
+			begin
+				alu_mem_valid_inst0		= 0;
+				alu_mem_valid_inst1		= 0;
+			end
+	end
+	else
+	begin
+		alu_mem_valid_inst0		= 0;
+		alu_mem_valid_inst1		= 0;
 	end
 
 end
