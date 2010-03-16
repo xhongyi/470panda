@@ -27,14 +27,13 @@ all:    simv
 # Modify starting here
 #####
 
-<<<<<<< .mine
-MODULE		= 	rs
-=======
+
+
 MODULE		= 	mt
->>>>>>> .r70
+
 
 TESTBENCH = 	sys_defs.vh	    \
-#testbench/$(MODULE)_test.v
+testbench/$(MODULE)_test.v
 
 SIMFILES =	verilog/$(MODULE).v	\
 

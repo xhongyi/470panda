@@ -1,6 +1,7 @@
 /*
  * Module name: mt.v
  * Description: module design of map table
+ * 03-15-10 wangyef: Modified I/O port, expanded CDB width
  */
 
 `timescale 1ns/100ps
@@ -8,33 +9,38 @@
 module mt (// Inputs
 					 clock,
 					 reset,
-					 rob_dispatch_num,
+					 id_dispatch_num,
 					 fl_pr0,
 					 fl_pr1,
+					
+					id_valid_inst0,
+					id_valid_inst1,
+					id_opa_select0,
+					id_opa_select1,
+					id_opb_select0,
+					id_opb_select1,
 
-					 rob_ar_a_valid,
-					 rob_ar_b_valid,
-					 rob_ar_a1_valid,
-					 rob_ar_b1_valid,
-					 rob_ar_a2_valid,
-					 rob_ar_b2_valid,
-
-					 rob_ar_a,
-					 rob_ar_b,
-					 rob_ar_a1,
-					 rob_ar_b1,
-					 rob_ar_a2,
-					 rob_ar_b2,
+					id_ra_idx0,
+					id_ra_idx1,
+					id_rb_idx0,
+					id_rb_idx1,
+					id_dest_idx0,
+					id_dest_idx1,
+					
 
 					 cdb_broadcast,
 					 cdb_pr_tag0,
 					 cdb_pr_tag1,
 					 cdb_pr_tag2,
 					 cdb_pr_tag3,
+					 cdb_pr_tag4,
+					 cdb_pr_tag5,
 					 cdb_ar_tag0,
 					 cdb_ar_tag1,
 					 cdb_ar_tag2,
 					 cdb_ar_tag3,
+					 cdb_ar_tag4,
+					 cdb_ar_tag5,
 
 					 //Outputs
 					 rob_p0told,
@@ -51,41 +57,45 @@ module mt (// Inputs
 					 );
 	
 	`ifndef CDB_WIDTH
-	`define CDB_WIDTH 4
+	`define CDB_WIDTH 6
 	`endif
 
 	input 				clock;
 	input					reset;
-	input 	[1:0]	rob_dispatch_num;
+	input 	[1:0]	id_dispatch_num;
 	input 	[6:0]	fl_pr0;
 	input 	[6:0]	fl_pr1;
 
 	// If a2 or b2 is not valid, the default value for pr is 0
-	input					rob_ar_a_valid;
-	input					rob_ar_b_valid;
-	input					rob_ar_a1_valid;
-	input					rob_ar_b1_valid;
-	input					rob_ar_a2_valid;
-	input					rob_ar_b2_valid;
+	input id_valid_inst0;
+	input id_valid_inst1;
+	input id_opa_select0;
+	input id_opa_select1;
+	input id_opb_select0;
+	input id_opb_select1;
+	
+	input	[4:0]	id_ra_idx0;
+	input	[4:0]	id_ra_idx1;
+	input	[4:0]	id_rb_idx0;
+	input	[4:0]	id_rb_idx1;
+	input 	[4:0]	id_dest_idx0;
+	input	[4:0]	id_dest_idx1;
 
+	
 
-	input		[4:0]	rob_ar_a;
-	input		[4:0]	rob_ar_b;
-	input		[4:0]	rob_ar_a1;
-	input		[4:0]	rob_ar_b1;
-	input		[4:0]	rob_ar_a2;
-	input		[4:0]	rob_ar_b2;
-
-
-	input		[`CDB_WIDTH-1:0]	cdb_broadcast;
-	input		[6:0]	cdb_pr_tag0;
-	input		[6:0]	cdb_pr_tag1;
-	input		[6:0]	cdb_pr_tag2;
-	input		[6:0]	cdb_pr_tag3;
-	input		[4:0]	cdb_ar_tag0;
-	input		[4:0]	cdb_ar_tag1;
-	input		[4:0]	cdb_ar_tag2;
-	input		[4:0]	cdb_ar_tag3;
+	input	[5:0]	cdb_broadcast;
+	input	[6:0]	cdb_pr_tag0;
+	input	[6:0]	cdb_pr_tag1;
+	input	[6:0]	cdb_pr_tag2;
+	input	[6:0]	cdb_pr_tag3;
+	input	[6:0]   cdb_pr_tag4;
+	input	[6:0]	cdb_pr_tag5;
+	input	[4:0]	cdb_ar_tag0;
+	input	[4:0]	cdb_ar_tag1;
+	input	[4:0]	cdb_ar_tag2;
+	input	[4:0]	cdb_ar_tag3;
+	input	[4:0]	cdb_ar_tag4;
+	input	[4:0]	cdb_ar_tag5;
 
 
 	output	[6:0]	rob_p0told;
@@ -100,25 +110,32 @@ module mt (// Inputs
 	output				rs_pr_b1_ready;
 	output				rs_pr_b2_ready;
 
-	reg			[6:0]	pr_tags[31:0];
-	reg		 [31:0]	ready_bits;
+	reg		[6:0]	pr_tags[31:0];
+	reg		[31:0]	ready_bits;
 
-	reg		 [31:0]	next_ready_bits;
+	reg		[31:0]	next_ready_bits;
+	wire 	rob_ar_a_valid = id_valid_inst0;
+	wire	rob_ar_b_valid = id_valid_inst1;
+	wire	rob_ar_a1_valid = (id_valid_inst0) & (id_opa_select0 == 0);
+	wire	rob_ar_a2_valid = (id_valid_inst1) & (id_opa_select1 == 0);
+	wire	rob_ar_b1_valid = (id_valid_inst0) & (id_opb_select0 == 0);
+	wire	rob_ar_b2_valid = (id_valid_inst1) & (id_opb_select1 == 0);
+	
 
-	wire 		[6:0]	pr_tags_next0 = 
-								(rob_dispatch_num == 2'd0 || ~rob_ar_a_valid) ? pr_tags[rob_ar_a] : 
-								(rob_dispatch_num == 2'd2 && rob_ar_b_valid && (rob_ar_a == rob_ar_b)) ? fl_pr1 : fl_pr0;
-	wire 		[6:0]	pr_tags_next1 = 
-								(rob_dispatch_num == 2'd2 && rob_ar_b_valid) ? fl_pr1 : 
-																															 pr_tags[rob_ar_b];
-	wire 		[4:0]	pr_tags_idx_next0 = rob_ar_a;
-	wire 		[4:0]	pr_tags_idx_next1 = rob_ar_b;
+	wire	[6:0]	pr_tags_next0 = 
+								(id_dispatch_num == 2'd0 || ~rob_ar_a_valid) ? pr_tags[id_dest_idx0] : 
+								(id_dispatch_num == 2'd2 && rob_ar_b_valid && (id_dest_idx0 == id_dest_idx1)) ? fl_pr1 : fl_pr0;
+	wire 	[6:0]	pr_tags_next1 = 
+								(id_dispatch_num == 2'd2 && rob_ar_b_valid) ? fl_pr1 : 
+																															 pr_tags[id_dest_idx1];
+	wire 	[4:0]	pr_tags_idx_next0 = id_dest_idx0;
+	wire 	[4:0]	pr_tags_idx_next1 = id_dest_idx1;
 
 	always @*
 	begin
 		next_ready_bits = ready_bits;
 
-		// Assume CDB_WIDTH is 4
+		// Assume CDB_WIDTH is 6
 		if (cdb_broadcast[0] && pr_tags[cdb_ar_tag0] == cdb_pr_tag0)
 			next_ready_bits[cdb_ar_tag0] = 1'b1;
 		if (cdb_broadcast[1] && pr_tags[cdb_ar_tag1] == cdb_pr_tag1)
@@ -127,29 +144,32 @@ module mt (// Inputs
 			next_ready_bits[cdb_ar_tag2] = 1'b1;
 		if (cdb_broadcast[3] && pr_tags[cdb_ar_tag3] == cdb_pr_tag3)
 			next_ready_bits[cdb_ar_tag3] = 1'b1;
-
-		if (rob_dispatch_num > 0 && rob_ar_a_valid)
-			next_ready_bits[rob_ar_a] = 1'b0;
-		if (rob_dispatch_num > 1 && rob_ar_b_valid)
-			next_ready_bits[rob_ar_b] = 1'b0;
+		if (cdb_broadcast[4] && pr_tags[cdb_ar_tag4] == cdb_pr_tag4)
+			next_ready_bits[cdb_ar_tag4] = 1'b1;
+		if (cdb_broadcast[5] && pr_tags[cdb_ar_tag5] == cdb_pr_tag5)
+			next_ready_bits[cdb_ar_tag5] = 1'b1;
+		if (id_dispatch_num > 0 && rob_ar_a_valid)
+			next_ready_bits[id_dest_idx0] = 1'b0;
+		if (id_dispatch_num > 1 && rob_ar_b_valid)
+			next_ready_bits[id_dest_idx1] = 1'b0;
 	end
 
-	assign rob_p0told = pr_tags[rob_ar_a];
-	assign rob_p1told = (rob_ar_a_valid && rob_ar_b == rob_ar_a) ? fl_pr0: pr_tags[rob_ar_b];
+	assign rob_p0told = pr_tags[id_dest_idx0];
+	assign rob_p1told = (rob_ar_a_valid && id_dest_idx1 == id_dest_idx0) ? fl_pr0: pr_tags[id_dest_idx1];
 
-	assign rs_pr_a1 = pr_tags[rob_ar_a1];
-	assign rs_pr_a2 = pr_tags[rob_ar_a2];
-	assign rs_pr_a1_ready = ready_bits[rob_ar_a1];
-	assign rs_pr_a2_ready = ready_bits[rob_ar_a2];
+	assign rs_pr_a1 = pr_tags[id_ra_idx0];
+	assign rs_pr_a2 = pr_tags[id_ra_idx1];
+	assign rs_pr_a1_ready = ready_bits[id_ra_idx0];
+	assign rs_pr_a2_ready = ready_bits[id_ra_idx1];
 
-	assign rs_pr_b1 = (rob_ar_a_valid && rob_ar_b1 == rob_ar_a)? fl_pr0: 
-																															 pr_tags[rob_ar_b1];
-	assign rs_pr_b2 = (rob_ar_a_valid && rob_ar_b2 == rob_ar_a)? fl_pr0: 
-																												  		 pr_tags[rob_ar_b2];
-	assign rs_pr_b1_ready = (rob_ar_a_valid && rob_ar_b1 == rob_ar_a)? 1'b0: 
-																															 ready_bits[rob_ar_b1];
-	assign rs_pr_b2_ready = (rob_ar_a_valid && rob_ar_b2 == rob_ar_a)? 1'b0: 
-																															 ready_bits[rob_ar_b2];
+	assign rs_pr_b1 = (rob_ar_a_valid && id_rb_idx0 == id_dest_idx0)? fl_pr0: 
+																															 pr_tags[id_rb_idx0];
+	assign rs_pr_b2 = (rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? fl_pr0: 
+																												  		 pr_tags[id_rb_idx1];
+	assign rs_pr_b1_ready = (rob_ar_a_valid && id_rb_idx0 == id_dest_idx0)? 1'b0: 
+																															 ready_bits[id_rb_idx0];
+	assign rs_pr_b2_ready = (rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? 1'b0: 
+																															 ready_bits[id_rb_idx1];
 
 	genvar i;
 	generate
@@ -198,8 +218,8 @@ module mt (// Inputs
 			ready_bits <= `SD 32'hffffffff;
 		end else begin
 			ready_bits <= `SD next_ready_bits;
-			pr_tags[rob_ar_a] <= `SD pr_tags_next0;
-			pr_tags[rob_ar_b] <= `SD pr_tags_next1;
+			pr_tags[id_dest_idx0] <= `SD pr_tags_next0;
+			pr_tags[id_dest_idx1] <= `SD pr_tags_next1;
 		end
 	end
 
