@@ -29,13 +29,14 @@ all:    simv
 
 
 
-MODULE		= 	mt
+MODULE		= 	rs
 
 
 TESTBENCH = 	sys_defs.vh	    \
-testbench/$(MODULE)_test.v
+#testbench/$(MODULE)_test.v
 
 SIMFILES =	verilog/$(MODULE).v	\
+						verilog/prien.v
 
 SYNFILES = synth/$(MODULE).vg
 
