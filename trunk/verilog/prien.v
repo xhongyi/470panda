@@ -10,16 +10,20 @@
 module prien_2(
 				decode,
 
-				encode,
+				encode_high,
+				encode_low,
 				valid);
 
 input		[1:0]	decode;
-output				encode;
+output				encode_high;
+output				encode_low;
 output				valid;
 
 assign valid = decode[1] | decode[0];
 
-assign encode = decode[1];
+assign encode_high = decode[1];
+
+assign encode_low = ~decode[0];
 
 endmodule
 
@@ -37,18 +41,21 @@ output	[1:0]	encode_low;
 output				valid;
 
 wire 		[1:0]	sub_valid;
-wire		[1:0]	sub_encode;
+wire		[1:0]	sub_encode_high;
+wire		[1:0]	sub_encode_low;
 
 prien_2 sub_prien [1:0] (.decode(decode),
-				.encode(sub_encode), .valid(sub_valid));
+				.encode_high(sub_encode_high),
+				.encode_low(sub_encode_low),
+				.valid(sub_valid));
 
 assign	encode_high[1] = sub_valid[1];
-assign	encode_high[0] = (sub_valid[1]) ? sub_encode[1] :
-												 (sub_valid[0]) ? sub_encode[0] : 1'b0;
+assign	encode_high[0] = (sub_valid[1]) ? sub_encode_high[1] :
+												 (sub_valid[0]) ? sub_encode_high[0] : 1'b0;
 
 assign	encode_low[1] = ~sub_valid[0]  & sub_valid[1];
-assign	encode_low[0] = (sub_valid[0]) ? sub_encode[0] :
-												(sub_valid[1]) ? sub_encode[1] : 1'b0;
+assign	encode_low[0] = (sub_valid[0]) ? sub_encode_low[0] :
+												(sub_valid[1]) ? sub_encode_low[1] : 1'b0;
 
 assign	valid = sub_valid[1] | sub_valid[0];
 

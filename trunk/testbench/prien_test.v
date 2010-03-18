@@ -43,7 +43,7 @@ initial begin
 	clock = 0;
 	decode = 32'hffff_ffff;
 	cre_high = 5'd31;
-	cre_low = 5'd1;
+	cre_low = 5'd0;
 //test reset and 1 dispatch with 0 retire.
 @(negedge clock);
 decode = 32'h0f00_0000;
