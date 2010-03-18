@@ -670,60 +670,6 @@ begin
 		cr_rs_pr_b2_ready = 0;
 		cr_rs_pr_b2 = i+3;
 end
-//////////////////////////////////////////////////////////////////////////////////////////////
-@(negedge clock)
-reset = 1;
-@(negedge clock)
-reset = 0;
-@(negedge clock)
-for (i = 0; i <= 31; i = i+2)
-begin
-	@(negedge clock)
-		rob_dispatch_num = 2;
-		fl_pr0 = i+32;
-		fl_pr1 = i+33;
-
-		rob_ar_a_valid = 1;
-		rob_ar_b_valid = 1;
-		rob_ar_a1_valid = 0;
-		rob_ar_a2_valid = 0;
-		rob_ar_b1_valid = 0;
-		rob_ar_b2_valid = 0;
-
-		rob_ar_a = i;
-		rob_ar_b = i+1;
-		rob_ar_a1 = 0;
-		rob_ar_a2 = 0;
-		rob_ar_b1 = 0;
-		rob_ar_b2 = 0;
-
-		cdb_broadcast = 2;
-		cdb_pr_tags[0] = i+64;
-		cdb_pr_tags[1] = i+65;
-		cdb_pr_tags[2] = 0;
-		cdb_pr_tags[3] = 0;
-		cdb_ar_tags[0] = i;
-		cdb_ar_tags[1] = i+1;
-		cdb_ar_tags[2] = 0;
-		cdb_ar_tags[3] = 0;
-
-		// The correct output values
-		cr_rob_p0told = i;
-		cr_rob_p1told = i+1;
-
-		cr_rs_pr_a1_ready = 0;
-		cr_rs_pr_a1 = 0;
-
-		cr_rs_pr_a2_ready = 0;
-		cr_rs_pr_a2 = 0;
-
-		cr_rs_pr_b1_ready = 0;
-		cr_rs_pr_b1 = 0;
-
-		cr_rs_pr_b2_ready = 0;
-		cr_rs_pr_b2 = 0;
-end
-//////////////////////////////////////////////////////////////////////////////////////////////
 
 		@(negedge clock)
 		$finish;
