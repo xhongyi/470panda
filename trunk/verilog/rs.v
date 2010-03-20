@@ -573,6 +573,28 @@ reg					halt					[`NUM_RS_ENTRIES-1:0];
 reg					illegal_inst	[`NUM_RS_ENTRIES-1:0];
 reg					valid_inst		[`NUM_RS_ENTRIES-1:0];
 
+reg		[1:0]	next_alu_type				[`NUM_RS_ENTRIES-1:0];
+reg	 [63:0]	next_npc						[`NUM_RS_ENTRIES-1:0];
+reg	 [31:0]	next_ir							[`NUM_RS_ENTRIES-1:0];
+reg					next_branch_taken		[`NUM_RS_ENTRIES-1:0];
+reg	 [63:0]	next_pred_addr			[`NUM_RS_ENTRIES-1:0];
+reg		[1:0]	next_opa_select			[`NUM_RS_ENTRIES-1:0];
+reg		[1:0]	next_opb_select			[`NUM_RS_ENTRIES-1:0];
+reg		[4:0]	next_dest_ar_idx		[`NUM_RS_ENTRIES-1:0];
+reg		[6:0]	next_dest_pr_idx		[`NUM_RS_ENTRIES-1:0];
+reg		[6:0]	next_pra_idx				[`NUM_RS_ENTRIES-1:0];
+reg					next_pra_ready			[`NUM_RS_ENTRIES-1:0];
+reg		[6:0]	next_prb_idx				[`NUM_RS_ENTRIES-1:0];
+reg					next_prb_ready			[`NUM_RS_ENTRIES-1:0];
+reg		[4:0]	next_alu_func				[`NUM_RS_ENTRIES-1:0];
+reg					next_rd_mem					[`NUM_RS_ENTRIES-1:0];
+reg					next_wr_mem					[`NUM_RS_ENTRIES-1:0];
+reg					next_cond_branch		[`NUM_RS_ENTRIES-1:0];					
+reg					next_uncond_branch	[`NUM_RS_ENTRIES-1:0];
+reg					next_halt						[`NUM_RS_ENTRIES-1:0];
+reg					next_illegal_inst		[`NUM_RS_ENTRIES-1:0];
+reg					next_valid_inst			[`NUM_RS_ENTRIES-1:0];
+
 
 reg		[1:0]	dispatch_valid_inst;
 reg		[`LOG_NUM_RS_ENTRIES-1:0]	dispatch_rs_idx;
@@ -631,7 +653,7 @@ reg		[`LOG_NUM_RS_ENTRIES-1:0]	next_ready_mem_idx			[`NUM_RS_ENTRIES-1:0];*/
 wire	[1:0]	actual_dispatch_num = id_dispatch_num - ((id_dispatch_num[1])? ~id_valid_inst1 : 0) - 
 																	((id_dispatch_num > 0) ? ~id_valid_inst0 : 0);
 
-integer i;
+unsigned integer i;
 
 /*assign next_num_empty_entries = num_empty_entries - id_dispatch_num -
 																// The dispatched inst may be not valid
@@ -673,6 +695,32 @@ prien prien_ent_avail(.decode(ent_avail),
 
 always @ *
 begin
+
+	for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
+	begin
+			next_alu_type[i]			= alu_type[i];
+			next_npc[i]						= npc[i];
+			next_ir[i]						= ir[i];
+			next_branch_taken[i]	= branch_taken[i];
+			next_pred_addr[i]			= pred_addr[i];
+			next_opa_select[i]		= opa_select[i];
+			next_opb_select[i]		= opb_select[i];
+			next_dest_ar_idx[i]		= dest_ar_idx[i];
+			next_dest_pr_idx[i]		= dest_pr_idx[i];
+			next_pra_idx[i]				= pra_idx[i];
+			next_pra_ready[i]			= pra_ready[i];
+			next_prb_idx[i]				= prb_idx[i];
+			next_prb_ready[i]			= prb_ready[i];
+			next_alu_func[i]			= alu_func[i];
+			next_rd_mem[i]				= rd_mem[i];
+			next_wr_mem[i]				= wr_mem[i];
+			next_cond_branch[i]		= cond_branch[i];
+			next_uncond_branch[i]	= uncond_branch[i];
+			next_halt[i]					= halt[i];
+			next_illegal_inst[i]	= illegal_inst[i];
+			next_valid_inst[i]		= valid_inst[i];
+	end
+
 	/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 	begin
 		next_avail_ent_idx[i] = avail_ent_idx[i];
@@ -1266,6 +1314,176 @@ begin
 		alu_mem_valid_inst1		= 0;
 	end
 
+
+
+	// Dispatch
+	if (id_valid_inst0 & ~id_illegal_inst0)
+	begin
+		case (id_IR0[31:26])
+			`MULQ_INST: 
+				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
+			`LDA_INST, `LDQ_INST, `LDQ_L_INST,
+			`STQ_INST, `STQ_C_INST:
+				next_alu_type[ent_avail_high_idx] = `ALU_MEM;
+			default:
+				next_alu_type[ent_avail_high_idx] = `ALU_SIM;
+		endcase
+
+		next_npc[ent_avail_high_idx]					= id_NPC0;
+		next_ir[ent_avail_high_idx]						= id_IR0;
+		next_branch_taken[ent_avail_high_idx]	= id_branch_taken0;
+		next_pred_addr[ent_avail_high_idx]		= id_pred_addr0;
+		next_opa_select[ent_avail_high_idx]		= id_opa_select0;
+		next_opb_select[ent_avail_high_idx]		= id_opb_select0;
+		next_dest_ar_idx[ent_avail_high_idx]	= id_dest_idx0;
+		next_dest_pr_idx[ent_avail_high_idx]	= mt_pr_dest_idx0;
+		next_pra_idx[ent_avail_high_idx]			= mt_pra_idx0;
+		next_pra_ready[ent_avail_high_idx]		= mt_pra_ready0;
+		next_prb_idx[ent_avail_high_idx]			= mt_prb_idx0;
+		next_prb_ready[ent_avail_high_idx]		= mt_prb_ready0;
+		next_alu_func[ent_avail_high_idx]			= id_alu_func0;
+		next_rd_mem[ent_avail_high_idx]				= id_rd_mem0;
+		next_wr_mem[ent_avail_high_idx]				= id_wr_mem0;
+		next_cond_branch[ent_avail_high_idx]	= id_cond_branch0;
+		next_uncond_branch[ent_avail_high_idx]= id_uncond_branch0;
+		next_halt[ent_avail_high_idx]					= id_halt0;
+		next_illegal_inst[ent_avail_high_idx]	= id_illegal_inst0;
+		next_valid_inst[ent_avail_high_idx]		= id_valid_inst0;
+
+		next_ent_avail[ent_avail_high_idx]		= 0;
+		next_ent_taken[ent_avail_high_idx]		= 1;
+	end
+
+	if (id_valid_inst1 & ~id_illegal_inst1)
+	begin
+		case (id_IR1[31:26])
+			`MULQ_INST: 
+				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
+			`LDA_INST, `LDQ_INST, `LDQ_L_INST,
+			`STQ_INST, `STQ_C_INST:
+				next_alu_type[ent_avail_high_idx] = `ALU_MEM;
+			default:
+				next_alu_type[ent_avail_high_idx] = `ALU_SIM;
+		endcase
+
+		next_npc[ent_avail_low_idx]					= id_NPC1;
+		next_ir[ent_avail_low_idx]						= id_IR1;
+		next_branch_taken[ent_avail_low_idx]	= id_branch_taken1;
+		next_pred_addr[ent_avail_low_idx]		= id_pred_addr1;
+		next_opa_select[ent_avail_low_idx]		= id_opa_select1;
+		next_opb_select[ent_avail_low_idx]		= id_opb_select1;
+		next_dest_ar_idx[ent_avail_low_idx]	= id_dest_idx1;
+		next_dest_pr_idx[ent_avail_low_idx]	= mt_pr_dest_idx1;
+		next_pra_idx[ent_avail_low_idx]			= mt_pra_idx1;
+		next_pra_ready[ent_avail_low_idx]		= mt_pra_ready1;
+		next_prb_idx[ent_avail_low_idx]			= mt_prb_idx1;
+		next_prb_ready[ent_avail_low_idx]		= mt_prb_ready1;
+		next_alu_func[ent_avail_low_idx]			= id_alu_func1;
+		next_rd_mem[ent_avail_low_idx]				= id_rd_mem1;
+		next_wr_mem[ent_avail_low_idx]				= id_wr_mem1;
+		next_cond_branch[ent_avail_low_idx]	= id_cond_branch1;
+		next_uncond_branch[ent_avail_low_idx]= id_uncond_branch1;
+		next_halt[ent_avail_low_idx]					= id_halt1;
+		next_illegal_inst[ent_avail_low_idx]	= id_illegal_inst1;
+		next_valid_inst[ent_avail_low_idx]		= id_valid_inst1;
+
+		next_ent_avail[ent_avail_low_idx]		= 0;
+		next_ent_taken[ent_avail_low_idx]		= 1;
+	end
+
+	// Complete
+	if (cdb_broadcast[0])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag0 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag0 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	if (cdb_broadcast[1])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag1 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag1 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	if (cdb_broadcast[2])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag2 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag2 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	if (cdb_broadcast[3])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag3 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag3 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	if (cdb_broadcast[4])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag4 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag4 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	if (cdb_broadcast[5])
+	begin
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+		begin
+			if (ent_taken[i])
+			begin
+				if (cdb_pr_tag5 == pra_idx[i]) next_pra_ready[i] = 1;
+				if (cdb_pr_tag5 == prb_idx[i]) next_prb_ready[i] = 1;
+			end
+		end
+	end
+
+	// Detect the ready inst and set each ready bits
+	
+	for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
+	begin
+		if (next_ent_taken[i])
+		begin
+			`ifndef VCS
+				$assert(next_mem_ready[i] != `ALU_INV);
+			`endif
+			if (next_pra_ready[i] & next_prb_ready[i])
+			begin
+				case (next_alu_type[i])
+					`ALU_SIM: next_sim_ready[i] = 1;
+					`ALU_MUL: next_mul_ready[i] = 1;
+					`ALU_MEM: next_mem_ready[i] = 1;
+					//`ALU_INV: $display("Wrong");
+				endcase
+			end
+		end
+	end
 end
 
 
@@ -1287,6 +1505,31 @@ begin
 
 		/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 			avail_ent_idx[i] <= `SD i;*/
+		
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
+		begin
+			alu_type[i]			<= `SD `ALU_INV;
+			npc[i]					<= `SD 0;
+			ir[i]						<= `SD `NOOP_INST;
+			branch_taken[i]	<= `SD 0;
+			pred_addr[i]		<= `SD 0;
+			opa_select[i]		<= `SD 0;
+			opb_select[i]		<= `SD 0;
+			dest_ar_idx[i]	<= `SD `ZERO_REG;
+			dest_pr_idx[i]	<= `SD 0;
+			pra_idx[i]			<= `SD 0;
+			pra_ready[i]		<= `SD 0;
+			prb_idx[i]			<= `SD 0;
+			prb_ready[i]		<= `SD 0;
+			alu_func[i]			<= `SD 0;
+			rd_mem[i]				<= `SD 0;
+			wr_mem[i]				<= `SD 0;
+			cond_branch[i]	<= `SD 0;
+			uncond_branch[i]<= `SD 0;
+			halt[i]					<= `SD 0;
+			illegal_inst[i]	<= `SD 0;
+			valid_inst[i]		<= `SD 0;
+		end
 	end
 	else
 	begin
@@ -1300,6 +1543,31 @@ begin
 		mem_ready					<= `SD next_mem_ready;
 		ent_taken					<= `SD next_ent_taken;
 		ent_avail					<= `SD next_ent_avail;
+
+		for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
+		begin
+			alu_type[i]			<= `SD next_alu_type[i];
+			npc[i]					<= `SD next_npc[i];
+			ir[i]						<= `SD next_ir[i];
+			branch_taken[i]	<= `SD next_branch_taken[i];
+			pred_addr[i]		<= `SD next_pred_addr[i];
+			opa_select[i]		<= `SD next_opa_select[i];
+			opb_select[i]		<= `SD next_opb_select[i];
+			dest_ar_idx[i]	<= `SD next_dest_ar_idx[i];
+			dest_pr_idx[i]	<= `SD next_dest_pr_idx[i];
+			pra_idx[i]			<= `SD next_pra_idx[i];
+			pra_ready[i]		<= `SD next_pra_ready[i];
+			prb_idx[i]			<= `SD next_prb_idx[i];
+			prb_ready[i]		<= `SD next_prb_ready[i];
+			alu_func[i]			<= `SD next_alu_func[i];
+			rd_mem[i]				<= `SD next_rd_mem[i];
+			wr_mem[i]				<= `SD next_wr_mem[i];
+			cond_branch[i]	<= `SD next_cond_branch[i];
+			uncond_branch[i]<= `SD next_uncond_branch[i];
+			halt[i]					<= `SD next_halt[i];
+			illegal_inst[i]	<= `SD next_illegal_inst[i];
+			valid_inst[i]		<= `SD next_valid_inst[i];
+		end
 
 	end
 end

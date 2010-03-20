@@ -291,6 +291,9 @@
  *****************************************/
 `define CDB_WIDTH		4
 
-`define	ALU_SIM			2'b00;
-`define ALU_MUL			2'b01;
-`define	ALU_MEM			2'b10;
+`define	ALU_INV			2'b00 // invalid
+`define	ALU_SIM			2'b01
+`define ALU_MUL			2'b10
+`define	ALU_MEM			2'b11
+
+`define	ZERO_VAL		64'b0 // zero values
