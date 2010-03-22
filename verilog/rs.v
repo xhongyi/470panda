@@ -653,7 +653,7 @@ reg		[`LOG_NUM_RS_ENTRIES-1:0]	next_ready_mem_idx			[`NUM_RS_ENTRIES-1:0];*/
 wire	[1:0]	actual_dispatch_num = id_dispatch_num - ((id_dispatch_num[1])? ~id_valid_inst1 : 0) - 
 																	((id_dispatch_num > 0) ? ~id_valid_inst0 : 0);
 
-unsigned integer i;
+integer i;
 
 /*assign next_num_empty_entries = num_empty_entries - id_dispatch_num -
 																// The dispatched inst may be not valid
