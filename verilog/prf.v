@@ -50,7 +50,7 @@ module prf (// Inputs
 						alu_mem_pra_value1,
 
 						alu_mul_pra_value0,
-						alu_mul_pra_value1,
+						alu_mul_pra_value1
 						);
 
 
