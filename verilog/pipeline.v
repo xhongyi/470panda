@@ -144,6 +144,7 @@
 	wire					id_rs_rob_mt_valid_inst1;
 
 	wire		[1:0]	id_rs_rob_mt_if_dispatch_num;
+	wire		[1:0]	id_isnt_need_num;
 
 	/*
 	 * Output from Map Table
@@ -368,8 +369,35 @@
 	 *
 	 * When there is no exception, they are just equal to reset
 	 */
+	wire		if_reset;
+	wire		id_reset;
+	wire		mt_reset;
+	wire		rob_reset;
+	wire		rs_reset;
+	wire		fl_reset;
+	wire		prf_reset;
+	wire		alu_sim_reset;
+	wire		alu_mul_reset;
+	wire		alu_mem_reset;
+	wire		cdb_reset;
+	wire		ic_reset;
+	wire		dc_reset;
 
+	assign	if_reset 			= reset;
+	assign	id_reset 			= reset;
+	assign	mt_reset 			= reset;
+	assign	rob_reset 		= reset;
+	assign	rs_reset 			= reset;
+	assign	fl_reset 			= reset;
+	assign	prf_reset 		= reset;
+	assign	alu_sim_reset = reset;
+	assign	alu_mul_reset = reset;
+	assign	alu_mem_reset = reset;
+	assign	cdb_reset 		= reset;
+	assign	ic_reset 			= reset;
+	assign	dc_reset 			= reset;
 
-if_mod if (// Inputs
-						clock,
-						if_reset,
+if_mod if_mod0 (// Inputs
+								clock,
+								if_reset,
+								

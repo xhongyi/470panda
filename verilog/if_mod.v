@@ -23,12 +23,12 @@ module if_mod(// Inputs
 				id_inst_need_num, //new
 
 				// Outputs
-				if_NPC_out,        // PC+4 of fetched instruction
-				if_IR_out0,         // fetched instruction out
-				if_IR_out1,		//  second fetched instruction out
+				id_NPC_out,        // PC+4 of fetched instruction
+				id_IR_out0,         // fetched instruction out
+				id_IR_out1,		//  second fetched instruction out
 				proc2Imem_addr,
-				if_valid_inst_out0,
-				if_valid_inst_out1  // when low, instruction is garbage
+				id_valid_inst_out0,
+				id_valid_inst_out1  // when low, instruction is garbage
 				);
 
 input         clock;              // system clock
