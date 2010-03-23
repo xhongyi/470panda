@@ -114,33 +114,33 @@ module brcond(// Inputs
 endmodule // brcond
 
 
-module sim(// Inputs
-                clock,
-                reset,
-                rs_sim_NPC0,
-				rs_sim_NPC1,
-                rs_sim_IR0,
-				rs_sim_IR1,
-                rs_sim_pra0,
-				rs_sim_pra1,
-                rs_sim_prb0,
-				rs_sim_prb1,
-                rs_sim_opa_select0,
-				rs_sim_opa_select1,
-                rs_sim_opb_select0,
-				rs_sim_opb_select1,
-                rs_sim_alu_func0,
-				rs_sim_alu_func1,
-                rs_sim_cond_branch0,
-				rs_sim_cond_branch1,
-                rs_sim_uncond_branch0,
-				rs_sim_uncond_branch1,
-                
-                // Outputs
-                sim_alu_result_out0,
-				sim_alu_result_out1,
-                sim_take_branch_out0,
-				sim_take_branch_out1
+module alu_sim(// Inputs
+								clock,
+								reset,
+								rs_sim_NPC0,
+								rs_sim_NPC1,
+								rs_sim_IR0,
+								rs_sim_IR1,
+								prf_pra0,
+								prf_pra1,
+								prf_prb0,
+								prf_prb1,
+								rs_sim_opa_select0,
+								rs_sim_opa_select1,
+								rs_sim_opb_select0,
+								rs_sim_opb_select1,
+								rs_sim_alu_func0,
+								rs_sim_alu_func1,
+								rs_sim_cond_branch0,
+								rs_sim_cond_branch1,
+								rs_sim_uncond_branch0,
+								rs_sim_uncond_branch1,
+
+								// Outputs
+								sim_alu_result_out0,
+								sim_alu_result_out1,
+								sim_take_branch_out0,
+								sim_take_branch_out1
                );
 
   input         clock;               // system clock
