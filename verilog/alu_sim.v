@@ -117,65 +117,65 @@ endmodule // brcond
 module alu_sim(// Inputs
 								clock,
 								reset,
-								rs_sim_NPC0,
-								rs_sim_NPC1,
-								rs_sim_IR0,
-								rs_sim_IR1,
+								rs_NPC0,
+								rs_NPC1,
+								rs_IR0,
+								rs_IR1,
 								prf_pra0,
 								prf_pra1,
 								prf_prb0,
 								prf_prb1,
-								rs_sim_opa_select0,
-								rs_sim_opa_select1,
-								rs_sim_opb_select0,
-								rs_sim_opb_select1,
-								rs_sim_alu_func0,
-								rs_sim_alu_func1,
-								rs_sim_cond_branch0,
-								rs_sim_cond_branch1,
-								rs_sim_uncond_branch0,
-								rs_sim_uncond_branch1,
+								rs_opa_select0,
+								rs_opa_select1,
+								rs_opb_select0,
+								rs_opb_select1,
+								rs_alu_func0,
+								rs_alu_func1,
+								rs_cond_branch0,
+								rs_cond_branch1,
+								rs_uncond_branch0,
+								rs_uncond_branch1,
 
 								// Outputs
-								sim_alu_result_out0,
-								sim_alu_result_out1,
-								sim_take_branch_out0,
-								sim_take_branch_out1
+								alu_result_out0,
+								alu_result_out1,
+								take_branch_out0,
+								take_branch_out1
                );
 
   input         clock;               // system clock
   input         reset;               // system reset
-  input  [63:0] rs_sim_NPC0;           // incoming instruction PC+4
-  input  [63:0] rs_sim_NPC1;           // incoming instruction PC+4
-  input  [31:0] rs_sim_IR0;            // incoming instruction
-  input  [31:0] rs_sim_IR1;            // incoming instruction
-  input  [63:0] rs_sim_pra0;          // register A value from reg file   
-  input  [63:0] rs_sim_pra1;          // register A value from reg file
+  input  [63:0] rs_NPC0;           // incoming instruction PC+4
+  input  [63:0] rs_NPC1;           // incoming instruction PC+4
+  input  [31:0] rs_IR0;            // incoming instruction
+  input  [31:0] rs_IR1;            // incoming instruction
+  input  [63:0] rs_pra0;          // register A value from reg file   
+  input  [63:0] rs_pra1;          // register A value from reg file
 
-  input  [63:0] rs_sim_prb0;          // register B value from reg file
-  input  [63:0] rs_sim_prb1;          // register B value from reg file
+  input  [63:0] rs_prb0;          // register B value from reg file
+  input  [63:0] rs_prb1;          // register B value from reg file
 
-  input   [1:0] rs_sim_opa_select0;    // opA mux select from decoder
-  input   [1:0] rs_sim_opa_select1;    // opA mux select from decoder
+  input   [1:0] rs_opa_select0;    // opA mux select from decoder
+  input   [1:0] rs_opa_select1;    // opA mux select from decoder
 
-  input   [1:0] rs_sim_opb_select0;    // opB mux select from decoder
-  input   [1:0] rs_sim_opb_select1;    // opB mux select from decoder
+  input   [1:0] rs_opb_select0;    // opB mux select from decoder
+  input   [1:0] rs_opb_select1;    // opB mux select from decoder
 
-  input   [4:0] rs_sim_alu_func0;      // ALU function select from decoder
-  input   [4:0] rs_sim_alu_func1;      // ALU function select from decoder
+  input   [4:0] rs_alu_func0;      // ALU function select from decoder
+  input   [4:0] rs_alu_func1;      // ALU function select from decoder
 
-  input         rs_sim_cond_branch0;   // is this a cond br? from decoder
-  input         rs_sim_cond_branch1;   // is this a cond br? from decoder
+  input         rs_cond_branch0;   // is this a cond br? from decoder
+  input         rs_cond_branch1;   // is this a cond br? from decoder
   
-  input         rs_sim_uncond_branch0; // is this an uncond br? from decoder
-  input         rs_sim_uncond_branch1; // is this an uncond br? from decoder
+  input         rs_uncond_branch0; // is this an uncond br? from decoder
+  input         rs_uncond_branch1; // is this an uncond br? from decoder
 
 
-  output [63:0] sim_alu_result_out0;   // ALU result
-  output [63:0] sim_alu_result_out1;   // ALU result
+  output [63:0] alu_result_out0;   // ALU result
+  output [63:0] alu_result_out1;   // ALU result
 
-  output        sim_take_branch_out0;  // is this a taken branch?
-  output        sim_take_branch_out1;  // is this a taken branch?
+  output        take_branch_out0;  // is this a taken branch?
+  output        take_branch_out1;  // is this a taken branch?
   //output [1:0]		rs_alu_ready;
 
   reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
@@ -185,28 +185,28 @@ module alu_sim(// Inputs
    //   mem_disp: sign-extended 16-bit immediate for memory format
    //   br_disp: sign-extended 21-bit immediate * 4 for branch displacement
    //   alu_imm: zero-extended 8-bit immediate for ALU ops
-  wire [63:0] mem_disp0 = { {48{rs_sim_IR0[15]}}, rs_sim_IR0[15:0] };
-  wire [63:0] br_disp0  = { {41{rs_sim_IR0[20]}}, rs_sim_IR0[20:0], 2'b00 };
-  wire [63:0] alu_imm0  = { 56'b0, rs_sim_IR0[20:13] };
+  wire [63:0] mem_disp0 = { {48{rs_IR0[15]}}, rs_IR0[15:0] };
+  wire [63:0] br_disp0  = { {41{rs_IR0[20]}}, rs_IR0[20:0], 2'b00 };
+  wire [63:0] alu_imm0  = { 56'b0, rs_IR0[20:13] };
   //Second copy for the second set of instructions
-  wire [63:0] mem_disp1 = { {48{rs_sim_IR1[15]}}, rs_sim_IR1[15:0] };
-  wire [63:0] br_disp1  = { {41{rs_sim_IR1[20]}}, rs_sim_IR1[20:0], 2'b00 };
-  wire [63:0] alu_imm1  = { 56'b0, rs_sim_IR1[20:13] };
+  wire [63:0] mem_disp1 = { {48{rs_IR1[15]}}, rs_IR1[15:0] };
+  wire [63:0] br_disp1  = { {41{rs_IR1[20]}}, rs_IR1[20:0], 2'b00 };
+  wire [63:0] alu_imm1  = { 56'b0, rs_IR1[20:13] };
    //
    // ALU opA mux
    //
   always @*
   begin
-    case (rs_sim_opa_select0)
-      `ALU_OPA_IS_REGA:     opa_mux_out0 = rs_sim_pra0;
+    case (rs_opa_select0)
+      `ALU_OPA_IS_REGA:     opa_mux_out0 = rs_pra0;
       `ALU_OPA_IS_MEM_DISP: opa_mux_out0 = mem_disp0;
-      `ALU_OPA_IS_NPC:      opa_mux_out0 = rs_sim_NPC0;
+      `ALU_OPA_IS_NPC:      opa_mux_out0 = rs_NPC0;
       `ALU_OPA_IS_NOT3:     opa_mux_out0 = ~64'h3;
     endcase
-	case (rs_sim_opa_select1)
-      `ALU_OPA_IS_REGA:     opa_mux_out1 = rs_sim_pra1;
+	case (rs_opa_select1)
+      `ALU_OPA_IS_REGA:     opa_mux_out1 = rs_pra1;
       `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
-      `ALU_OPA_IS_NPC:      opa_mux_out1 = rs_sim_NPC1;
+      `ALU_OPA_IS_NPC:      opa_mux_out1 = rs_NPC1;
       `ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
     endcase
   end
@@ -220,13 +220,13 @@ module alu_sim(// Inputs
      // value on the output of the mux you have an invalid opb_select
     opb_mux_out0 = 64'hbaadbeefdeadbeef;
 	opb_mux_out1 = 64'hbaadbeefdeadbeef;
-    case (rs_sim_opb_select0)
-      `ALU_OPB_IS_REGB:    opb_mux_out0 = rs_sim_prb0;
+    case (rs_opb_select0)
+      `ALU_OPB_IS_REGB:    opb_mux_out0 = rs_prb0;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out0 = alu_imm0;
       `ALU_OPB_IS_BR_DISP: opb_mux_out0 = br_disp0;
     endcase 
-	case (rs_sim_opb_select1)
-      `ALU_OPB_IS_REGB:    opb_mux_out1 = rs_sim_prb1;
+	case (rs_opb_select1)
+      `ALU_OPB_IS_REGB:    opb_mux_out1 = rs_prb1;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out1 = alu_imm1;
       `ALU_OPB_IS_BR_DISP: opb_mux_out1 = br_disp1;
     endcase
@@ -238,32 +238,32 @@ module alu_sim(// Inputs
   alu alu_0 (// Inputs
              .opa(opa_mux_out0),
              .opb(opb_mux_out0),
-             .func(rs_sim_alu_func0),
+             .func(rs_alu_func0),
 
              // Output
-             .result(sim_alu_result_out0)
+             .result(alu_result_out0)
             );
   alu alu_1 (// Inputs
              .opa(opa_mux_out1),
              .opb(opb_mux_out1),
-             .func(rs_sim_alu_func1),
+             .func(rs_alu_func1),
 
              // Output
-             .result(sim_alu_result_out1)
+             .result(alu_result_out1)
             );
    //
    // instantiate the branch condition tester
    //
   brcond brcond0 (// Inputs
-                .opa(rs_sim_pra0),       // always check regA value
-                .func(rs_sim_IR0[28:26]), // inst bits to determine check
+                .opa(rs_pra0),       // always check regA value
+                .func(rs_IR0[28:26]), // inst bits to determine check
 
                 // Output
                 .cond(brcond_result0)
                );
   brcond brcond1 (// Inputs
-                .opa(rs_sim_pra1),       // always check regA value
-                .func(rs_sim_IR1[28:26]), // inst bits to determine check
+                .opa(rs_pra1),       // always check regA value
+                .func(rs_IR1[28:26]), // inst bits to determine check
 
                 // Output
                 .cond(brcond_result1)
@@ -271,10 +271,10 @@ module alu_sim(// Inputs
 
    // ultimate "take branch" signal:
    //    unconditional, or conditional and the condition is true
-  assign ex_take_branch_out0 = rs_sim_uncond_branch0
-                          | (rs_sim_cond_branch0 & brcond_result0);
-  assign ex_take_branch_out1 = rs_sim_uncond_branch1
-                          | (rs_sim_cond_branch1 & brcond_result1);
+  assign ex_take_branch_out0 = rs_uncond_branch0
+                          | (rs_cond_branch0 & brcond_result0);
+  assign ex_take_branch_out1 = rs_uncond_branch1
+                          | (rs_cond_branch1 & brcond_result1);
 
 endmodule // module ex_stage
 
