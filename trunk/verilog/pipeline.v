@@ -316,11 +316,38 @@
 	/*
 	 * Outputs from physical register file
 	 */
+	wire	[63:0]	alu_sim_pra_value0,
+	wire	[63:0]	alu_sim_pra_value1,
+
+	wire	[63:0]	alu_mem_pra_value0,
+	wire	[63:0]	alu_mem_pra_value1,
+
+	wire	[63:0]	alu_mul_pra_value0,
+	wire	[63:0]	alu_mul_pra_value1,
 
 
 	/*
 	 * Outputs from CDB
 	 */
+	wire	[CDB_WIDTH-1:0]	cdb_rs_rob_mt_broadcast;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag0;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag1;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag2;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag3;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag4;
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag5;
+	wire		[4:0]	cdb_mt_ar_tag0;
+	wire		[4:0]	cdb_mt_ar_tag1;
+	wire		[4:0]	cdb_mt_ar_tag2;
+	wire		[4:0]	cdb_mt_ar_tag3;
+	wire		[4:0]	cdb_mt_ar_tag4;
+	wire		[4:0]	cdb_mt_ar_tag5;
+	wire					cdb_rob_exception0;
+	wire					cdb_rob_exception1;
+	wire					cdb_rob_exception2;
+	wire					cdb_rob_exception3;
+	wire					cdb_rob_exception4;
+	wire					cdb_rob_exception5;
 
 	/*
 	 * Outputs from simple ALU
@@ -333,3 +360,15 @@
 	/*
 	 * Output from memory ALU
 	 */
+	
+
+	/*
+	 * Reset for each module
+	 *
+	 * When there is no exception, they are just equal to reset
+	 */
+
+
+if_mod if (// Inputs
+						clock,
+						if_reset,
