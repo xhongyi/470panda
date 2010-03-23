@@ -45,13 +45,13 @@ module rs(// Inputs
 
 						id_dispatch_num,
 
-						mt_pr_dest_idx0,
+						fl_pr_dest_idx0,
 						mt_pra_idx0,
 						mt_prb_idx0,
 						mt_pra_ready0, // *** If the reg is not valid, it is ready ***
 						mt_prb_ready0,
 
-						mt_pr_dest_idx1,
+						fl_pr_dest_idx1,
 						mt_pra_idx1,
 						mt_prb_idx1,
 						mt_pra_ready1, // *** If the reg is not valid, it is ready ***
@@ -254,13 +254,13 @@ input					id_valid_inst1;
 
 input		[1:0]	id_dispatch_num;
 
-input		[6:0]	mt_pr_dest_idx0;
+input		[6:0]	fl_pr_dest_idx0;
 input		[6:0]	mt_pra_idx0;
 input		[6:0]	mt_prb_idx0;
 input					mt_pra_ready0; // *** If the reg is not valid, it is ready ***
 input					mt_prb_ready0;
 
-input		[6:0]	mt_pr_dest_idx1;
+input		[6:0]	fl_pr_dest_idx1;
 input		[6:0]	mt_pra_idx1;
 input		[6:0]	mt_prb_idx1;
 input					mt_pra_ready1; // *** If the reg is not valid, it is ready ***
@@ -1336,7 +1336,7 @@ begin
 		next_opa_select[ent_avail_high_idx]		= id_opa_select0;
 		next_opb_select[ent_avail_high_idx]		= id_opb_select0;
 		next_dest_ar_idx[ent_avail_high_idx]	= id_dest_idx0;
-		next_dest_pr_idx[ent_avail_high_idx]	= mt_pr_dest_idx0;
+		next_dest_pr_idx[ent_avail_high_idx]	= fl_pr_dest_idx0;
 		next_pra_idx[ent_avail_high_idx]			= mt_pra_idx0;
 		next_pra_ready[ent_avail_high_idx]		= mt_pra_ready0;
 		next_prb_idx[ent_avail_high_idx]			= mt_prb_idx0;
@@ -1373,7 +1373,7 @@ begin
 		next_opa_select[ent_avail_low_idx]		= id_opa_select1;
 		next_opb_select[ent_avail_low_idx]		= id_opb_select1;
 		next_dest_ar_idx[ent_avail_low_idx]	= id_dest_idx1;
-		next_dest_pr_idx[ent_avail_low_idx]	= mt_pr_dest_idx1;
+		next_dest_pr_idx[ent_avail_low_idx]	= fl_pr_dest_idx1;
 		next_pra_idx[ent_avail_low_idx]			= mt_pra_idx1;
 		next_pra_ready[ent_avail_low_idx]		= mt_pra_ready1;
 		next_prb_idx[ent_avail_low_idx]			= mt_prb_idx1;
