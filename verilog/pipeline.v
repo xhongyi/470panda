@@ -85,7 +85,8 @@
 	/*
 	 * Output from IF
 	 */
-	wire	 [63:0]	if_id_NPC;
+	wire	 [63:0]	if_id_NPC0;
+	wire	 [63:0]	if_id_NPC1;
 	wire	 [31:0]	if_id_IR0;
 	wire	 [31:0]	if_id_IR1;
 	wire					if_id_valid_inst0;
@@ -362,7 +363,20 @@
 	/*
 	 * Output from memory ALU
 	 */
-	
+
+	/*
+	 * Outputs from branch history table
+	 */
+
+	wire				bht_if_branch_taken0;
+	wire				bht_if_branch_taken1;
+
+	/*
+	 * Outputs from brach target buffer
+	 */
+
+	wire [63:0]	btb_if_pred_taken0;
+	wire [63:0]	btb_if_pred_taken1;
 
 	/*
 	 * Reset for each module
@@ -398,6 +412,15 @@
 	assign	dc_reset 			= reset;
 
 if_mod if_mod0 (// Inputs
-								clock,
-								if_reset,
+								.clock(clock),
+								.reset(if_reset),
+								.bht_branch_taken0(bht_if_branch_taken0),
+								.bht_branch_taken1(bht_if_branch_taken1),
+								.btb_pred_addr0(btb_if_pred_addr0),
+								.btb_pred_addr1(btb_if_pred_aadr0),
+								.Imem2proc_data(Imem2proc_data),
+								.Imem_valid(Imem_valid),
+								.id_inst_need_num(id_if_need_num),
+
+								.id_NPC
 								
