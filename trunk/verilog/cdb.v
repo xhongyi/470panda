@@ -9,6 +9,8 @@
 `timescale 1ns/100ps
 
 module cdb (// Inputs
+						clock,
+						reset,
 						alu_sim_complete0,
 						alu_sim_pr_idx0,
 						alu_sim_ar_idx0,
