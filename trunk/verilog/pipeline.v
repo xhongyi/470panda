@@ -313,4 +313,23 @@
 	wire					rs_alu_mem_valid_inst0;
 	wire					rs_alu_mem_valid_inst1;
 
+	/*
+	 * Outputs from physical register file
+	 */
 
+
+	/*
+	 * Outputs from CDB
+	 */
+
+	/*
+	 * Outputs from simple ALU
+	 */
+
+	/*
+	 * Outputs from multiplier
+	 */
+
+	/*
+	 * Output from memory ALU
+	 */
