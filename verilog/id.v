@@ -387,7 +387,8 @@ module id (
 				rs_rob_mt_valid_inst0,
 				rs_rob_mt_valid_inst1,
 
-				rs_rob_mt_if_dispatch_num
+				rs_rob_mt_dispatch_num,
+				if_inst_need_num
 				);
 
 input					clock;
@@ -456,7 +457,8 @@ output				rs_rob_mt_illegal_inst1;
 output				rs_rob_mt_valid_inst0;
 output				rs_rob_mt_valid_inst1;
 
-output	[1:0]	rs_rob_mt_if_dispatch_num;
+output	[1:0]	rs_rob_mt_dispatch_num;
+output	[1:0]	if_inst_need_num;
 
 // Internal states
 
@@ -616,18 +618,43 @@ end
  */
 
 reg		[1:0]	dispatch_num;
+reg		[1:0] inst_need_num;
+
+always @*
+begin
+	if (rob_cap == 2'b10 && rs_cap == 2'b10 && valid_isnt0 && valid_inst1)
+		dispatch_num = 2'b10;
+	else if (rob_cap == 2'b0 || rs_cap == 2'b0)
+		dispatch_num = 2'b00;
+	else if (valid_inst0)
+		dispatch_num = 2'b01;
+	else
+		dispatch_num = 2'b00;
+end
 
 always @*
 begin
 	if (rob_cap == 2'b10 && rs_cap == 2'b10)
-		dispatch_num = 2'b10;
+		inst_need_num = 2'b10;
 	else if (rob_cap == 2'b0 || rs_cap == 2'b0)
-		dispatch_num = 2'b00;
+	begin
+		if (~valid_inst0)
+			inst_need_num = 2'b10;
+		else if (valid_inst0 && ~valid_inst1)
+			inst_need_num = 2'b01;
+		else
+			inst_need_num = 2'b00;
 	else
-		dispatch_num = 2'b01;
+	begin
+		if (valid_inst1)
+			inst_need_num = 2'b01;
+		else
+			inst_need_num = 2'b10;
+	end
 end
 
-assign rs_rob_mt_if_dispatch_num = dispatch_num;
+assign rs_rob_mt_dispatch_num = dispatch_num;
+assign if_inst_need_num		=	inst_need_num;
 
 assign rs_NPC0						= npc0;
 assign rs_IR0							= ir0;
@@ -734,7 +761,7 @@ begin
 		illegal_inst1 	<= `SD 0;
 		valid_inst1			<= `SD 0;
 	end
-	else if (dispatch_num[1]) // Two instructions are dispatched
+	else if (dispatch_num[1] || (dispatch_num[0] && ~valid_inst1)) // Two instructions are dispatched
 		begin
 		npc0 						<= `SD if_NPC0;
 		ir0 						<= `SD if_IR0;
@@ -749,7 +776,9 @@ begin
 		alu_func0 			<= `SD next_alu_func0;
 		rd_mem0 				<= `SD next_rd_mem0;
 		wr_mem0 				<= `SD next_wr_mem0;
-		ldl_mem0 				<= `SD next_ldl_mem0;
+		ldl_mem0 				<= `SD next_ldl_mem0;		if (valid_inst1)
+		begin
+
 		stc_mem0 				<= `SD next_stc_mem0;
 		cond_branch0 		<= `SD next_cond_branch0;
 		uncond_branch0 	<= `SD next_uncond_branch0;
@@ -768,7 +797,9 @@ begin
 		opb_select1 		<= `SD next_opb_select1;
 		dest_idx1 			<= `SD next_dest_idx1;
 		alu_func1 			<= `SD next_alu_func1;
-		rd_mem1 				<= `SD next_rd_mem1;
+		rd_mem1 				<= `SD next_rd_mem1;		if (valid_inst1)
+		begin
+
 		wr_mem1 				<= `SD next_wr_mem1;
 		ldl_mem1 				<= `SD next_ldl_mem1;
 		stc_mem1 				<= `SD next_stc_mem1;
@@ -778,7 +809,7 @@ begin
 		illegal_inst1 	<= `SD next_illegal_inst1;
 		valid_inst1 		<= `SD next_valid_inst1;
 		end
-	else if (dispatch_num[0]) // One instructions are dispatched
+	else if (dispatch_num[0] && valid_inst1) // One instructions are dispatched
 		begin
 		npc0 						<= `SD npc1;
 		ir0 						<= `SD ir1;
@@ -822,7 +853,11 @@ begin
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
 		end
-
+	else
+	begin
+		valid_inst0			<= `SD 0;
+		valid_inst1			<= `SD 0;
+	end
 end
 
 endmodule
