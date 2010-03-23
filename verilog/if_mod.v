@@ -20,7 +20,7 @@ module if_mod(// Inputs
 				btb_pred_addr1,
 				Imem2proc_data,
 				Imem_valid,
-				busy,
+				if_inst_need_num, //new
 
 				// Outputs
 				if_NPC_out,        // PC+4 of fetched instruction
