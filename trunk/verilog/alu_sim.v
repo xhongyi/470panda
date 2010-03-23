@@ -125,6 +125,10 @@ module alu_sim(// Inputs
 								prf_pra1,
 								prf_prb0,
 								prf_prb1,
+								rs_dest_ar_idx0,
+								rs_dest_ar_idx1,
+								rs_dest_pr_idx0,
+								rs_dest_pr_idx1,
 								rs_opa_select0,
 								rs_opa_select1,
 								rs_opb_select0,
@@ -135,12 +139,26 @@ module alu_sim(// Inputs
 								rs_cond_branch1,
 								rs_uncond_branch0,
 								rs_uncond_branch1,
-
+								rs_branch_taken0,
+								rs_branch_taken1,
+								rs_pred_addr0,
+								rs_pred_addr1,
+								rs_valid_inst0,
+								rs_valid_inst1,
 								// Outputs
-								alu_result_out0,
-								alu_result_out1,
-								take_branch_out0,
-								take_branch_out1
+								cdb_complete0,
+								cdb_complete1,
+								cdb_dest_ar_idx0,
+								cdb_dest_ar_idx1,
+								cdb_prf_dest_pr_idx0,
+								cdb_prf_dest_pr_idx1,
+								cdb_exception0,
+								cdb_exception1,
+								prf_result0,
+								prf_result1,
+								prf_write_enable0,
+								prf_write_enable1,
+								rs_alu_avail
                );
 
   input         clock;               // system clock
@@ -149,12 +167,15 @@ module alu_sim(// Inputs
   input  [63:0] rs_NPC1;           // incoming instruction PC+4
   input  [31:0] rs_IR0;            // incoming instruction
   input  [31:0] rs_IR1;            // incoming instruction
-  input  [63:0] rs_pra0;          // register A value from reg file   
-  input  [63:0] rs_pra1;          // register A value from reg file
+  input  [63:0] prf_pra0;          // register A value from reg file   
+  input  [63:0] prf_pra1;          // register A value from reg file
 
-  input  [63:0] rs_prb0;          // register B value from reg file
-  input  [63:0] rs_prb1;          // register B value from reg file
-
+  input  [63:0] prf_prb0;          // register B value from reg file
+  input  [63:0] prf_prb1;          // register B value from reg file
+	input	 [4:0] rs_dest_ar_idx0;
+	input	 [4:0] rs_dest_ar_idx1;
+	input	 [6:0] rs_dest_pr_idx0;
+	input	 [6:0] rs_dest_pr_idx1;
   input   [1:0] rs_opa_select0;    // opA mux select from decoder
   input   [1:0] rs_opa_select1;    // opA mux select from decoder
 
@@ -169,18 +190,66 @@ module alu_sim(// Inputs
   
   input         rs_uncond_branch0; // is this an uncond br? from decoder
   input         rs_uncond_branch1; // is this an uncond br? from decoder
-
-
-  output [63:0] alu_result_out0;   // ALU result
-  output [63:0] alu_result_out1;   // ALU result
-
-  output        take_branch_out0;  // is this a taken branch?
-  output        take_branch_out1;  // is this a taken branch?
-  //output [1:0]		rs_alu_ready;
+	input					rs_branch_taken0;
+	input					rs_branch_taken1;
+	input	[64:0]	rs_pred_addr0;
+	input	[64:0]	rs_pred_addr1;
+	input 				rs_valid_inst0;
+	input					rs_valid_inst1;
+	
+	
+  output [63:0] prf_result0;   // ALU result
+  output [63:0] prf_result1;   // ALU result
+	output 				prf_write_enable0;
+	output				prf_write_enable1;
+	output				cdb_complete0;
+	output				cdb_complete1;
+	output				cdb_dest_ar_idx0;
+	output				cdb_dest_ar_idx1;
+	output				cdb_prf_dest_pr_idx0;
+	output				cdb_prf_dest_pr_idx1;
+	output				cdb_exception0;
+	output			  cdb_exception1;
+  output [1:0]		rs_alu_avail;
+	
+	//Output Registers
+	reg [63:0] prf_result0;   // ALU result
+	reg [63:0] prf_result1;   // ALU result
+	reg 				prf_write_enable0;
+	reg				prf_write_enable1;
+	reg				cdb_complete0;
+	reg				cdb_complete1;
+	reg				cdb_dest_ar_idx0;
+	reg				cdb_dest_ar_idx1;
+	reg				cdb_prf_dest_pr_idx0;
+	reg				cdb_prf_dest_pr_idx1;
+	reg				cdb_exception0;
+	reg			  cdb_exception1;
+  reg [1:0]		rs_alu_avail;
+	
+	//Update registers
+	reg [63:0] next_prf_result0;   // ALU result
+	reg [63:0] next_prf_result1;   // ALU result
+	reg 			next_prf_write_enable0;
+	reg				next_prf_write_enable1;
+	reg				next_cdb_complete0;
+	reg				next_cdb_complete1;
+	reg				next_cdb_dest_ar_idx0;
+	reg				next_cdb_dest_ar_idx1;
+	reg				next_cdb_prf_dest_pr_idx0;
+	reg				next_cdb_prf_dest_pr_idx1;
+	reg				next_cdb_exception0;
+	reg			  next_cdb_exception1;
+  reg [1:0]		next_rs_alu_avail;
+	
+	
+	
+	
+	
 
   reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
   wire          brcond_result0, brcond_result1;
-   
+  wire					ex_mem_branch_taken0, ex_mem_branch_taken1; 
    // set up possible immediates:
    //   mem_disp: sign-extended 16-bit immediate for memory format
    //   br_disp: sign-extended 21-bit immediate * 4 for branch displacement
@@ -195,16 +264,27 @@ module alu_sim(// Inputs
    //
    // ALU opA mux
    //
+	always @*
+	begin
+		next_cdb_complete0 = 1;
+		next_cdb_complete1 = 1;
+		next_cdb_dest_ar_idx0 = rs_dest_ar_idx0;
+		next_cdb_dest_ar_idx1 = rs_dest_ar_idx1;
+		next_cdb_dest_pr_idx0 = rs_dest_pr_idx0;
+		next_cdb_dest_pr_idx1 = rs_dest_pr_idx1;
+		next_rs_alu_avail = 2'b11;
+		next_cdb_complete0 = rs_valid_inst0;
+		next_cdb_complete1 = rs_valid_inst1;
   always @*
   begin
     case (rs_opa_select0)
-      `ALU_OPA_IS_REGA:     opa_mux_out0 = rs_pra0;
+      `ALU_OPA_IS_REGA:     opa_mux_out0 = prf_pra0;
       `ALU_OPA_IS_MEM_DISP: opa_mux_out0 = mem_disp0;
       `ALU_OPA_IS_NPC:      opa_mux_out0 = rs_NPC0;
       `ALU_OPA_IS_NOT3:     opa_mux_out0 = ~64'h3;
     endcase
 	case (rs_opa_select1)
-      `ALU_OPA_IS_REGA:     opa_mux_out1 = rs_pra1;
+      `ALU_OPA_IS_REGA:     opa_mux_out1 = prf_pra1;
       `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
       `ALU_OPA_IS_NPC:      opa_mux_out1 = rs_NPC1;
       `ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
@@ -221,12 +301,12 @@ module alu_sim(// Inputs
     opb_mux_out0 = 64'hbaadbeefdeadbeef;
 	opb_mux_out1 = 64'hbaadbeefdeadbeef;
     case (rs_opb_select0)
-      `ALU_OPB_IS_REGB:    opb_mux_out0 = rs_prb0;
+      `ALU_OPB_IS_REGB:    opb_mux_out0 = prf_prb0;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out0 = alu_imm0;
       `ALU_OPB_IS_BR_DISP: opb_mux_out0 = br_disp0;
     endcase 
 	case (rs_opb_select1)
-      `ALU_OPB_IS_REGB:    opb_mux_out1 = rs_prb1;
+      `ALU_OPB_IS_REGB:    opb_mux_out1 = prf_prb1;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out1 = alu_imm1;
       `ALU_OPB_IS_BR_DISP: opb_mux_out1 = br_disp1;
     endcase
@@ -241,7 +321,7 @@ module alu_sim(// Inputs
              .func(rs_alu_func0),
 
              // Output
-             .result(alu_result_out0)
+             .result(next_prf_result0)
             );
   alu alu_1 (// Inputs
              .opa(opa_mux_out1),
@@ -249,7 +329,7 @@ module alu_sim(// Inputs
              .func(rs_alu_func1),
 
              // Output
-             .result(alu_result_out1)
+             .result(next_prf_result1)
             );
    //
    // instantiate the branch condition tester
@@ -275,6 +355,43 @@ module alu_sim(// Inputs
                           | (rs_cond_branch0 & brcond_result0);
   assign ex_take_branch_out1 = rs_uncond_branch1
                           | (rs_cond_branch1 & brcond_result1);
+													
+													
+													
+	always @(posedge clock)//Sequential logic
+	begin
+		if(reset)
+		begin
+			cdb_complete0 <= `SD 0;
+			cdb_complete1 <= `SD 0;
+			cdb_dest_ar_idx0 <= `SD 0;
+			cdb_dest_ar_idx1 <= `SD 0;
+			cdb_prf_dest_pr_idx0 <= `SD 0;
+			cdb_prf_dest_pr_idx1 <=`SD 0;
+			cdb_exception0 <= `SD 0;
+			cdb_exception1 <= `SD 0;
+			prf_result0 <= `SD 0;
+			prf_result1 <= `SD 0;
+			prf_write_enable0 <= `SD 0;
+			prf_write_enable1 <= `SD 0;
+			rs_alu_avail <= `SD 0;
+		end
+		else
+		begin
+			cdb_complete0 <= `SD next_cdb_complete0;
+			cdb_complete1 <= `SD next_cdb_complete1;
+			cdb_dest_ar_idx0 <= `SD next_cdb_dest_ar_idx0;
+			cdb_dest_ar_idx1 <= `SD next_cdb_dest_ar_idx1;
+			cdb_prf_dest_pr_idx0 <= `SD next_cdb_prf_dest_pr_idx0;
+			cdb_prf_dest_pr_idx1 <=`SD next_cdb_prf_dest_pr_idx1;
+			cdb_exception0 <= `SD next_cdb_exception0;
+			cdb_exception1 <= `SD next_cdb_exception1;
+			prf_result0 <= `SD next_prf_result0;
+			prf_result1 <= `SD next_prf_result1;
+			prf_write_enable0 <= `SD next_prf_write_enable0;
+			prf_write_enable1 <= `SD next_prf_write_enable1;
+			rs_alu_avail <= `SD next_rs_alu_avail;
+		end
 
 endmodule // module ex_stage
 
