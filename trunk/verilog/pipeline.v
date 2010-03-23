@@ -173,6 +173,7 @@
 	wire	 [6:0] rob_fl_retire_tag_a;
 	wire	 [6:0] rob_fl_retire_tag_b;
 	wire	 [1:0] rob_fl_retire_num;
+	wire				 retire_halt;
 
 	/*
 	 * Output from RS
