@@ -2,7 +2,7 @@
  * 
  * Module name: prf.v
  * 
- * Description: Top-level module of panda pipeline
+ * Description: physical register file
  *
  ************************************************************/
 
