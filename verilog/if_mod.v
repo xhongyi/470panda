@@ -54,8 +54,8 @@ output        id_valid_inst0;
 output				id_valid_inst1;
 output				id_branch_taken0;
 output				id_branch_taken1;
-output				id_pred_addr0;
-output				id_pred_addr1;
+output [64:0]	id_pred_addr0;
+output [64:0]	id_pred_addr1;
 reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
