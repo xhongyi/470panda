@@ -34,9 +34,9 @@ module rob(//inputs
 			//retire
 			fl_retire_tag_a,
 			fl_retire_tag_b,
-			fl_retire_num
+			fl_retire_num,
 
-
+			retire_halt //new it is true when halt inst is retired
 
 );
 input reset;
