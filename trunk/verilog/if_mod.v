@@ -44,7 +44,8 @@ input  [1:0]  Imem_valid;
 input  [1:0]  busy;		//Whether RS and ROB are busy
 
 output [63:0] proc2Imem_addr;     // Address sent to Instruction memory
-output [63:0] if_NPC;         // PC of instruction after fetched (PC+4).
+output [63:0] if_NPC0;         // PC of instruction after fetched (PC+4).
+output [63:0] if_NPC1;
 output [31:0] if_IR0;          // fetched instruction
 output [31:0] if_IR1;
 output        if_valid_inst0;
@@ -76,7 +77,9 @@ assign PC_enable0 = if_valid_inst0 ;//| bht_branch_taken0;
 assign PC_enable1 = if_valid_inst1 ;//| bht_branch_taken1;
     // Pass PC+4 down pipeline w/instruction
 	// I don't know what is going on here.......
-assign if_NPC = busy[1] ? PC_reg : busy[0] ? PC_plus_4 : PC_plus_8;
+	
+assign if_NPC0 = busy[1] ? PC_reg : PC_plus_4;
+assign if_NPC1 = busy[1] ? PC_reg: busy[0] ? PC_plus_4 : PC_plus_8;
 
 assign    if_valid_inst0 =  ~busy[1];
 assign	  if_valid_inst1 =  ~(busy[1]|busy[0]);	
