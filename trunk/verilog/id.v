@@ -536,7 +536,6 @@ wire				next_halt1;
 wire				next_illegal_inst1;
 wire				next_valid_inst1;
 
-
 /*
  * Decode Stage
  */
@@ -637,6 +636,9 @@ assign rs_mt_ra_idx0			= ra_idx0;
 assign rs_mt_rb_idx0			= rb_idx0;
 assign rs_mt_rc_idx0			= rc_idx0;
 
+assign rs_branch_taken0		= branch_taken0;
+assign rs_pred_addr0			= pred_addr0;
+
 assign rs_mt_opa_select0 	= opa_select0;
 assign rs_mt_opb_select0	= opb_select0;
 
@@ -662,6 +664,9 @@ assign rs_IR1							= ir1;
 assign rs_mt_ra_idx1			= ra_idx1;
 assign rs_mt_rb_idx1			= rb_idx1;
 assign rs_mt_rc_idx1			= rc_idx1;
+
+assign rs_branch_taken0		= branch_taken0;
+assign rs_pred_addr0			= pred_addr0;
 
 assign rs_mt_opa_select1 	= opa_select1;
 assign rs_mt_opb_select1	= opb_select1;

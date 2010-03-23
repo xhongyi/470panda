@@ -29,7 +29,7 @@ all:    simv
 
 
 
-MODULE		= 	rs
+MODULE		= 	id
 
 
 TESTBENCH = 	sys_defs.vh	    \
