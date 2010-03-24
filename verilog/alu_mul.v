@@ -174,8 +174,8 @@ module alu_mul(
 		
 		assign cdb_dest_ar_idx0 = dest_ar_idx0;
 		assign cdb_dest_ar_idx1 = dest_ar_idx1;
-		assign cdb_dest_pr_idx0 = dest_pr_idx0;
-		assign cdb_dest_pr_idx1 = dest_pr_idx1;
+		assign cdb_prf_dest_pr_idx0 = dest_pr_idx0;
+		assign cdb_prf_dest_pr_idx1 = dest_pr_idx1;
 		assign rs_alu_avail = 2'b11;
 		
 
@@ -218,8 +218,8 @@ module alu_mul(
 	//
    // instantiate the ALU
    //
-  mult mult0(clock, reset, pra0, prb0, valid_inst0, prf_result, cdb_complete0);
-	mult mult1(clock, reset, pra1, prb1, valid_inst1, prf_result, cdb_complete1);
+  mult mult0(clock, reset, pra0, prb0, valid_inst0, prf_result0, cdb_complete0);
+	mult mult1(clock, reset, pra1, prb1, valid_inst1, prf_result1, cdb_complete1);
   
 	always @(posedge clock)
 	begin
