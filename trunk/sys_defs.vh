@@ -289,7 +289,7 @@
  * New defined
  *
  *****************************************/
-`define CDB_WIDTH		6
+`define CDB_WIDTH		4
 
 `define	ALU_INV			2'b00 // invalid
 `define	ALU_SIM			2'b01
