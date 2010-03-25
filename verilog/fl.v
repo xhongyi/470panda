@@ -14,7 +14,7 @@
 module free_list (//inputs
 		  clock,
 		  reset,
-		  rob_dispatch_num,
+		  id_dispatch_num,
 		  rob_retire_num,
 		  rob_retire_tag_0,
 		  rob_retire_tag_1,
@@ -26,7 +26,7 @@ module free_list (//inputs
   		 );
 
 input clock, reset;
-input [1:0] rob_dispatch_num;
+input [1:0] id_dispatch_num;
 input [1:0] rob_retire_num;
 input [6:0] rob_retire_tag_0, rob_retire_tag_1;
 
@@ -39,7 +39,7 @@ reg [6:0] rob_rs_mt_pr0, rob_rs_mt_pr1;
 integer i;
 
 always @* begin
-  if (rob_dispatch_num == 2'd2) begin
+  if (id_dispatch_num == 2'd2) begin
     if (tail == 7'd94) begin
       next_tail = 7'd0;
       rob_rs_mt_pr0 = tail;
@@ -56,7 +56,7 @@ always @* begin
       rob_rs_mt_pr1 = tail + 7'd1;
     end
   end
-  else if (rob_dispatch_num == 2'd1) begin
+  else if (id_dispatch_num == 2'd1) begin
     rob_rs_mt_pr0 = tail;
     rob_rs_mt_pr1 = 7'd0;
     if (tail == 7'd95)
