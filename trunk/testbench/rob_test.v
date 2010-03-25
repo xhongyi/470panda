@@ -21,7 +21,8 @@ reg [6:0] mt_p1told;
 reg [1:0] id_dispatch_num;
 reg 	  id_valid_inst0;
 reg		  id_valid_inst1;
-
+reg			id_halt0;
+reg			id_halt1;
 
 reg [5:0] cdb_pr_ready; //Note: the bandwidth is CDB_WIDTH;
 reg [6:0] cdb_pr_tag_0;  //Note: the bandwidth is CDB_WIDTH;
@@ -37,6 +38,9 @@ wire [6:0] fl_retire_tag_a;
 wire [6:0] fl_retire_tag_b;
 wire [1:0] fl_retire_num;
 
+wire	retire_halt;
+
+
 reg [1:0]  id_cap_pred;
 reg [6:0]  fl_retire_tag_a_pred;
 reg [6:0]  fl_retire_tag_b_pred;
@@ -47,10 +51,9 @@ reg [6:0]  fl_retire_num_pred;
 reg correct;
 reg done;
   // Instantiate the Pipeline
-rob    testee (//inputs
+rob testee(//inputs
 			reset,
 			clock,
-			
 			//dispatch
 			fl_pr0,
 			fl_pr1,
@@ -59,21 +62,25 @@ rob    testee (//inputs
 			id_dispatch_num,
 			id_valid_inst0,
 			id_valid_inst1,
+			id_halt0,
+			id_halt1,
 			//complete
 			cdb_pr_ready,
 			cdb_pr_tag_0,
 			cdb_pr_tag_1,
 			cdb_pr_tag_2,
-			cdb_pr_tag_3,			
+			cdb_pr_tag_3,
 			cdb_pr_tag_4,
 			cdb_pr_tag_5,
 			//outputs
+			//dispatch
 			id_cap,
 			//retire
 			fl_retire_tag_a,
 			fl_retire_tag_b,
-			fl_retire_num
+			fl_retire_num,
 
+			retire_halt //new it is true when halt inst is retired
 
 );
 	

@@ -77,12 +77,17 @@ input				clock;
 input				reset;
 input	[6:0]	rs_alu_sim_pra_idx0;
 input	[6:0]	rs_alu_sim_pra_idx1;
-	
 input	[6:0]	rs_alu_mul_pra_idx0;
 input	[6:0]	rs_alu_mul_pra_idx1;
-
 input	[6:0]	rs_alu_mem_pra_idx0;
 input	[6:0]	rs_alu_mem_pra_idx1;
+
+input	[6:0]	rs_alu_sim_prb_idx0;
+input	[6:0]	rs_alu_sim_prb_idx1;
+input	[6:0]	rs_alu_mul_prb_idx0;
+input	[6:0]	rs_alu_mul_prb_idx1;
+input	[6:0]	rs_alu_mem_prb_idx0;
+input	[6:0]	rs_alu_mem_prb_idx1;
 
 input					alu_sim_wr_enable0;
 input	[6:0]		alu_sim_pr_idx0;
@@ -111,12 +116,18 @@ input	[63:0]	alu_mem_pr_value1,
 	// Outputs
 output	[63:0]	alu_sim_pra_value0,
 output	[63:0]	alu_sim_pra_value1,
-
 output	[63:0]	alu_mem_pra_value0,
 output	[63:0]	alu_mem_pra_value1,
-
 output	[63:0]	alu_mul_pra_value0,
 output	[63:0]	alu_mul_pra_value1,
+
+output	[63:0]	alu_sim_prb_value0,
+output	[63:0]	alu_sim_prb_value1,
+output	[63:0]	alu_mem_prb_value0,
+output	[63:0]	alu_mem_prb_value1,
+output	[63:0]	alu_mul_prb_value0,
+output	[63:0]	alu_mul_prb_value1,
+
 
 //Internal Memory
 
@@ -126,6 +137,9 @@ reg [63:0] register [95:0];
 
 reg [63:0] next_register[95:0];
 
+//integers
+
+integer i;
 
 //Read
 
@@ -135,6 +149,13 @@ assign alu_mul_pra_value0 = register[rs_alu_mul_pra_idx0];
 assign alu_mul_pra_value1 = register[rs_alu_mul_pra_idx1];
 assign alu_mem_pra_value0 = register[rs_alu_mem_pra_idx0];
 assign alu_mem_pra_value1 = register[rs_alu_mem_pra_idx1];
+
+assign alu_sim_prb_value0 = register[rs_alu_sim_prb_idx0];
+assign alu_sim_prb_value1 = register[rs_alu_sim_prb_idx1];
+assign alu_mul_prb_value0 = register[rs_alu_mul_prb_idx0];
+assign alu_mul_prb_value1 = register[rs_alu_mul_prb_idx1];
+assign alu_mem_prb_value0 = register[rs_alu_mem_prb_idx0];
+assign alu_mem_prb_value1 = register[rs_alu_mem_prb_idx1];
 
 //Write
 
@@ -153,7 +174,18 @@ end
 always @ (posedge clock)
 begin
 	if(reset) 
-	register <= `SD next_register;
+	begin
+	  for ( i = 0; i < 64; i = i + 1)
+		begin
+			register[i] <= `SD 0;
+		end
+	else
+	begin
+		for ( i = 0; i < 64; i = i + 1)
+		begin
+			register[i] <= `SD next_register[i];
+		end
+	end
 end
 
 
