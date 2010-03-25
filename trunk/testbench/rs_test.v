@@ -650,9 +650,7 @@ reg				correct;
 
 
 
-always @(posedge clock) begin
-	#4
-	correct = 1;
+always @* begin
 	if (cre_alu_sim_valid_inst0) begin
 		if (
 		cre_alu_sim_NPC0 != alu_sim_NPC0 ||
@@ -1001,7 +999,10 @@ always @(posedge clock) begin
    		correct = 0;
   	end
   end
-  
+end
+
+always @(posedge clock) begin
+	#4
   if (~correct) begin
 		$display("*** Incorrect at time %4.0f\n", $time);
 		$finish;
@@ -1023,6 +1024,7 @@ initial begin
 	$monitor("Time:%4.0f \n",$time);
 
 ///////////////////////////////////////////origin inputs
+	correct = 1;
 	clock = 0;
 	reset = 0;
 
@@ -1229,15 +1231,15 @@ initial begin
 	rob_cap = 2; // rob capacity
 
 ///input of other signal for rs/////////////////////////////////////////
-	fl_pr_dest_idx0 = 2;
+	fl_pr_dest_idx0 = 0;
 	mt_pra_idx0 = 0;
-	mt_prb_idx0 = 1;
+	mt_prb_idx0 = 0;
 	mt_pra_ready0 = 0; // *** If the reg is not valid, it is ready ***
 	mt_prb_ready0 = 0;
 
-	fl_pr_dest_idx1 = 5;
-	mt_pra_idx1 = 3;
-	mt_prb_idx1 = 4;
+	fl_pr_dest_idx1 = 0;
+	mt_pra_idx1 = 0;
+	mt_prb_idx1 = 0;
 	mt_pra_ready1 = 0; // *** If the reg is not valid, it is ready ***
 	mt_prb_ready1 = 0;
 
@@ -1319,15 +1321,15 @@ initial begin
 	rob_cap = 2; // rob capacity
 
 ///input of other signal for rs/////////////////////////////////////////
-	fl_pr_dest_idx0 = 0;
+	fl_pr_dest_idx0 = 2;
 	mt_pra_idx0 = 0;
-	mt_prb_idx0 = 0;
+	mt_prb_idx0 = 1;
 	mt_pra_ready0 = 0; // *** If the reg is not valid, it is ready ***
 	mt_prb_ready0 = 0;
 
-	fl_pr_dest_idx1 = 0;
-	mt_pra_idx1 = 0;
-	mt_prb_idx1 = 0;
+	fl_pr_dest_idx1 = 5;
+	mt_pra_idx1 = 3;
+	mt_prb_idx1 = 4;
 	mt_pra_ready1 = 0; // *** If the reg is not valid, it is ready ***
 	mt_prb_ready1 = 0;
 
@@ -1337,9 +1339,9 @@ initial begin
 	alu_mem_avail = 0; // For access the memory
 
 // Complete inputs
-	cdb_broadcast = 6'b000011;
+	cdb_broadcast = 6'b000000;
 	cdb_pr_tag0 = 0;
-	cdb_pr_tag1 = 1;
+	cdb_pr_tag1 = 0;
 	cdb_pr_tag2 = 0;
 	cdb_pr_tag3 = 0;
 	cdb_pr_tag4 = 0;
@@ -1391,7 +1393,10 @@ initial begin
 	cre_alu_sim_illegal_inst1 = 0;
 	cre_alu_sim_valid_inst0 = 0;
 	cre_alu_sim_valid_inst1 = 0;
-@(negedge clock); ////First test case for simple ALU; #2_b
+	
+@(negedge clock); ////First test case for simple ALU; #3 // $1 and $2 have
+//been broadcasted and they would be set ready on the next clocking edge, which means
+//the instruction would be issued next cycle.
 ///////////////////////////////////////////origin inputs
 ///input of id//////////////////////////////////////////////////////////
 	if_IR0 = 0;
@@ -1479,9 +1484,9 @@ initial begin
 
 	cre_alu_sim_illegal_inst0 = 0;
 	cre_alu_sim_illegal_inst1 = 0;
-	cre_alu_sim_valid_inst0 = 1;
+	cre_alu_sim_valid_inst0 = 1;//as this is set for the next cycle.
 	cre_alu_sim_valid_inst1 = 0;
-@(negedge clock); ////First test case for simple ALU; #3
+@(negedge clock); ////First test case for simple ALU; #4
 ///////////////////////////////////////////origin inputs
 ///input of id//////////////////////////////////////////////////////////
 	if_IR0 = 0;
@@ -1529,7 +1534,7 @@ initial begin
 	cre_id_rs_cap = 2;
 
 // Sim outputs
-	cre_alu_sim_NPC0 = 4;
+	cre_alu_sim_NPC0 = 0;
 	cre_alu_sim_NPC1 = 0;
 	cre_alu_sim_IR0 = 32'h40010402;
 	cre_alu_sim_IR1 = 0;
@@ -1567,194 +1572,10 @@ initial begin
 	cre_alu_sim_halt0 = 0;
 	cre_alu_sim_halt1 = 0;
 
-	cre_alu_sim_illegal_inst0 = 0;
-	cre_alu_sim_illegal_inst1 = 0;
-	cre_alu_sim_valid_inst0 = 1;
-	cre_alu_sim_valid_inst1 = 0;
-
-@(negedge clock); ////2nd test case for simple ALU; #4
-///////////////////Test 2 dispatch and 2 issue on the next cycle
-///////////////////////////////////////////origin inputs
-///input of id//////////////////////////////////////////////////////////
-	if_IR0 = 32'h40010402;
-	if_IR1 = 32'h40010402;
-	if_valid_inst0 = 1;
-	if_valid_inst1 = 1;
-	if_NPC0 = 8;
-	if_NPC1 = 12;
-
-	if_branch_taken0 = 0;
-	if_branch_taken1 = 0;
-	if_pred_addr0 = 0;
-	if_pred_addr1 = 0;
-
-	rob_cap = 2; // rob capacity
-
-///input of other signal for rs/////////////////////////////////////////
-	fl_pr_dest_idx0 = 8;
-	mt_pra_idx0 = 6;
-	mt_prb_idx0 = 7;
-					mt_pra_ready0 = 0; // *** If the reg is not valid, it is ready ***
-					mt_prb_ready0 = 0;
-
-	fl_pr_dest_idx1 = 11;
-	mt_pra_idx1 = 9;
-	mt_prb_idx1 = 10;
-					mt_pra_ready1 = 0; // *** If the reg is not valid, it is ready ***
-					mt_prb_ready1 = 0;
-
-// Issue inputs
-	alu_sim_avail = 2'b11; // For the simple calculations
-	alu_mul_avail = 0; // For the multiplication unit
-	alu_mem_avail = 0; // For access the memory
-
-// Complete inputs
-	cdb_broadcast = 6'b000000;
-	cdb_pr_tag0 = 0;
-	cdb_pr_tag1 = 0;
-	cdb_pr_tag2 = 0;
-	cdb_pr_tag3 = 0;
-	cdb_pr_tag4 = 0;
-	cdb_pr_tag5 = 0;
-
-/////////////////////////////////////////correct output
-	cre_id_rs_cap = 2;
-
-// Sim outputs
-	cre_alu_sim_NPC0 = 0;
-	cre_alu_sim_NPC1 = 0;
-	cre_alu_sim_IR0 = 0;
-	cre_alu_sim_IR1 = 0;
-
-	cre_alu_sim_branch_taken0 = 0;
-	cre_alu_sim_branch_taken1 = 0;
-	cre_alu_sim_pred_addr0 = 0;
-	cre_alu_sim_pred_addr1 = 0;
-
-	cre_alu_sim_prf_pra_idx0 = 0;
-	cre_alu_sim_prf_pra_idx1 = 0;
-	cre_alu_sim_prf_prb_idx0 = 0;
-	cre_alu_sim_prf_prb_idx1 = 0;
-
-	cre_alu_sim_opa_select0 = 0;
-	cre_alu_sim_opa_select1 = 0;
-	cre_alu_sim_opb_select0 = 0;
-	cre_alu_sim_opb_select1 = 0;
-
-	cre_alu_sim_dest_ar_idx0 = 0;
-	cre_alu_sim_dest_ar_idx1 = 0;
-	cre_alu_sim_dest_pr_idx0 = 0;
-	cre_alu_sim_dest_pr_idx1 = 0;
-	cre_alu_sim_func0 = 0;
-	cre_alu_sim_func1 = 0;
-
-	cre_alu_sim_rd_mem0 = 0;
-	cre_alu_sim_rd_mem1 = 0;
-	cre_alu_sim_wr_mem0 = 0;
-	cre_alu_sim_wr_mem1 = 0;
-	cre_alu_sim_cond_branch0 = 0;
-	cre_alu_sim_cond_branch1 = 0;
-	cre_alu_sim_uncond_branch0 = 0;
-	cre_alu_sim_uncond_branch1 = 0;
-	cre_alu_sim_halt0 = 0;
-	cre_alu_sim_halt1 = 0;
-
-	cre_alu_sim_illegal_inst0 = 0;
+	cre_alu_sim_illegal_inst0 = 1;
 	cre_alu_sim_illegal_inst1 = 0;
 	cre_alu_sim_valid_inst0 = 0;
 	cre_alu_sim_valid_inst1 = 0;
-
-@(negedge clock); ////2nd test case for simple ALU; #5
-///////////////////Test 2 dispatch and 2 issue on the next cycle
-///////////////////////////////////////////origin inputs
-///input of id//////////////////////////////////////////////////////////
-	if_IR0 = 0;
-	if_IR1 = 0;
-	if_valid_inst0 = 0;
-	if_valid_inst1 = 0;
-	if_NPC0 = 0;
-	if_NPC1 = 0;
-
-	if_branch_taken0 = 0;
-	if_branch_taken1 = 0;
-	if_pred_addr0 = 0;
-	if_pred_addr1 = 0;
-
-	rob_cap = 2; // rob capacity
-
-///input of other signal for rs/////////////////////////////////////////
-	fl_pr_dest_idx0 = 0;
-	mt_pra_idx0 = 0;
-	mt_prb_idx0 = 0;
-					mt_pra_ready0 = 0; // *** If the reg is not valid, it is ready ***
-					mt_prb_ready0 = 0;
-
-	fl_pr_dest_idx1 = 0;
-	mt_pra_idx1 = 0;
-	mt_prb_idx1 = 0;
-					mt_pra_ready1 = 0; // *** If the reg is not valid, it is ready ***
-					mt_prb_ready1 = 0;
-
-// Issue inputs
-	alu_sim_avail = 2'b11; // For the simple calculations
-	alu_mul_avail = 0; // For the multiplication unit
-	alu_mem_avail = 0; // For access the memory
-
-// Complete inputs
-	cdb_broadcast = 6'b001111;
-	cdb_pr_tag0 = 6;
-	cdb_pr_tag1 = 7;
-	cdb_pr_tag2 = 9;
-	cdb_pr_tag3 = 10;
-	cdb_pr_tag4 = 0;
-	cdb_pr_tag5 = 0;
-
-/////////////////////////////////////////correct output
-	cre_id_rs_cap = 2;
-
-// Sim outputs
-	cre_alu_sim_NPC0 = 8;
-	cre_alu_sim_NPC1 = 12;
-	cre_alu_sim_IR0 = 32'h40010402;
-	cre_alu_sim_IR1 = 32'h40010402;
-
-	cre_alu_sim_branch_taken0 = 0;
-	cre_alu_sim_branch_taken1 = 0;
-	cre_alu_sim_pred_addr0 = 0;
-	cre_alu_sim_pred_addr1 = 0;
-
-	cre_alu_sim_prf_pra_idx0 = 6;
-	cre_alu_sim_prf_pra_idx1 = 9;
-	cre_alu_sim_prf_prb_idx0 = 7;
-	cre_alu_sim_prf_prb_idx1 = 10;
-
-	cre_alu_sim_opa_select0 = `ALU_OPA_IS_REGA;
-	cre_alu_sim_opa_select1 = `ALU_OPB_IS_REGB;
-	cre_alu_sim_opb_select0 = `ALU_OPA_IS_REGA;
-	cre_alu_sim_opb_select1 = `ALU_OPB_IS_REGB;
-
-	cre_alu_sim_dest_ar_idx0 = 2;
-	cre_alu_sim_dest_ar_idx1 = 2;
-	cre_alu_sim_dest_pr_idx0 = 8;
-	cre_alu_sim_dest_pr_idx1 = 11;
-	cre_alu_sim_func0 = `ALU_ADDQ;
-	cre_alu_sim_func1 = `ALU_ADDQ;
-
-	cre_alu_sim_rd_mem0 = 0;
-	cre_alu_sim_rd_mem1 = 0;
-	cre_alu_sim_wr_mem0 = 0;
-	cre_alu_sim_wr_mem1 = 0;
-	cre_alu_sim_cond_branch0 = 0;
-	cre_alu_sim_cond_branch1 = 0;
-	cre_alu_sim_uncond_branch0 = 0;
-	cre_alu_sim_uncond_branch1 = 0;
-	cre_alu_sim_halt0 = 0;
-	cre_alu_sim_halt1 = 0;
-
-	cre_alu_sim_illegal_inst0 = 0;
-	cre_alu_sim_illegal_inst1 = 0;
-	cre_alu_sim_valid_inst0 = 1;
-	cre_alu_sim_valid_inst1 = 1;
 
 @(negedge clock);
 $finish;
