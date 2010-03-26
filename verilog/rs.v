@@ -605,25 +605,11 @@ reg		[`NUM_RS_ENTRIES-1:0]	mem_ready;
 reg		[`NUM_RS_ENTRIES-1:0] ent_taken; // ent means entry
 reg		[`NUM_RS_ENTRIES-1:0] ent_avail;
 
-/*reg		[`LOG_NUM_RS_ENTRIES:0]		num_empty_entries;
-reg		[`LOG_NUM_RS_ENTRIES:0]		num_ready_sim;
-reg		[`LOG_NUM_RS_ENTRIES:0]		num_ready_mul;
-reg		[`LOG_NUM_RS_ENTRIES:0]		num_ready_mem;
-reg		[`LOG_NUM_RS_ENTRIES-1:0]	avail_ent_idx		[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0] ready_sim_idx			[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0]	ready_mul_idx			[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0]	ready_mem_idx			[`NUM_RS_ENTRIES-1:0];*/
-
 reg		[`NUM_RS_ENTRIES-1:0]	next_sim_ready;
 reg		[`NUM_RS_ENTRIES-1:0]	next_mul_ready;
 reg		[`NUM_RS_ENTRIES-1:0]	next_mem_ready;
 reg		[`NUM_RS_ENTRIES-1:0] next_ent_taken;
 reg		[`NUM_RS_ENTRIES-1:0] next_ent_avail;
-
-/*reg		[`LOG_NUM_RS_ENTRIES:0]		next_num_empty_entries;
-reg		[`LOG_NUM_RS_ENTRIES:0]		next_num_ready_sim;
-reg		[`LOG_NUM_RS_ENTRIES:0]		next_num_ready_mul;
-reg		[`LOG_NUM_RS_ENTRIES:0]		next_num_ready_mem;*/
 
 wire				ready_sim_valid;
 wire	[4:0]	ready_sim_high_idx;
@@ -645,23 +631,7 @@ wire				ent_avail_valid;
 wire	[4:0]	ent_avail_high_idx;
 wire	[4:0]	ent_avail_low_idx;
 
-/*reg		[`LOG_NUM_RS_ENTRIES-1:0]	next_avail_ent_idx		[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0] next_ready_sim_idx			[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0]	next_ready_mul_idx			[`NUM_RS_ENTRIES-1:0];
-reg		[`LOG_NUM_RS_ENTRIES-1:0]	next_ready_mem_idx			[`NUM_RS_ENTRIES-1:0];*/
-
-wire	[1:0]	actual_dispatch_num = id_dispatch_num - ((id_dispatch_num[1])? ~id_valid_inst1 : 0) - 
-																	((id_dispatch_num > 0) ? ~id_valid_inst0 : 0);
-
 integer i;
-
-/*assign next_num_empty_entries = num_empty_entries - id_dispatch_num -
-																// The dispatched inst may be not valid
-																((id_dispatch_num[1])? ~id_valid_inst1 : 0) -
-																((id_dispatch_num > 0)? ~id_valid_inst0 : 0); 
-*/
-/*assign id_rs_cap = (num_empty_entries == 0) ? 2'b00:
-									 (num_empty_entries == 1) ? 2'b01: 2'b10;*/
 
 assign id_rs_cap = (~ent_avail_valid) ? 2'b00 :
 									 (ent_avail_high_idx == ent_avail_low_idx) ? 2'b01 : 2'b10;
@@ -695,149 +665,89 @@ prien prien_ent_avail(.decode(ent_avail),
 
 always @ *
 begin
-
+// default: if there is nothing dispatched or issued, then everything stays the same.
 	for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 	begin
-			next_alu_type[i]			= alu_type[i];
-			next_npc[i]						= npc[i];
-			next_ir[i]						= ir[i];
-			next_branch_taken[i]	= branch_taken[i];
-			next_pred_addr[i]			= pred_addr[i];
-			next_opa_select[i]		= opa_select[i];
-			next_opb_select[i]		= opb_select[i];
-			next_dest_ar_idx[i]		= dest_ar_idx[i];
-			next_dest_pr_idx[i]		= dest_pr_idx[i];
-			next_pra_idx[i]				= pra_idx[i];
-			next_pra_ready[i]			= pra_ready[i];
-			next_prb_idx[i]				= prb_idx[i];
-			next_prb_ready[i]			= prb_ready[i];
-			next_alu_func[i]			= alu_func[i];
-			next_rd_mem[i]				= rd_mem[i];
-			next_wr_mem[i]				= wr_mem[i];
-			next_cond_branch[i]		= cond_branch[i];
-			next_uncond_branch[i]	= uncond_branch[i];
-			next_halt[i]					= halt[i];
-			next_illegal_inst[i]	= illegal_inst[i];
-			next_valid_inst[i]		= valid_inst[i];
+		next_alu_type[i]			= alu_type[i];
+		next_npc[i]						= npc[i];
+		next_ir[i]						= ir[i];
+		next_branch_taken[i]	= branch_taken[i];
+		next_pred_addr[i]			= pred_addr[i];
+		next_opa_select[i]		= opa_select[i];
+		next_opb_select[i]		= opb_select[i];
+		next_dest_ar_idx[i]		= dest_ar_idx[i];
+		next_dest_pr_idx[i]		= dest_pr_idx[i];
+		next_pra_idx[i]				= pra_idx[i];
+		next_pra_ready[i]			= pra_ready[i];
+		next_prb_idx[i]				= prb_idx[i];
+		next_prb_ready[i]			= prb_ready[i];
+		next_alu_func[i]			= alu_func[i];
+		next_rd_mem[i]				= rd_mem[i];
+		next_wr_mem[i]				= wr_mem[i];
+		next_cond_branch[i]		= cond_branch[i];
+		next_uncond_branch[i]	= uncond_branch[i];
+		next_halt[i]					= halt[i];
+		next_illegal_inst[i]	= illegal_inst[i];
+		next_valid_inst[i]		= valid_inst[i];
 	end
 
-	/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
-	begin
-		next_avail_ent_idx[i] = avail_ent_idx[i];
-	end*/
-	//next_num_empty_entries= num_empty_entries;
-	next_ent_taken			= ent_taken;
-	next_ent_avail			= ent_avail;
+	next_sim_ready = sim_ready;
+	next_mul_ready = mul_ready;
+	next_mem_ready = mem_ready;
+	next_ent_taken = ent_taken; // ent means entry
+	next_ent_avail = ent_avail;
+//--------------------------------------------------------------ISSUE LOGIC
+//////////////////////////////////////////////////////////////////////////////////////////////////Here is the simple alu
+	if (ready_sim_valid) begin
+		if (alu_sim_avail[1] && alu_sim_avail[0]) begin
+			if (ready_sim_high_idx != ready_sim_low_idx) begin
+				alu_sim_NPC0					= npc[ready_sim_high_idx];
+				alu_sim_IR0 					= ir[ready_sim_high_idx];
+				alu_sim_branch_taken0 = branch_taken[ready_sim_high_idx];
+				alu_sim_pred_addr0 		= pred_addr[ready_sim_high_idx];
+				alu_sim_prf_pra_idx0 	= pra_idx[ready_sim_high_idx];
+				alu_sim_prf_prb_idx0 	= prb_idx[ready_sim_high_idx];
+				alu_sim_opa_select0		= opa_select[ready_sim_high_idx];
+				alu_sim_opb_select0		= opb_select[ready_sim_high_idx];
+				alu_sim_dest_ar_idx0	= dest_ar_idx[ready_sim_high_idx];
+				alu_sim_dest_pr_idx0	= dest_pr_idx[ready_sim_high_idx];
+				alu_sim_func0					= alu_func[ready_sim_high_idx];
+				alu_sim_rd_mem0				= rd_mem[ready_sim_high_idx];
+				alu_sim_wr_mem0				= wr_mem[ready_sim_high_idx];
+				alu_sim_cond_branch0	= cond_branch[ready_sim_high_idx];
+				alu_sim_uncond_branch0	= uncond_branch[ready_sim_high_idx];
+				alu_sim_halt0					= halt[ready_sim_high_idx];
+				alu_sim_illegal_inst0	= illegal_inst[ready_sim_high_idx];
+				alu_sim_valid_inst0		= valid_inst[ready_sim_high_idx];
 
-	next_sim_ready 			= sim_ready;
-	//next_num_ready_sim 	= num_ready_sim;
-	/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
-	begin
-		next_ready_sim_idx[i] = ready_sim_idx[i];
-	end*/
-	if (ready_sim_valid)
-	begin
-	if (alu_sim_avail[1] && alu_sim_avail[0])
-	begin
-		if (ready_sim_high_idx != ready_sim_low_idx)
-		begin
-			alu_sim_NPC0					= npc[ready_sim_high_idx];
-			alu_sim_IR0 					= ir[ready_sim_high_idx];
-			alu_sim_branch_taken0 = branch_taken[ready_sim_high_idx];
-			alu_sim_pred_addr0 		= pred_addr[ready_sim_high_idx];
-			alu_sim_prf_pra_idx0 	= pra_idx[ready_sim_high_idx];
-			alu_sim_prf_prb_idx0 	= prb_idx[ready_sim_high_idx];
-			alu_sim_opa_select0		= opa_select[ready_sim_high_idx];
-			alu_sim_opb_select0		= opb_select[ready_sim_high_idx];
-			alu_sim_dest_ar_idx0	= dest_ar_idx[ready_sim_high_idx];
-			alu_sim_dest_pr_idx0	= dest_pr_idx[ready_sim_high_idx];
-			alu_sim_func0					= alu_func[ready_sim_high_idx];
-			alu_sim_rd_mem0				= rd_mem[ready_sim_high_idx];
-			alu_sim_wr_mem0				= wr_mem[ready_sim_high_idx];
-			alu_sim_cond_branch0	= cond_branch[ready_sim_high_idx];
-			alu_sim_uncond_branch0		= uncond_branch[ready_sim_high_idx];
-			alu_sim_halt0					= halt[ready_sim_high_idx];
-			alu_sim_illegal_inst0	= illegal_inst[ready_sim_high_idx];
-			alu_sim_valid_inst0		= valid_inst[ready_sim_high_idx];
+				alu_sim_NPC1					= npc[ready_sim_low_idx];
+				alu_sim_IR1 					= ir[ready_sim_low_idx];
+				alu_sim_branch_taken1 = branch_taken[ready_sim_low_idx];
+				alu_sim_pred_addr1 		= pred_addr[ready_sim_low_idx];
+				alu_sim_prf_pra_idx1 	= pra_idx[ready_sim_low_idx];
+				alu_sim_prf_prb_idx1 	= prb_idx[ready_sim_low_idx];
+				alu_sim_opa_select1		= opa_select[ready_sim_low_idx];
+				alu_sim_opb_select1		= opb_select[ready_sim_low_idx];
+				alu_sim_dest_ar_idx1	= dest_ar_idx[ready_sim_low_idx];
+				alu_sim_dest_pr_idx1	= dest_pr_idx[ready_sim_low_idx];
+				alu_sim_func1					= alu_func[ready_sim_low_idx];
+				alu_sim_rd_mem1				= rd_mem[ready_sim_low_idx];
+				alu_sim_wr_mem1				= wr_mem[ready_sim_low_idx];
+				alu_sim_cond_branch1	= cond_branch[ready_sim_low_idx];
+				alu_sim_uncond_branch1	= uncond_branch[ready_sim_low_idx];
+				alu_sim_halt1					= halt[ready_sim_low_idx];
+				alu_sim_illegal_inst1	= illegal_inst[ready_sim_low_idx];
+				alu_sim_valid_inst1		= valid_inst[ready_sim_low_idx];
 
-			alu_sim_NPC1					= npc[ready_sim_low_idx];
-			alu_sim_IR1 					= ir[ready_sim_low_idx];
-			alu_sim_branch_taken1 = branch_taken[ready_sim_low_idx];
-			alu_sim_pred_addr1 		= pred_addr[ready_sim_low_idx];
-			alu_sim_prf_pra_idx1 	= pra_idx[ready_sim_low_idx];
-			alu_sim_prf_prb_idx1 	= prb_idx[ready_sim_low_idx];
-			alu_sim_opa_select1		= opa_select[ready_sim_low_idx];
-			alu_sim_opb_select1		= opb_select[ready_sim_low_idx];
-			alu_sim_dest_ar_idx1	= dest_ar_idx[ready_sim_low_idx];
-			alu_sim_dest_pr_idx1	= dest_pr_idx[ready_sim_low_idx];
-			alu_sim_func1					= alu_func[ready_sim_low_idx];
-			alu_sim_rd_mem1				= rd_mem[ready_sim_low_idx];
-			alu_sim_wr_mem1				= wr_mem[ready_sim_low_idx];
-			alu_sim_cond_branch1	= cond_branch[ready_sim_low_idx];
-			alu_sim_uncond_branch1		= uncond_branch[ready_sim_low_idx];
-			alu_sim_halt1					= halt[ready_sim_low_idx];
-			alu_sim_illegal_inst1	= illegal_inst[ready_sim_low_idx];
-			alu_sim_valid_inst1		= valid_inst[ready_sim_low_idx];
+				next_sim_ready[ready_sim_high_idx] = 0;
+				next_sim_ready[ready_sim_low_idx] = 0;
 
-			next_sim_ready[ready_sim_high_idx] = 0;
-			next_sim_ready[ready_sim_low_idx] = 0;
-			//next_num_ready_sim							 = next_num_ready_sim - 2;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_sim_idx[i-2] = next_ready_sim_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 2;
-			next_ent_taken[ready_sim_high_idx] = 0;
-			next_ent_taken[ready_sim_low_idx] = 0;
-			next_ent_avail[ready_sim_high_idx] = 1'b1;
-			next_ent_avail[ready_sim_low_idx] = 1'b1;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i+1)
-			begin
-				next_avail_ent_idx[i-2] = next_avail_ent_idx[i];
-			end*/
-		end
-		else
-		begin
-			alu_sim_NPC0					= npc[ready_sim_high_idx];
-			alu_sim_IR0 					= ir[ready_sim_high_idx];
-			alu_sim_branch_taken0 = branch_taken[ready_sim_high_idx];
-			alu_sim_pred_addr0 		= pred_addr[ready_sim_high_idx];
-			alu_sim_prf_pra_idx0 	= pra_idx[ready_sim_high_idx];
-			alu_sim_prf_prb_idx0 	= prb_idx[ready_sim_high_idx];
-			alu_sim_opa_select0		= opa_select[ready_sim_high_idx];
-			alu_sim_opb_select0		= opb_select[ready_sim_high_idx];
-			alu_sim_dest_ar_idx0	= dest_ar_idx[ready_sim_high_idx];
-			alu_sim_dest_pr_idx0	= dest_pr_idx[ready_sim_high_idx];
-			alu_sim_func0					= alu_func[ready_sim_high_idx];
-			alu_sim_rd_mem0				= rd_mem[ready_sim_high_idx];
-			alu_sim_wr_mem0				= wr_mem[ready_sim_high_idx];
-			alu_sim_cond_branch0	= cond_branch[ready_sim_high_idx];
-			alu_sim_uncond_branch0		= uncond_branch[ready_sim_high_idx];
-			alu_sim_halt0					= halt[ready_sim_high_idx];
-			alu_sim_illegal_inst0	= illegal_inst[ready_sim_high_idx];
-			alu_sim_valid_inst0		= valid_inst[ready_sim_high_idx];
-
-			alu_sim_valid_inst1 	=	0;
-
-			next_sim_ready[ready_sim_high_idx]	= 0;
-			//next_num_ready_sim								= next_num_ready_sim - 1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_sim_idx[i-1] = next_ready_sim_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 1;
-			next_ent_taken[ready_sim_high_idx] = 0;
-			next_ent_avail[ready_sim_high_idx] = 1'b1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-			end*/
-		end
-	end
-	else if (alu_sim_avail[0])
-	begin
+				next_ent_taken[ready_sim_high_idx] = 0;
+				next_ent_taken[ready_sim_low_idx] = 0;
+				next_ent_avail[ready_sim_high_idx] = 1'b1;
+				next_ent_avail[ready_sim_low_idx] = 1'b1;
+			end
+			else begin
 				alu_sim_NPC0					= npc[ready_sim_high_idx];
 				alu_sim_IR0 					= ir[ready_sim_high_idx];
 				alu_sim_branch_taken0 = branch_taken[ready_sim_high_idx];
@@ -857,182 +767,82 @@ begin
 				alu_sim_illegal_inst0	= illegal_inst[ready_sim_high_idx];
 				alu_sim_valid_inst0		= valid_inst[ready_sim_high_idx];
 
-				alu_sim_valid_inst1 	=	0;
+				alu_sim_valid_inst1 	=	0;//Tell the alu_sim that only instruction0 is valid
 
 				next_sim_ready[ready_sim_high_idx]	= 0;
-				//next_num_ready_sim								= next_num_ready_sim - 1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_ready_sim_idx[i-1] = next_ready_sim_idx[i];
-				end*/
-
-				//next_num_empty_entries = next_num_empty_entries - 1;
+				
 				next_ent_taken[ready_sim_high_idx] = 0;
 				next_ent_avail[ready_sim_high_idx] = 1'b1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-				end*/
+			end
+		end
+		else if (alu_sim_avail[0]) begin
+			alu_sim_NPC0					= npc[ready_sim_high_idx];
+			alu_sim_IR0 					= ir[ready_sim_high_idx];
+			alu_sim_branch_taken0 = branch_taken[ready_sim_high_idx];
+			alu_sim_pred_addr0 		= pred_addr[ready_sim_high_idx];
+			alu_sim_prf_pra_idx0 	= pra_idx[ready_sim_high_idx];
+			alu_sim_prf_prb_idx0 	= prb_idx[ready_sim_high_idx];
+			alu_sim_opa_select0		= opa_select[ready_sim_high_idx];
+			alu_sim_opb_select0		= opb_select[ready_sim_high_idx];
+			alu_sim_dest_ar_idx0	= dest_ar_idx[ready_sim_high_idx];
+			alu_sim_dest_pr_idx0	= dest_pr_idx[ready_sim_high_idx];
+			alu_sim_func0					= alu_func[ready_sim_high_idx];
+			alu_sim_rd_mem0				= rd_mem[ready_sim_high_idx];
+			alu_sim_wr_mem0				= wr_mem[ready_sim_high_idx];
+			alu_sim_cond_branch0	= cond_branch[ready_sim_high_idx];
+			alu_sim_uncond_branch0		= uncond_branch[ready_sim_high_idx];
+			alu_sim_halt0					= halt[ready_sim_high_idx];
+			alu_sim_illegal_inst0	= illegal_inst[ready_sim_high_idx];
+			alu_sim_valid_inst0		= valid_inst[ready_sim_high_idx];
+
+			alu_sim_valid_inst1 	=	0;//Tell the alu_sim that only instruction0 is valid
+
+			next_sim_ready[ready_sim_high_idx]	= 0;
+			
+			next_ent_taken[ready_sim_high_idx] = 0;
+			next_ent_avail[ready_sim_high_idx] = 1'b1;
+		end
+		else if (alu_sim_avail[1]) begin
+			alu_sim_NPC1					= npc[ready_sim_high_idx];
+			alu_sim_IR1 					= ir[ready_sim_high_idx];
+			alu_sim_branch_taken1 = branch_taken[ready_sim_high_idx];
+			alu_sim_pred_addr1 		= pred_addr[ready_sim_high_idx];
+			alu_sim_prf_pra_idx1 	= pra_idx[ready_sim_high_idx];
+			alu_sim_prf_prb_idx1 	= prb_idx[ready_sim_high_idx];
+			alu_sim_opa_select1		= opa_select[ready_sim_high_idx];
+			alu_sim_opb_select1		= opb_select[ready_sim_high_idx];
+			alu_sim_dest_ar_idx1	= dest_ar_idx[ready_sim_high_idx];
+			alu_sim_dest_pr_idx1	= dest_pr_idx[ready_sim_high_idx];
+			alu_sim_func1					= alu_func[ready_sim_high_idx];
+			alu_sim_rd_mem1				= rd_mem[ready_sim_high_idx];
+			alu_sim_wr_mem1				= wr_mem[ready_sim_high_idx];
+			alu_sim_cond_branch1	= cond_branch[ready_sim_high_idx];
+			alu_sim_uncond_branch1		= uncond_branch[ready_sim_high_idx];
+			alu_sim_halt1					= halt[ready_sim_high_idx];
+			alu_sim_illegal_inst1	= illegal_inst[ready_sim_high_idx];
+			alu_sim_valid_inst1		= valid_inst[ready_sim_high_idx];
+
+			alu_sim_valid_inst0 	=	0;//Tell the alu_sim that only instruction1 is valid
+
+			next_sim_ready[ready_sim_high_idx]	= 0;
+			
+			next_ent_taken[ready_sim_high_idx] = 0;
+			next_ent_avail[ready_sim_high_idx] = 1'b1;
+		end
+		else begin
+			alu_sim_valid_inst0		= 0;
+			alu_sim_valid_inst1		= 0;
+		end
 	end
-	else if (alu_sim_avail[1])
-	begin
-					alu_sim_NPC1					= npc[ready_sim_high_idx];
-					alu_sim_IR1 					= ir[ready_sim_high_idx];
-					alu_sim_branch_taken1 = branch_taken[ready_sim_high_idx];
-					alu_sim_pred_addr1 		= pred_addr[ready_sim_high_idx];
-					alu_sim_prf_pra_idx1 	= pra_idx[ready_sim_high_idx];
-					alu_sim_prf_prb_idx1 	= prb_idx[ready_sim_high_idx];
-					alu_sim_opa_select1		= opa_select[ready_sim_high_idx];
-					alu_sim_opb_select1		= opb_select[ready_sim_high_idx];
-					alu_sim_dest_ar_idx1	= dest_ar_idx[ready_sim_high_idx];
-					alu_sim_dest_pr_idx1	= dest_pr_idx[ready_sim_high_idx];
-					alu_sim_func1					= alu_func[ready_sim_high_idx];
-					alu_sim_rd_mem1				= rd_mem[ready_sim_high_idx];
-					alu_sim_wr_mem1				= wr_mem[ready_sim_high_idx];
-					alu_sim_cond_branch1	= cond_branch[ready_sim_high_idx];
-					alu_sim_uncond_branch1		= uncond_branch[ready_sim_high_idx];
-					alu_sim_halt1					= halt[ready_sim_high_idx];
-					alu_sim_illegal_inst1	= illegal_inst[ready_sim_high_idx];
-					alu_sim_valid_inst1		= valid_inst[ready_sim_high_idx];
-
-					alu_sim_valid_inst0 	=	0;
-
-					next_sim_ready[ready_sim_high_idx]	= 0;
-					//next_num_ready_sim								= next_num_ready_sim - 1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_ready_sim_idx[i-1] = next_ready_sim_idx[i];
-					end*/
-
-					//next_num_empty_entries = next_num_empty_entries - 1;
-					next_ent_taken[ready_sim_high_idx] = 0;
-					next_ent_avail[ready_sim_high_idx] = 1'b1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-					end*/
-	end
-	else
-	begin
+	else begin
 		alu_sim_valid_inst0		= 0;
 		alu_sim_valid_inst1		= 0;
 	end
-	end
-	else
-	begin
-		alu_sim_valid_inst0		= 0;
-		alu_sim_valid_inst1		= 0;
-	end
 
-	next_mul_ready 			= mul_ready;
-	//next_num_ready_mul 	= num_ready_mul;
-	/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
-	begin
-		next_ready_mul_idx[i] = ready_mul_idx[i];
-	end*/
-	if (ready_mul_valid)
-	begin
-	if (alu_mul_avail[1] && alu_mul_avail[0])
-	begin
-		if (ready_mul_high_idx != ready_mul_low_idx)
-		begin
-			alu_mul_NPC0					= npc[ready_mul_high_idx];
-			alu_mul_IR0 					= ir[ready_mul_high_idx];
-			alu_mul_branch_taken0 = branch_taken[ready_mul_high_idx];
-			alu_mul_pred_addr0 		= pred_addr[ready_mul_high_idx];
-			alu_mul_prf_pra_idx0 	= pra_idx[ready_mul_high_idx];
-			alu_mul_prf_prb_idx0 	= prb_idx[ready_mul_high_idx];
-			alu_mul_opa_select0		= opa_select[ready_mul_high_idx];
-			alu_mul_opb_select0		= opb_select[ready_mul_high_idx];
-			alu_mul_dest_ar_idx0	= dest_ar_idx[ready_mul_high_idx];
-			alu_mul_dest_pr_idx0	= dest_pr_idx[ready_mul_high_idx];
-			alu_mul_func0					= alu_func[ready_mul_high_idx];
-			alu_mul_rd_mem0				= rd_mem[ready_mul_high_idx];
-			alu_mul_wr_mem0				= wr_mem[ready_mul_high_idx];
-			alu_mul_cond_branch0	= cond_branch[ready_mul_high_idx];
-			alu_mul_uncond_branch0		= uncond_branch[ready_mul_high_idx];
-			alu_mul_halt0					= halt[ready_mul_high_idx];
-			alu_mul_illegal_inst0	= illegal_inst[ready_mul_high_idx];
-			alu_mul_valid_inst0		= valid_inst[ready_mul_high_idx];
-
-			alu_mul_NPC1					= npc[ready_mul_low_idx];
-			alu_mul_IR1 					= ir[ready_mul_low_idx];
-			alu_mul_branch_taken1 = branch_taken[ready_mul_low_idx];
-			alu_mul_pred_addr1 		= pred_addr[ready_mul_low_idx];
-			alu_mul_prf_pra_idx1 	= pra_idx[ready_mul_low_idx];
-			alu_mul_prf_prb_idx1 	= prb_idx[ready_mul_low_idx];
-			alu_mul_opa_select1		= opa_select[ready_mul_low_idx];
-			alu_mul_opb_select1		= opb_select[ready_mul_low_idx];
-			alu_mul_dest_ar_idx1	= dest_ar_idx[ready_mul_low_idx];
-			alu_mul_dest_pr_idx1	= dest_pr_idx[ready_mul_low_idx];
-			alu_mul_func1					= alu_func[ready_mul_low_idx];
-			alu_mul_rd_mem1				= rd_mem[ready_mul_low_idx];
-			alu_mul_wr_mem1				= wr_mem[ready_mul_low_idx];
-			alu_mul_cond_branch1	= cond_branch[ready_mul_low_idx];
-			alu_mul_uncond_branch1		= uncond_branch[ready_mul_low_idx];
-			alu_mul_halt1					= halt[ready_mul_low_idx];
-			alu_mul_illegal_inst1	= illegal_inst[ready_mul_low_idx];
-			alu_mul_valid_inst1		= valid_inst[ready_mul_low_idx];
-
-			next_mul_ready[ready_mul_high_idx] = 0;
-			next_mul_ready[ready_mul_low_idx] = 0;
-			//next_num_ready_mul							 = next_num_ready_mul - 2;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_mul_idx[i-2] = next_ready_mul_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 2;
-			next_ent_taken[ready_mul_high_idx] = 0;
-			next_ent_taken[ready_mul_low_idx] = 0;
-			next_ent_avail[ready_mul_high_idx] = 1'b1;
-			next_ent_avail[ready_mul_low_idx] = 1'b1;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i+1)
-			begin
-				next_avail_ent_idx[i-2] = next_avail_ent_idx[i];
-			end*/
-		end
-		else
-		begin
-			alu_mul_NPC0					= npc[ready_mul_high_idx];
-			alu_mul_IR0 					= ir[ready_mul_high_idx];
-			alu_mul_branch_taken0 = branch_taken[ready_mul_high_idx];
-			alu_mul_pred_addr0 		= pred_addr[ready_mul_high_idx];
-			alu_mul_prf_pra_idx0 	= pra_idx[ready_mul_high_idx];
-			alu_mul_prf_prb_idx0 	= prb_idx[ready_mul_high_idx];
-			alu_mul_opa_select0		= opa_select[ready_mul_high_idx];
-			alu_mul_opb_select0		= opb_select[ready_mul_high_idx];
-			alu_mul_dest_ar_idx0	= dest_ar_idx[ready_mul_high_idx];
-			alu_mul_dest_pr_idx0	= dest_pr_idx[ready_mul_high_idx];
-			alu_mul_func0					= alu_func[ready_mul_high_idx];
-			alu_mul_rd_mem0				= rd_mem[ready_mul_high_idx];
-			alu_mul_wr_mem0				= wr_mem[ready_mul_high_idx];
-			alu_mul_cond_branch0	= cond_branch[ready_mul_high_idx];
-			alu_mul_uncond_branch0		= uncond_branch[ready_mul_high_idx];
-			alu_mul_halt0					= halt[ready_mul_high_idx];
-			alu_mul_illegal_inst0	= illegal_inst[ready_mul_high_idx];
-			alu_mul_valid_inst0		= valid_inst[ready_mul_high_idx];
-
-			alu_mul_valid_inst1 	=	0;
-
-			next_mul_ready[ready_mul_high_idx]	= 0;
-			//next_num_ready_mul								= next_num_ready_mul - 1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_mul_idx[i-1] = next_ready_mul_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 1;
-			next_ent_taken[ready_mul_high_idx] = 0;
-			next_ent_avail[ready_mul_high_idx] = 1'b1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-			end*/
-		end
-	end
-	else if (alu_mul_avail[0])
-	begin
+////////////////////////////////////////////////////////////////////////////////////////Here starts the multiply
+	if (ready_mul_valid) begin
+		if (alu_mul_avail[1] && alu_mul_avail[0]) begin
+			if (ready_mul_high_idx != ready_mul_low_idx) begin
 				alu_mul_NPC0					= npc[ready_mul_high_idx];
 				alu_mul_IR0 					= ir[ready_mul_high_idx];
 				alu_mul_branch_taken0 = branch_taken[ready_mul_high_idx];
@@ -1052,143 +862,203 @@ begin
 				alu_mul_illegal_inst0	= illegal_inst[ready_mul_high_idx];
 				alu_mul_valid_inst0		= valid_inst[ready_mul_high_idx];
 
-				alu_mul_valid_inst1 	=	0;
+				alu_mul_NPC1					= npc[ready_mul_low_idx];
+				alu_mul_IR1 					= ir[ready_mul_low_idx];
+				alu_mul_branch_taken1 = branch_taken[ready_mul_low_idx];
+				alu_mul_pred_addr1 		= pred_addr[ready_mul_low_idx];
+				alu_mul_prf_pra_idx1 	= pra_idx[ready_mul_low_idx];
+				alu_mul_prf_prb_idx1 	= prb_idx[ready_mul_low_idx];
+				alu_mul_opa_select1		= opa_select[ready_mul_low_idx];
+				alu_mul_opb_select1		= opb_select[ready_mul_low_idx];
+				alu_mul_dest_ar_idx1	= dest_ar_idx[ready_mul_low_idx];
+				alu_mul_dest_pr_idx1	= dest_pr_idx[ready_mul_low_idx];
+				alu_mul_func1					= alu_func[ready_mul_low_idx];
+				alu_mul_rd_mem1				= rd_mem[ready_mul_low_idx];
+				alu_mul_wr_mem1				= wr_mem[ready_mul_low_idx];
+				alu_mul_cond_branch1	= cond_branch[ready_mul_low_idx];
+				alu_mul_uncond_branch1		= uncond_branch[ready_mul_low_idx];
+				alu_mul_halt1					= halt[ready_mul_low_idx];
+				alu_mul_illegal_inst1	= illegal_inst[ready_mul_low_idx];
+				alu_mul_valid_inst1		= valid_inst[ready_mul_low_idx];
+
+				next_mul_ready[ready_mul_high_idx] = 0;
+				next_mul_ready[ready_mul_low_idx] = 0;
+
+				next_ent_taken[ready_mul_high_idx] = 0;
+				next_ent_taken[ready_mul_low_idx] = 0;
+				next_ent_avail[ready_mul_high_idx] = 1'b1;
+				next_ent_avail[ready_mul_low_idx] = 1'b1;
+			end
+			else begin
+				alu_mul_NPC0					= npc[ready_mul_high_idx];
+				alu_mul_IR0 					= ir[ready_mul_high_idx];
+				alu_mul_branch_taken0 = branch_taken[ready_mul_high_idx];
+				alu_mul_pred_addr0 		= pred_addr[ready_mul_high_idx];
+				alu_mul_prf_pra_idx0 	= pra_idx[ready_mul_high_idx];
+				alu_mul_prf_prb_idx0 	= prb_idx[ready_mul_high_idx];
+				alu_mul_opa_select0		= opa_select[ready_mul_high_idx];
+				alu_mul_opb_select0		= opb_select[ready_mul_high_idx];
+				alu_mul_dest_ar_idx0	= dest_ar_idx[ready_mul_high_idx];
+				alu_mul_dest_pr_idx0	= dest_pr_idx[ready_mul_high_idx];
+				alu_mul_func0					= alu_func[ready_mul_high_idx];
+				alu_mul_rd_mem0				= rd_mem[ready_mul_high_idx];
+				alu_mul_wr_mem0				= wr_mem[ready_mul_high_idx];
+				alu_mul_cond_branch0	= cond_branch[ready_mul_high_idx];
+				alu_mul_uncond_branch0		= uncond_branch[ready_mul_high_idx];
+				alu_mul_halt0					= halt[ready_mul_high_idx];
+				alu_mul_illegal_inst0	= illegal_inst[ready_mul_high_idx];
+				alu_mul_valid_inst0		= valid_inst[ready_mul_high_idx];
+
+				alu_mul_valid_inst1 	=	0;//Tell the alu_mult that only instruction0 is valid
 
 				next_mul_ready[ready_mul_high_idx]	= 0;
-				//next_num_ready_mul								= next_num_ready_mul - 1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_ready_mul_idx[i-1] = next_ready_mul_idx[i];
-				end*/
-
-				//next_num_empty_entries = next_num_empty_entries - 1;
+				
 				next_ent_taken[ready_mul_high_idx] = 0;
 				next_ent_avail[ready_mul_high_idx] = 1'b1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-				end*/
-	end
-	else if (alu_mul_avail[1])
-	begin
-					alu_mul_NPC1					= npc[ready_mul_high_idx];
-					alu_mul_IR1 					= ir[ready_mul_high_idx];
-					alu_mul_branch_taken1 = branch_taken[ready_mul_high_idx];
-					alu_mul_pred_addr1 		= pred_addr[ready_mul_high_idx];
-					alu_mul_prf_pra_idx1 	= pra_idx[ready_mul_high_idx];
-					alu_mul_prf_prb_idx1 	= prb_idx[ready_mul_high_idx];
-					alu_mul_opa_select1		= opa_select[ready_mul_high_idx];
-					alu_mul_opb_select1		= opb_select[ready_mul_high_idx];
-					alu_mul_dest_ar_idx1	= dest_ar_idx[ready_mul_high_idx];
-					alu_mul_dest_pr_idx1	= dest_pr_idx[ready_mul_high_idx];
-					alu_mul_func1					= alu_func[ready_mul_high_idx];
-					alu_mul_rd_mem1				= rd_mem[ready_mul_high_idx];
-					alu_mul_wr_mem1				= wr_mem[ready_mul_high_idx];
-					alu_mul_cond_branch1	= cond_branch[ready_mul_high_idx];
-					alu_mul_uncond_branch1		= uncond_branch[ready_mul_high_idx];
-					alu_mul_halt1					= halt[ready_mul_high_idx];
-					alu_mul_illegal_inst1	= illegal_inst[ready_mul_high_idx];
-					alu_mul_valid_inst1		= valid_inst[ready_mul_high_idx];
-
-					alu_mul_valid_inst0 	=	0;
-
-					next_mul_ready[ready_mul_high_idx]	= 0;
-					//next_num_ready_mul								= next_num_ready_mul - 1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_ready_mul_idx[i-1] = next_ready_mul_idx[i];
-					end*/
-
-					//next_num_empty_entries = next_num_empty_entries - 1;
-					next_ent_taken[ready_mul_high_idx] = 0;
-					next_ent_avail[ready_mul_high_idx] = 1'b1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-					end*/
-	end
-	else
-	begin
-		alu_mul_valid_inst0		= 0;
-		alu_mul_valid_inst1		= 0;
-	end
-	end
-	else
-	begin
-		alu_mul_valid_inst0		= 0;
-		alu_mul_valid_inst1		= 0;
-	end
-
-	next_mem_ready 			= mem_ready;
-	//next_num_ready_mem 	= num_ready_mem;
-	/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
-	begin
-		next_ready_mem_idx[i] = ready_mem_idx[i];
-	end*/
-	if (ready_mem_valid)
-	begin
-	if (alu_mem_avail[1] && alu_mem_avail[0])
-	begin
-		if (ready_mem_high_idx != ready_mem_low_idx)
-		begin
-			alu_mem_NPC0					= npc[ready_mem_high_idx];
-			alu_mem_IR0 					= ir[ready_mem_high_idx];
-			alu_mem_branch_taken0 = branch_taken[ready_mem_high_idx];
-			alu_mem_pred_addr0 		= pred_addr[ready_mem_high_idx];
-			alu_mem_prf_pra_idx0 	= pra_idx[ready_mem_high_idx];
-			alu_mem_prf_prb_idx0 	= prb_idx[ready_mem_high_idx];
-			alu_mem_opa_select0		= opa_select[ready_mem_high_idx];
-			alu_mem_opb_select0		= opb_select[ready_mem_high_idx];
-			alu_mem_dest_ar_idx0	= dest_ar_idx[ready_mem_high_idx];
-			alu_mem_dest_pr_idx0	= dest_pr_idx[ready_mem_high_idx];
-			alu_mem_func0					= alu_func[ready_mem_high_idx];
-			alu_mem_rd_mem0				= rd_mem[ready_mem_high_idx];
-			alu_mem_wr_mem0				= wr_mem[ready_mem_high_idx];
-			alu_mem_cond_branch0	= cond_branch[ready_mem_high_idx];
-			alu_mem_uncond_branch0		= uncond_branch[ready_mem_high_idx];
-			alu_mem_halt0					= halt[ready_mem_high_idx];
-			alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
-			alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
-
-			alu_mem_NPC1					= npc[ready_mem_low_idx];
-			alu_mem_IR1 					= ir[ready_mem_low_idx];
-			alu_mem_branch_taken1 = branch_taken[ready_mem_low_idx];
-			alu_mem_pred_addr1 		= pred_addr[ready_mem_low_idx];
-			alu_mem_prf_pra_idx1 	= pra_idx[ready_mem_low_idx];
-			alu_mem_prf_prb_idx1 	= prb_idx[ready_mem_low_idx];
-			alu_mem_opa_select1		= opa_select[ready_mem_low_idx];
-			alu_mem_opb_select1		= opb_select[ready_mem_low_idx];
-			alu_mem_dest_ar_idx1	= dest_ar_idx[ready_mem_low_idx];
-			alu_mem_dest_pr_idx1	= dest_pr_idx[ready_mem_low_idx];
-			alu_mem_func1					= alu_func[ready_mem_low_idx];
-			alu_mem_rd_mem1				= rd_mem[ready_mem_low_idx];
-			alu_mem_wr_mem1				= wr_mem[ready_mem_low_idx];
-			alu_mem_cond_branch1	= cond_branch[ready_mem_low_idx];
-			alu_mem_uncond_branch1		= uncond_branch[ready_mem_low_idx];
-			alu_mem_halt1					= halt[ready_mem_low_idx];
-			alu_mem_illegal_inst1	= illegal_inst[ready_mem_low_idx];
-			alu_mem_valid_inst1		= valid_inst[ready_mem_low_idx];
-
-			next_mem_ready[ready_mem_high_idx] = 0;
-			next_mem_ready[ready_mem_low_idx] = 0;
-			//next_num_ready_mem							 = next_num_ready_mem - 2;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_mem_idx[i-2] = next_ready_mem_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 2;
-			next_ent_taken[ready_mem_high_idx] = 0;
-			next_ent_taken[ready_mem_low_idx] = 0;
-			next_ent_avail[ready_mem_high_idx] = 1'b1;
-			next_ent_avail[ready_mem_low_idx] = 1'b1;
-			/*for (i = 2; i < `NUM_RS_ENTRIES; i = i+1)
-			begin
-				next_avail_ent_idx[i-2] = next_avail_ent_idx[i];
-			end*/
+			end
 		end
-		else
-		begin
+		else if (alu_mul_avail[0]) begin
+			alu_mul_NPC0					= npc[ready_mul_high_idx];
+			alu_mul_IR0 					= ir[ready_mul_high_idx];
+			alu_mul_branch_taken0 = branch_taken[ready_mul_high_idx];
+			alu_mul_pred_addr0 		= pred_addr[ready_mul_high_idx];
+			alu_mul_prf_pra_idx0 	= pra_idx[ready_mul_high_idx];
+			alu_mul_prf_prb_idx0 	= prb_idx[ready_mul_high_idx];
+			alu_mul_opa_select0		= opa_select[ready_mul_high_idx];
+			alu_mul_opb_select0		= opb_select[ready_mul_high_idx];
+			alu_mul_dest_ar_idx0	= dest_ar_idx[ready_mul_high_idx];
+			alu_mul_dest_pr_idx0	= dest_pr_idx[ready_mul_high_idx];
+			alu_mul_func0					= alu_func[ready_mul_high_idx];
+			alu_mul_rd_mem0				= rd_mem[ready_mul_high_idx];
+			alu_mul_wr_mem0				= wr_mem[ready_mul_high_idx];
+			alu_mul_cond_branch0	= cond_branch[ready_mul_high_idx];
+			alu_mul_uncond_branch0		= uncond_branch[ready_mul_high_idx];
+			alu_mul_halt0					= halt[ready_mul_high_idx];
+			alu_mul_illegal_inst0	= illegal_inst[ready_mul_high_idx];
+			alu_mul_valid_inst0		= valid_inst[ready_mul_high_idx];
+
+			alu_mul_valid_inst1 	=	0;//Tell the alu_mult that only instruction0 is valid
+
+			next_mul_ready[ready_mul_high_idx]	= 0;
+			
+			next_ent_taken[ready_mul_high_idx] = 0;
+			next_ent_avail[ready_mul_high_idx] = 1'b1;
+		end
+		else if (alu_mul_avail[1]) begin
+			alu_mul_NPC1					= npc[ready_mul_high_idx];
+			alu_mul_IR1 					= ir[ready_mul_high_idx];
+			alu_mul_branch_taken1 = branch_taken[ready_mul_high_idx];
+			alu_mul_pred_addr1 		= pred_addr[ready_mul_high_idx];
+			alu_mul_prf_pra_idx1 	= pra_idx[ready_mul_high_idx];
+			alu_mul_prf_prb_idx1 	= prb_idx[ready_mul_high_idx];
+			alu_mul_opa_select1		= opa_select[ready_mul_high_idx];
+			alu_mul_opb_select1		= opb_select[ready_mul_high_idx];
+			alu_mul_dest_ar_idx1	= dest_ar_idx[ready_mul_high_idx];
+			alu_mul_dest_pr_idx1	= dest_pr_idx[ready_mul_high_idx];
+			alu_mul_func1					= alu_func[ready_mul_high_idx];
+			alu_mul_rd_mem1				= rd_mem[ready_mul_high_idx];
+			alu_mul_wr_mem1				= wr_mem[ready_mul_high_idx];
+			alu_mul_cond_branch1	= cond_branch[ready_mul_high_idx];
+			alu_mul_uncond_branch1		= uncond_branch[ready_mul_high_idx];
+			alu_mul_halt1					= halt[ready_mul_high_idx];
+			alu_mul_illegal_inst1	= illegal_inst[ready_mul_high_idx];
+			alu_mul_valid_inst1		= valid_inst[ready_mul_high_idx];
+
+			alu_mul_valid_inst0 	=	0;//Tell the alu_mult that only instruction1 is valid
+
+			next_mul_ready[ready_mul_high_idx]	= 0;
+
+			next_ent_taken[ready_mul_high_idx] = 0;
+			next_ent_avail[ready_mul_high_idx] = 1'b1;
+		end
+		else begin
+			alu_mul_valid_inst0		= 0;
+			alu_mul_valid_inst1		= 0;
+		end
+	end
+	else begin
+		alu_mul_valid_inst0		= 0;
+		alu_mul_valid_inst1		= 0;
+	end
+//////////////////////////////////////////////////////////////////////////////Here is the LSQ
+	if (ready_mem_valid) begin
+		if (alu_mem_avail[1] && alu_mem_avail[0]) begin
+			if (ready_mem_high_idx != ready_mem_low_idx) begin
+				alu_mem_NPC0					= npc[ready_mem_high_idx];
+				alu_mem_IR0 					= ir[ready_mem_high_idx];
+				alu_mem_branch_taken0 = branch_taken[ready_mem_high_idx];
+				alu_mem_pred_addr0 		= pred_addr[ready_mem_high_idx];
+				alu_mem_prf_pra_idx0 	= pra_idx[ready_mem_high_idx];
+				alu_mem_prf_prb_idx0 	= prb_idx[ready_mem_high_idx];
+				alu_mem_opa_select0		= opa_select[ready_mem_high_idx];
+				alu_mem_opb_select0		= opb_select[ready_mem_high_idx];
+				alu_mem_dest_ar_idx0	= dest_ar_idx[ready_mem_high_idx];
+				alu_mem_dest_pr_idx0	= dest_pr_idx[ready_mem_high_idx];
+				alu_mem_func0					= alu_func[ready_mem_high_idx];
+				alu_mem_rd_mem0				= rd_mem[ready_mem_high_idx];
+				alu_mem_wr_mem0				= wr_mem[ready_mem_high_idx];
+				alu_mem_cond_branch0	= cond_branch[ready_mem_high_idx];
+				alu_mem_uncond_branch0		= uncond_branch[ready_mem_high_idx];
+				alu_mem_halt0					= halt[ready_mem_high_idx];
+				alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
+				alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
+
+				alu_mem_NPC1					= npc[ready_mem_low_idx];
+				alu_mem_IR1 					= ir[ready_mem_low_idx];
+				alu_mem_branch_taken1 = branch_taken[ready_mem_low_idx];
+				alu_mem_pred_addr1 		= pred_addr[ready_mem_low_idx];
+				alu_mem_prf_pra_idx1 	= pra_idx[ready_mem_low_idx];
+				alu_mem_prf_prb_idx1 	= prb_idx[ready_mem_low_idx];
+				alu_mem_opa_select1		= opa_select[ready_mem_low_idx];
+				alu_mem_opb_select1		= opb_select[ready_mem_low_idx];
+				alu_mem_dest_ar_idx1	= dest_ar_idx[ready_mem_low_idx];
+				alu_mem_dest_pr_idx1	= dest_pr_idx[ready_mem_low_idx];
+				alu_mem_func1					= alu_func[ready_mem_low_idx];
+				alu_mem_rd_mem1				= rd_mem[ready_mem_low_idx];
+				alu_mem_wr_mem1				= wr_mem[ready_mem_low_idx];
+				alu_mem_cond_branch1	= cond_branch[ready_mem_low_idx];
+				alu_mem_uncond_branch1		= uncond_branch[ready_mem_low_idx];
+				alu_mem_halt1					= halt[ready_mem_low_idx];
+				alu_mem_illegal_inst1	= illegal_inst[ready_mem_low_idx];
+				alu_mem_valid_inst1		= valid_inst[ready_mem_low_idx];
+
+				next_mem_ready[ready_mem_high_idx] = 0;
+				next_mem_ready[ready_mem_low_idx] = 0;
+
+				next_ent_taken[ready_mem_high_idx] = 0;
+				next_ent_taken[ready_mem_low_idx] = 0;
+				next_ent_avail[ready_mem_high_idx] = 1'b1;
+				next_ent_avail[ready_mem_low_idx] = 1'b1;
+			end
+			else begin
+				alu_mem_NPC0					= npc[ready_mem_high_idx];
+				alu_mem_IR0 					= ir[ready_mem_high_idx];
+				alu_mem_branch_taken0 = branch_taken[ready_mem_high_idx];
+				alu_mem_pred_addr0 		= pred_addr[ready_mem_high_idx];
+				alu_mem_prf_pra_idx0 	= pra_idx[ready_mem_high_idx];
+				alu_mem_prf_prb_idx0 	= prb_idx[ready_mem_high_idx];
+				alu_mem_opa_select0		= opa_select[ready_mem_high_idx];
+				alu_mem_opb_select0		= opb_select[ready_mem_high_idx];
+				alu_mem_dest_ar_idx0	= dest_ar_idx[ready_mem_high_idx];
+				alu_mem_dest_pr_idx0	= dest_pr_idx[ready_mem_high_idx];
+				alu_mem_func0					= alu_func[ready_mem_high_idx];
+				alu_mem_rd_mem0				= rd_mem[ready_mem_high_idx];
+				alu_mem_wr_mem0				= wr_mem[ready_mem_high_idx];
+				alu_mem_cond_branch0	= cond_branch[ready_mem_high_idx];
+				alu_mem_uncond_branch0		= uncond_branch[ready_mem_high_idx];
+				alu_mem_halt0					= halt[ready_mem_high_idx];
+				alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
+				alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
+
+				alu_mem_valid_inst1 	=	0;
+
+				next_mem_ready[ready_mem_high_idx] = 0;
+
+				next_ent_taken[ready_mem_high_idx] = 0;
+				next_ent_avail[ready_mem_high_idx] = 1'b1;
+			end
+		end
+		else if (alu_mem_avail[0]) begin
 			alu_mem_NPC0					= npc[ready_mem_high_idx];
 			alu_mem_IR0 					= ir[ready_mem_high_idx];
 			alu_mem_branch_taken0 = branch_taken[ready_mem_high_idx];
@@ -1211,114 +1081,49 @@ begin
 			alu_mem_valid_inst1 	=	0;
 
 			next_mem_ready[ready_mem_high_idx]	= 0;
-			//next_num_ready_mem								= next_num_ready_mem - 1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_ready_mem_idx[i-1] = next_ready_mem_idx[i];
-			end*/
-
-			//next_num_empty_entries = next_num_empty_entries - 1;
+			
 			next_ent_taken[ready_mem_high_idx] = 0;
 			next_ent_avail[ready_mem_high_idx] = 1'b1;
-			/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-			begin
-				next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-			end*/
+		end
+		else if (alu_mem_avail[1]) begin
+			alu_mem_NPC1					= npc[ready_mem_high_idx];
+			alu_mem_IR1 					= ir[ready_mem_high_idx];
+			alu_mem_branch_taken1 = branch_taken[ready_mem_high_idx];
+			alu_mem_pred_addr1 		= pred_addr[ready_mem_high_idx];
+			alu_mem_prf_pra_idx1 	= pra_idx[ready_mem_high_idx];
+			alu_mem_prf_prb_idx1 	= prb_idx[ready_mem_high_idx];
+			alu_mem_opa_select1		= opa_select[ready_mem_high_idx];
+			alu_mem_opb_select1		= opb_select[ready_mem_high_idx];
+			alu_mem_dest_ar_idx1	= dest_ar_idx[ready_mem_high_idx];
+			alu_mem_dest_pr_idx1	= dest_pr_idx[ready_mem_high_idx];
+			alu_mem_func1					= alu_func[ready_mem_high_idx];
+			alu_mem_rd_mem1				= rd_mem[ready_mem_high_idx];
+			alu_mem_wr_mem1				= wr_mem[ready_mem_high_idx];
+			alu_mem_cond_branch1	= cond_branch[ready_mem_high_idx];
+			alu_mem_uncond_branch1		= uncond_branch[ready_mem_high_idx];
+			alu_mem_halt1					= halt[ready_mem_high_idx];
+			alu_mem_illegal_inst1	= illegal_inst[ready_mem_high_idx];
+			alu_mem_valid_inst1		= valid_inst[ready_mem_high_idx];
+
+			alu_mem_valid_inst0 	=	0;
+
+			next_mem_ready[ready_mem_high_idx]	= 0;
+
+			next_ent_taken[ready_mem_high_idx] = 0;
+			next_ent_avail[ready_mem_high_idx] = 1'b1;
+		end
+		else begin
+			alu_mem_valid_inst0		= 0;
+			alu_mem_valid_inst1		= 0;
 		end
 	end
-	else if (alu_mem_avail[0])
-	begin
-				alu_mem_NPC0					= npc[ready_mem_high_idx];
-				alu_mem_IR0 					= ir[ready_mem_high_idx];
-				alu_mem_branch_taken0 = branch_taken[ready_mem_high_idx];
-				alu_mem_pred_addr0 		= pred_addr[ready_mem_high_idx];
-				alu_mem_prf_pra_idx0 	= pra_idx[ready_mem_high_idx];
-				alu_mem_prf_prb_idx0 	= prb_idx[ready_mem_high_idx];
-				alu_mem_opa_select0		= opa_select[ready_mem_high_idx];
-				alu_mem_opb_select0		= opb_select[ready_mem_high_idx];
-				alu_mem_dest_ar_idx0	= dest_ar_idx[ready_mem_high_idx];
-				alu_mem_dest_pr_idx0	= dest_pr_idx[ready_mem_high_idx];
-				alu_mem_func0					= alu_func[ready_mem_high_idx];
-				alu_mem_rd_mem0				= rd_mem[ready_mem_high_idx];
-				alu_mem_wr_mem0				= wr_mem[ready_mem_high_idx];
-				alu_mem_cond_branch0	= cond_branch[ready_mem_high_idx];
-				alu_mem_uncond_branch0		= uncond_branch[ready_mem_high_idx];
-				alu_mem_halt0					= halt[ready_mem_high_idx];
-				alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
-				alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
-
-				alu_mem_valid_inst1 	=	0;
-
-				next_mem_ready[ready_mem_high_idx]	= 0;
-				//next_num_ready_mem								= next_num_ready_mem - 1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_ready_mem_idx[i-1] = next_ready_mem_idx[i];
-				end*/
-
-				//next_num_empty_entries = next_num_empty_entries - 1;
-				next_ent_taken[ready_mem_high_idx] = 0;
-				next_ent_avail[ready_mem_high_idx] = 1'b1;
-				/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-				begin
-					next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-				end*/
-	end
-	else if (alu_mem_avail[1])
-	begin
-					alu_mem_NPC1					= npc[ready_mem_high_idx];
-					alu_mem_IR1 					= ir[ready_mem_high_idx];
-					alu_mem_branch_taken1 = branch_taken[ready_mem_high_idx];
-					alu_mem_pred_addr1 		= pred_addr[ready_mem_high_idx];
-					alu_mem_prf_pra_idx1 	= pra_idx[ready_mem_high_idx];
-					alu_mem_prf_prb_idx1 	= prb_idx[ready_mem_high_idx];
-					alu_mem_opa_select1		= opa_select[ready_mem_high_idx];
-					alu_mem_opb_select1		= opb_select[ready_mem_high_idx];
-					alu_mem_dest_ar_idx1	= dest_ar_idx[ready_mem_high_idx];
-					alu_mem_dest_pr_idx1	= dest_pr_idx[ready_mem_high_idx];
-					alu_mem_func1					= alu_func[ready_mem_high_idx];
-					alu_mem_rd_mem1				= rd_mem[ready_mem_high_idx];
-					alu_mem_wr_mem1				= wr_mem[ready_mem_high_idx];
-					alu_mem_cond_branch1	= cond_branch[ready_mem_high_idx];
-					alu_mem_uncond_branch1		= uncond_branch[ready_mem_high_idx];
-					alu_mem_halt1					= halt[ready_mem_high_idx];
-					alu_mem_illegal_inst1	= illegal_inst[ready_mem_high_idx];
-					alu_mem_valid_inst1		= valid_inst[ready_mem_high_idx];
-
-					alu_mem_valid_inst0 	=	0;
-
-					next_mem_ready[ready_mem_high_idx]	= 0;
-					//next_num_ready_mem								= next_num_ready_mem - 1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_ready_mem_idx[i-1] = next_ready_mem_idx[i];
-					end*/
-
-					//next_num_empty_entries = next_num_empty_entries - 1;
-					next_ent_taken[ready_mem_high_idx] = 0;
-					next_ent_avail[ready_mem_high_idx] = 1'b1;
-					/*for (i = 1; i < `NUM_RS_ENTRIES; i = i + 1)
-					begin
-						next_avail_ent_idx[i-1] = next_avail_ent_idx[i];
-					end*/
-	end
-	else
-	begin
-		alu_mem_valid_inst0		= 0;
-		alu_mem_valid_inst1		= 0;
-	end
-	end
-	else
-	begin
+	else begin
 		alu_mem_valid_inst0		= 0;
 		alu_mem_valid_inst1		= 0;
 	end
 
-
-
-	// Dispatch
-	if (id_valid_inst0 & ~id_illegal_inst0)
-	begin
+//------------------------------------------------------------------------DISPATCH LOGIC
+	if (id_valid_inst0 & ~id_illegal_inst0) begin
 		case (id_IR0[31:26])
 			`MULQ_INST: 
 				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
@@ -1328,7 +1133,7 @@ begin
 			default:
 				next_alu_type[ent_avail_high_idx] = `ALU_SIM;
 		endcase
-
+/////////////////////////////////////////////////////////////////////////////????
 		next_npc[ent_avail_high_idx]					= id_NPC0;
 		next_ir[ent_avail_high_idx]						= id_IR0;
 		next_branch_taken[ent_avail_high_idx]	= id_branch_taken0;
@@ -1463,8 +1268,6 @@ begin
 			end
 		end
 	end
-
-	// Detect the ready inst and set each ready bits
 	
 	for (i = 0; i < `NUM_RS_ENTRIES; i = i + 1)
 	begin
@@ -1479,7 +1282,6 @@ begin
 					`ALU_SIM: next_sim_ready[i] = 1;
 					`ALU_MUL: next_mul_ready[i] = 1;
 					`ALU_MEM: next_mem_ready[i] = 1;
-					//`ALU_INV: $display("Wrong");
 				endcase
 			end
 		end
@@ -1497,14 +1299,6 @@ begin
 		mem_ready 		<= `SD `NUM_RS_ENTRIES'b0;
 		ent_taken			<= `SD `NUM_RS_ENTRIES'b0;
 		ent_avail			<= {`NUM_RS_ENTRIES{1'b1}};
-
-		/*num_empty_entries	<= `SD {1'b1, {`LOG_NUM_RS_ENTRIES{1'b0}}};
-		num_ready_sim			<= `SD 0;
-		num_ready_mul			<= `SD 0;
-		num_ready_mem			<= `SD 0;*/
-
-		/*for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
-			avail_ent_idx[i] <= `SD i;*/
 		
 		for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 		begin
@@ -1533,11 +1327,6 @@ begin
 	end
 	else
 	begin
-		/*num_empty_entries	<= `SD next_num_empty_entries;
-		num_ready_sim			<= `SD next_num_ready_sim;
-		num_ready_mul			<= `SD next_num_ready_mul;
-		num_ready_mem			<= `SD next_num_ready_mem;*/
-
 		sim_ready					<= `SD next_sim_ready;
 		mul_ready					<= `SD next_mul_ready;
 		mem_ready					<= `SD next_mem_ready;
@@ -1571,5 +1360,62 @@ begin
 
 	end
 end
+
+genvar IDX;
+generate
+	for(IDX=0; IDX<`NUM_RS_ENTRIES; IDX=IDX+1)
+	begin : foo
+		wire		[1:0]	ALU_TYPE = alu_type[IDX];
+		wire	 [63:0]	NPC = npc[IDX];
+		wire	 [31:0]	IR = ir[IDX];
+		wire					BRANCH_TAKEN = branch_taken[IDX];
+		wire	 [63:0]	PRED_ADDR = pred_addr[IDX];
+		wire		[1:0]	OPA_SELECT = opa_select[IDX];
+		wire		[1:0]	OPB_SELECT = opb_select[IDX];
+		wire		[4:0]	DEST_AR_IDX = dest_ar_idx[IDX];
+		wire		[6:0]	DEST_PR_IDX = dest_pr_idx[IDX];
+		wire		[6:0]	PRA_IDX = pra_idx[IDX];
+		wire					PRA_READY = pra_ready[IDX];
+		wire		[6:0]	PRB_IDX = prb_idx[IDX];
+		wire					PRB_READY = prb_ready[IDX];
+		wire		[4:0]	ALU_FUNC = alu_func[IDX];
+		wire					RD_MEM = rd_mem[IDX];
+		wire					WR_MEM = wr_mem[IDX];
+		wire					COND_BRANCH = cond_branch[IDX];
+		wire					UNCOND_BRANCH = uncond_branch[IDX];
+		wire					HALT = halt[IDX];
+		wire					ILLEGAL_INST = illegal_inst[IDX];
+		wire					VALID_INST = valid_inst[IDX];
+		
+		wire		[1:0]	NEXT_ALU_TYPE = next_alu_type[IDX];
+		wire	 [63:0]	NEXT_NPC = next_npc[IDX];
+		wire	 [31:0]	NEXT_IR = next_ir[IDX];
+		wire					NEXT_BRANCH_TAKEN = next_branch_taken[IDX];
+		wire	 [63:0]	NEXT_PRED_ADDR = next_pred_addr[IDX];
+		wire		[1:0]	NEXT_OPA_SELECT = next_opa_select[IDX];
+		wire		[1:0]	NEXT_OPB_SELECT = next_opb_select[IDX];
+		wire		[4:0]	NEXT_DEST_AR_IDX = next_dest_ar_idx[IDX];
+		wire		[6:0]	NEXT_DEST_PR_IDX = next_dest_pr_idx[IDX];
+		wire		[6:0]	NEXT_PRA_IDX = next_pra_idx[IDX];
+		wire					NEXT_PRA_READY = next_pra_ready[IDX];
+		wire		[6:0]	NEXT_PRB_IDX = next_prb_idx[IDX];
+		wire					NEXT_PRB_READY = next_prb_ready[IDX];
+		wire		[4:0]	NEXT_ALU_FUNC = next_alu_func[IDX];
+		wire					NEXT_RD_MEM = next_rd_mem[IDX];
+		wire					NEXT_WR_MEM = next_wr_mem[IDX];
+		wire					NEXT_COND_BRANCH = next_cond_branch[IDX];
+		wire					NEXT_UNCOND_BRANCH = next_uncond_branch[IDX];
+		wire					NEXT_HALT = next_halt[IDX];
+		wire					NEXT_ILLEGAL_INST = next_illegal_inst[IDX];
+		wire					NEXT_VALID_INST = next_valid_inst[IDX];
+		
+		wire					SIM_READY = sim_ready[IDX];
+		wire					MUL_READY = mul_ready[IDX];
+		wire					MEM_READY = mem_ready[IDX];
+		wire					ENT_TAKEN = ent_taken[IDX]; // ent means entry
+		wire					ENT_AVAIL = ent_avail[IDX];
+ 
+end
+endgenerate
 
 endmodule
