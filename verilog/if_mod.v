@@ -23,7 +23,8 @@ module if_mod(// Inputs
 				id_dispatch_num,
 
 				// Outputs
-				id_NPC,        // PC+4 of fetched instruction
+				id_NPC0,        // PC+4 of fetched instruction
+				id_NPC1,
 				id_IR0,         // fetched instruction out
 				id_IR1,		//  second fetched instruction out
 				proc2Imem_addr,
@@ -47,7 +48,8 @@ input  [1:0]  Imem_valid;
 input  [1:0]  id_dispatch_num;		//Whether RS and ROB are busy
 
 output [63:0] proc2Imem_addr;     // Address sent to Instruction memory
-output [63:0] id_NPC;         // PC of instruction after fetched (PC+4).
+output [63:0] id_NPC0;         // PC of instruction after fetched (PC+4).
+output [63:0] id_NPC1;
 output [31:0] id_IR0;          // fetched instruction
 output [31:0] id_IR1;
 output        id_valid_inst0;
@@ -82,7 +84,8 @@ assign PC_enable0 = id_valid_inst0 ;//| bht_branch_taken0;
 assign PC_enable1 = id_valid_inst1 ;//| bht_branch_taken1;
     // Pass PC+4 down pipeline w/instruction
 	// I don't know what is going on here.......
-assign id_NPC = busy[1] ? PC_reg : busy[0] ? PC_plus_4 : PC_plus_8;
+assign id_NPC0 = busy[1] ? PC_reg : busy[0] ? PC_plus_4 : PC_plus_8;
+assign id_NPC1 = PC_plus_8;//the second PC always output PC_plus_8, busy[0] tells if the output is to be taken.
 
 assign    id_valid_inst0 =  ~busy[1];
 assign	  id_valid_inst1 =  ~(busy[1]|busy[0]);	
