@@ -54,17 +54,17 @@ output        id_valid_inst0;
 output				id_valid_inst1;
 output				id_branch_taken0;
 output				id_branch_taken1;
-output [64:0]	id_pred_addr0;
-output [64:0]	id_pred_addr1;
+output				id_pred_addr0;
+output				id_pred_addr1;
 reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
 wire   [63:0] next_PC;
 wire          PC_enable;
 wire          next_ready_for_valid;
-
+wire [1:0] busy =  2'd2 - id_dispatch_num;
 assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
-assign [1:0] busy =  2'd2 - id_dispatch_num;
+//
 // this mux is because the Imem gives us 64 bits not 32 bits
 assign id_IR0 = PC_reg[2] ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
 assign id_IR1 = Imem2proc_data[31:0];

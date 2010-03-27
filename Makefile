@@ -36,7 +36,15 @@ TESTBENCH = 	sys_defs.vh	    \
 #testbench/$(MODULE)_test.v
 
 SIMFILES =	verilog/$(MODULE).v	\
-						verilog/prien.v
+						verilog/prien.v \
+						verilog/if_mod.v \
+						verilog/id.v \
+						verilog/rs.v \
+						verilog/rob.v \
+						verilog/mt.v \
+						verilog/fl.v \
+						verilog/alu_sim.v \
+						verilog/alu_mul.v 
 
 SYNFILES = synth/$(MODULE).vg
 
