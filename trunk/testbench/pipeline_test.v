@@ -364,9 +364,7 @@ module testbench;
 		alu_mul_instr1_str  = get_instr_string(alu_mul_IR1, alu_mul_valid_inst0);
 		alu_mem_instr0_str  = get_instr_string(alu_mem_IR0, alu_mem_valid_inst0);
 		alu_mem_instr1_str  = get_instr_string(alu_mem_IR1, alu_mem_valid_inst0);
-    ex_instr_str  = get_instr_string(id_ex_IR, id_ex_valid_inst);
-    mem_instr_str = get_instr_string(ex_mem_IR, ex_mem_valid_inst);
-    wb_instr_str  = get_instr_string(mem_wb_IR, mem_wb_valid_inst);
+   
   end
 
   function [8*7:0] get_instr_string;
