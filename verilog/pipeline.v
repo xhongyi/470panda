@@ -109,17 +109,8 @@
 	output [63:0] rs_mem_NPC0;
 	output [31:0]	rs_mem_IR0;
 	output				rs_mem_valid_inst0;
-	output [63:0]	alu_sim_NPC0;
-	output [31:0]	alu_sim_IR0;
-	output				alu_sim_valid_inst0;
-	output [63:0]	alu_mul_NPC0;
-	output [31:0]	alu_mul_IR0;
-	output				alu_mul_valid_inst0;
-	output [63:0]	alu_mem_NPC0;
-	output [31:0]	alu_mem_IR0;
-	output				alu_mem_valid_inst0;
 
-  output [63:0] if_NPC1; //proc2Imem_addr
+	output [63:0] if_NPC1; //proc2Imem_addr
   output [31:0] if_IR1;
   output        if_valid_inst1;
   output [63:0] id_NPC1;
@@ -134,81 +125,18 @@
 	output [63:0] rs_mem_NPC1;
 	output [31:0]	rs_mem_IR1;
 	output				rs_mem_valid_inst1;
-	output [63:0]	alu_sim_NPC1;
-	output [31:0]	alu_sim_IR1;
-	output				alu_sim_valid_inst1;
-	output [63:0]	alu_mul_NPC1;
-	output [31:0]	alu_mul_IR1;
-	output				alu_mul_valid_inst1;
-	output [63:0]	alu_mem_NPC1;
-	output [31:0]	alu_mem_IR1;
-	output				alu_mem_valid_inst1;
 
-	output	[5:0]	cdb_broadcast,
-	output	[6:0]	cdb_pr_tag0,
-	output	[6:0]	cdb_pr_tag1,
-	output	[6:0]	cdb_pr_tag2,
-	output	[6:0]	cdb_pr_tag3,
-	output	[6:0]	cdb_pr_tag4,
-	output	[6:0]	cdb_pr_tag5,
-	output	[1:0]	rob_retire_num,
-	output	[6:0]	rob_retire_tag_a,
-	output	[6:0]	rob_retire_tag_b
+	output	[5:0]	cdb_broadcast;
+	output	[6:0]	cdb_pr_tag0;
+	output	[6:0]	cdb_pr_tag1;
+	output	[6:0]	cdb_pr_tag2;
+	output	[6:0]	cdb_pr_tag3;
+	output	[6:0]	cdb_pr_tag4;
+	output	[6:0]	cdb_pr_tag5;
+	output	[1:0]	rob_retire_num;
+	output	[6:0]	rob_retire_tag_a;
+	output	[6:0]	rob_retire_tag_b;
 
-	assign if_NPC0						= if_id_NPC0;
-	assign if_IR0							= if_id_IR0;
-	assign if_valid_inst0			= if_id_valid_inst0;
-	assign id_NPC0						= id_rs_NPC0;
-	assign id_IR0							= id_rs_IR0;
-	assign id_valid_inst0			= id_rs_rob_mt_valid_inst0;
-	assign rs_sim_NPC0				= rs_alu_sim_NPC0;
-	assign rs_sim_IR0					= rs_alu_sim_IR0;
-	assign rs_sim_valid_inst0 = rs_alu_sim_valid_inst0;
-	assign rs_mul_NPC0				= rs_alu_mul_NPC0;
-	assign rs_mul_IR0					= rs_alu_mul_IR0;
-	assign rs_mul_valid_inst0 = rs_alu_mul_valid_inst0;
-	assign rs_mem_NPC0				= rs_alu_mem_NPC0;
-	assign rs_mem_IR0					= rs_alu_mem_IR0;
-	assign rs_mem_valid_inst0 = rs_alu_mem_valid_inst0;
-	assign alu_sim_NPC0				= alu_
-	assign alu_sim_IR0
-	assign alu_sim_valid_inst0
-	assign alu_mul_NPC0
-	assign alu_mul_IR0
-	assign alu_mul_valid_inst0
-	assign alu_mem_NPC0
-	assign alu_mem_IR0
-	assign alu_mem_valid_inst0
-
-	assign if_NPC1
-	assign if_IR1
-	assign if_valid_inst1
-	assign id_NPC1
-	assign id_IR1
-	assign id_valid_inst1
-	assign rs_NPC1
-	assign rs_IR1
-	assign rs_valid_inst1
-	assign alu_sim_NPC1
-	assign alu_sim_IR1
-	assign alu_sim_valid_inst1
-	assign alu_mul_NPC1
-	assign alu_mul_IR1
-	assign alu_mul_valid_inst1
-	assign alu_mem_NPC1
-	assign alu_mem_IR1
-	assign alu_mem_valid_inst1
-
-	assign cdb_broadcast				= cdb_rs_rob_mt_broadcast;
-	assign cdb_pr_tag0					= cdb_rs_rob_mt_pr_tag0;
-	assign cdb_pr_tag1					= cdb_rs_rob_mt_pr_tag1;
-	assign cdb_pr_tag2					= cdb_rs_rob_mt_pr_tag2;
-	assign cdb_pr_tag3					= cdb_rs_rob_mt_pr_tag3;
-	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
-	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
-	assign rob_retire_num				= rob_fl_rob_retire_num;
-	assign rob_retire_tag_a			= rob_fl_retire_tag_a;
-	assign rob_retire_tag_b			= rob_fl_retire_tag_b;
 
 	/*
 	 * Output from IF
@@ -297,7 +225,7 @@
 	/*
 	 * Output from free list
 	 */
-	wire		[6:0]	fl_rob_rs_mt_pr0
+	wire		[6:0]	fl_rob_rs_mt_pr0;
 	wire		[6:0]	fl_rob_rs_mt_pr1;
 
 	/*
@@ -398,7 +326,7 @@
 	wire					rs_alu_mul_uncond_branch1;
 	wire					rs_alu_mul_halt0;
 	wire					rs_alu_mul_halt1;
-_out
+
 	wire					rs_alu_mul_illegal_inst0;
 	wire					rs_alu_mul_illegal_inst1;
 	wire					rs_alu_mul_valid_inst0;
@@ -451,26 +379,26 @@ _out
 	/*
 	 * Outputs from physical register file
 	 */
-	wire	[63:0]	prf_alu_sim_pra_value0,
-	wire	[63:0]	prf_alu_sim_pra_value1,
+	wire	[63:0]	prf_alu_sim_pra_value0;
+	wire	[63:0]	prf_alu_sim_pra_value1;
 
-	wire	[63:0]	prf_alu_mem_pra_value0,
-	wire	[63:0]	prf_alu_mem_pra_value1,
+	wire	[63:0]	prf_alu_mem_pra_value0;
+	wire	[63:0]	prf_alu_mem_pra_value1;
 
-	wire	[63:0]	prf_alu_mul_pra_value0,
-	wire	[63:0]	prf_alu_mul_pra_value1,
+	wire	[63:0]	prf_alu_mul_pra_value0;
+	wire	[63:0]	prf_alu_mul_pra_value1;
 
 
 	/*
 	 * Outputs from CDB
 	 */
-	wire	[CDB_WIDTH-1:0]	cdb_rs_rob_mt_broadcast;
+	wire	[`CDB_WIDTH-1:0]	cdb_rs_rob_mt_broadcast;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag0;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag1;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag2;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag3;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag4;
-	wire		[6:0]	cdb_rs_rob_mt_pr_tag5;_out
+	wire		[6:0]	cdb_rs_rob_mt_pr_tag5;
 	wire		[4:0]	cdb_mt_ar_tag0;
 	wire		[4:0]	cdb_mt_ar_tag1;
 	wire		[4:0]	cdb_mt_ar_tag2;
@@ -554,6 +482,62 @@ _out
 	wire		ic_reset;
 	wire		dc_reset;
 
+
+	assign proc2mem_command		= `BUS_NONE;
+	assign porc2mem_addr			= 0;
+	assign porc2mem_data			= 0;
+
+	assign pipeline_completed_inst	= 0;
+	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
+	assign pipeline_commit_wr_idx		= 0;
+	assign pipeline_commit_wr_data	= 0;
+	assign pipeline_commit_wr_en		= 0;
+	assign pipeline_commit_NPC			= 0;
+
+
+	assign if_NPC0						= if_id_NPC0;
+	assign if_IR0							= if_id_IR0;
+	assign if_valid_inst0			= if_id_valid_inst0;
+	assign id_NPC0						= id_rs_NPC0;
+	assign id_IR0							= id_rs_IR0;
+	assign id_valid_inst0			= id_rs_rob_mt_valid_inst0;
+	assign rs_sim_NPC0				= rs_alu_sim_NPC0;
+	assign rs_sim_IR0					= rs_alu_sim_IR0;
+	assign rs_sim_valid_inst0 = rs_alu_sim_valid_inst0;
+	assign rs_mul_NPC0				= rs_alu_mul_NPC0;
+	assign rs_mul_IR0					= rs_alu_mul_IR0;
+	assign rs_mul_valid_inst0 = rs_alu_mul_valid_inst0;
+	assign rs_mem_NPC0				= rs_alu_mem_NPC0;
+	assign rs_mem_IR0					= rs_alu_mem_IR0;
+	assign rs_mem_valid_inst0 = rs_alu_mem_valid_inst0;
+
+	assign if_NPC1						= if_id_NPC1;
+	assign if_IR1							= if_id_IR1;
+	assign if_valid_inst1			= if_id_valid_inst1;
+	assign id_NPC1						= id_rs_NPC1;
+	assign id_IR1							= id_rs_IR1;
+	assign id_valid_inst1			= id_rs_rob_mt_valid_inst1;
+	assign rs_sim_NPC1				= rs_alu_sim_NPC1;
+	assign rs_sim_IR1					= rs_alu_sim_IR1;
+	assign rs_sim_valid_inst1 = rs_alu_sim_valid_inst1;
+	assign rs_mul_NPC1				= rs_alu_mul_NPC1;
+	assign rs_mul_IR1					= rs_alu_mul_IR1;
+	assign rs_mul_valid_inst1 = rs_alu_mul_valid_inst1;
+	assign rs_mem_NPC1				= rs_alu_mem_NPC1;
+	assign rs_mem_IR1					= rs_alu_mem_IR1;
+	assign rs_mem_valid_inst1 = rs_alu_mem_valid_inst1;
+
+	assign cdb_broadcast				= cdb_rs_rob_mt_broadcast;
+	assign cdb_pr_tag0					= cdb_rs_rob_mt_pr_tag0;
+	assign cdb_pr_tag1					= cdb_rs_rob_mt_pr_tag1;
+	assign cdb_pr_tag2					= cdb_rs_rob_mt_pr_tag2;
+	assign cdb_pr_tag3					= cdb_rs_rob_mt_pr_tag3;
+	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
+	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
+	assign rob_retire_num				= rob_fl_retire_num;
+	assign rob_retire_tag_a			= rob_fl_retire_tag_a;
+	assign rob_retire_tag_b			= rob_fl_retire_tag_b;
+
 	assign	if_reset 			= reset;
 	assign	id_reset 			= reset;
 	assign	mt_reset 			= reset;
@@ -579,7 +563,7 @@ _out
 								.btb_pred_addr1(btb_if_pred_aadr0),
 								.Imem2proc_data(Imem2proc_data),
 								.Imem_valid(Imem_valid),
-								.id_inst_need_num(id_if_need_num)_out,
+								.id_inst_need_num(id_if_need_num),
 
 								.id_NPC0(if_id_NPC0),
 								.id_NPC1(if_id_NPC1),
@@ -587,7 +571,7 @@ _out
 								.id_IR1(if_id_IR1),
 								.proc2Imem_addr(if_NPC_out),
 								.id_valid_inst0(if_id_valid_inst0),
-								.id_valid_inst1(if_id_valid_inst1)
+								.id_valid_inst1(if_id_valid_inst1),
 
 								.id_branch_taken0(if_id_branch_taken0),
 								.id_pred_addr0(if_id_pred_addr0),
@@ -823,13 +807,13 @@ _out
 
 					.id_dispatch_num(id_rs_rob_mt_dispatch_num),
 
-					.fl_pr_dest_idx0,
+					.fl_pr_dest_idx0(fl_rob_rs_mt_pr0),
 					.mt_pra_idx0(mt_rs_pr_a1),
 					.mt_prb_idx0(mt_rs_pr_b1),
 					.mt_pra_ready0(mt_rs_pr_a1_ready),
 					.mt_prb_ready0(mt_rs_pr_b1_ready),
 
-					.fl_pr_dest_idx1,
+					.fl_pr_dest_idx1(fl_rob_rs_mt_pr1),
 					.mt_pra_idx1(mt_rs_pr_a2),
 					.mt_prb_idx1(mt_rs_pr_b2),
 					.mt_pra_ready1(mt_rs_pr_a2_ready),
@@ -854,7 +838,7 @@ _out
 					.alu_sim_IR0(rs_alu_sim_IR0),
 
 					.alu_sim_branch_taken0(alu_sim_branch_taken0),
-					.alu_sim_pred_addr0(alu_sim_pred_addro),
+					.alu_sim_pred_addr0(alu_sim_pred_addr0),
 
 					.alu_sim_prf_pra_idx0(rs_alu_sim_prf_pra_idx0), 
 					.alu_sim_prf_prb_idx0(rs_alu_sim_prf_prb_idx0),
@@ -880,7 +864,7 @@ _out
 					.alu_sim_IR1(rs_alu_sim_IR1),
 
 					.alu_sim_branch_taken1(alu_sim_branch_taken1),
-					.alu_sim_pred_addr1(alu_sim_pred_addro),
+					.alu_sim_pred_addr1(alu_sim_pred_addr1),
 
 					.alu_sim_prf_pra_idx1(rs_alu_sim_prf_pra_idx1), 
 					.alu_sim_prf_prb_idx1(rs_alu_sim_prf_prb_idx1),
@@ -906,7 +890,7 @@ _out
 					.alu_mul_IR0(rs_alu_mul_IR0),
 
 					.alu_mul_branch_taken0(alu_mul_branch_taken0),
-					.alu_mul_pred_addr0(alu_mul_pred_addro),
+					.alu_mul_pred_addr0(alu_mul_pred_addr0),
 
 					.alu_mul_prf_pra_idx0(rs_alu_mul_prf_pra_idx0), 
 					.alu_mul_prf_prb_idx0(rs_alu_mul_prf_prb_idx0),
@@ -932,7 +916,7 @@ _out
 					.alu_mul_IR1(rs_alu_mul_IR1),
 
 					.alu_mul_branch_taken1(alu_mul_branch_taken1),
-					.alu_mul_pred_addr1(alu_mul_pred_addro),
+					.alu_mul_pred_addr1(alu_mul_pred_addr1),
 
 					.alu_mul_prf_pra_idx1(rs_alu_mul_prf_pra_idx1), 
 					.alu_mul_prf_prb_idx1(rs_alu_mul_prf_prb_idx1),
@@ -958,7 +942,7 @@ _out
 					.alu_mem_IR0(rs_alu_mem_IR0),
 
 					.alu_mem_branch_taken0(alu_mem_branch_taken0),
-					.alu_mem_pred_addr0(alu_mem_pred_addro),
+					.alu_mem_pred_addr0(alu_mem_pred_addr0),
 
 					.alu_mem_prf_pra_idx0(rs_alu_mem_prf_pra_idx0), 
 					.alu_mem_prf_prb_idx0(rs_alu_mem_prf_prb_idx0),
@@ -984,7 +968,7 @@ _out
 					.alu_mem_IR1(rs_alu_mem_IR1),
 
 					.alu_mem_branch_taken1(alu_mem_branch_taken1),
-					.alu_mem_pred_addr1(alu_mem_pred_addro),
+					.alu_mem_pred_addr1(alu_mem_pred_addr1),
 
 					.alu_mem_prf_pra_idx1(rs_alu_mem_prf_pra_idx1), 
 					.alu_mem_prf_prb_idx1(rs_alu_mem_prf_prb_idx1),
@@ -1013,65 +997,65 @@ _out
 	 */
 
 	prf prf0 (// Inputs
-						clock(clock),
-						reset(prf_reset),
-						rs_alu_sim_pra_idx0(rs_alu_sim_prf_pra_idx0),
-						rs_alu_sim_pra_idx1(rs_alu_sim_prf_pra_idx1),
-						rs_alu_mul_pra_idx0(rs_alu_mul_prf_pra_idx0),
-						rs_alu_mul_pra_idx1(rs_alu_mul_prf_pra_idx1),
-						rs_alu_mem_pra_idx0(rs_alu_mem_prf_pra_idx0),
-						rs_alu_mem_pra_idx1(rs_alu_mem_prf_pra_idx1),
+						.clock(clock),
+						.reset(prf_reset),
+						.rs_alu_sim_pra_idx0(rs_alu_sim_prf_pra_idx0),
+						.rs_alu_sim_pra_idx1(rs_alu_sim_prf_pra_idx1),
+						.rs_alu_mul_pra_idx0(rs_alu_mul_prf_pra_idx0),
+						.rs_alu_mul_pra_idx1(rs_alu_mul_prf_pra_idx1),
+						.rs_alu_mem_pra_idx0(rs_alu_mem_prf_pra_idx0),
+						.rs_alu_mem_pra_idx1(rs_alu_mem_prf_pra_idx1),
 
-						rs_alu_sim_prb_idx0(rs_alu_sim_prf_prb_idx0),
-						rs_alu_sim_prb_idx1(rs_alu_sim_prf_prb_idx1),
-						rs_alu_mul_prb_idx0(rs_alu_mul_prf_prb_idx0),
-						rs_alu_mul_prb_idx1(rs_alu_mul_prf_prb_idx1),
-						rs_alu_mem_prb_idx0(rs_alu_mem_prf_prb_idx0),
-						rs_alu_mem_prb_idx1(rs_alu_mem_prf_prb_idx1),
+						.rs_alu_sim_prb_idx0(rs_alu_sim_prf_prb_idx0),
+						.rs_alu_sim_prb_idx1(rs_alu_sim_prf_prb_idx1),
+						.rs_alu_mul_prb_idx0(rs_alu_mul_prf_prb_idx0),
+						.rs_alu_mul_prb_idx1(rs_alu_mul_prf_prb_idx1),
+						.rs_alu_mem_prb_idx0(rs_alu_mem_prf_prb_idx0),
+						.rs_alu_mem_prb_idx1(rs_alu_mem_prf_prb_idx1),
 
-						alu_sim_wr_enable0(alu_sim_prf_wr_enable0),
-						alu_sim_pr_idx0(alu_sim_cdb_prf_pr_idx0),
-						alu_sim_pr_value0(alu_sim_prf_pr_value0),
+						.alu_sim_wr_enable0(alu_sim_prf_wr_enable0),
+						.alu_sim_pr_idx0(alu_sim_cdb_prf_pr_idx0),
+						.alu_sim_pr_value0(alu_sim_prf_pr_value0),
 
-						alu_sim_wr_enable1(alu_sim_prf_wr_enable1),
-						alu_sim_pr_idx1(alu_sim_prf_pr_idx1),
-						alu_sim_pr_value1(alu_sim_prf_pr_value1),
+						.alu_sim_wr_enable1(alu_sim_prf_wr_enable1),
+						.alu_sim_pr_idx1(alu_sim_prf_pr_idx1),
+						.alu_sim_pr_value1(alu_sim_prf_pr_value1),
 
-						alu_mul_wr_enable0(alu_mul_prf_wr_enable0),
-						alu_mul_pr_idx0(alu_mul_prf_pr_idx0),
-						alu_mul_pr_value0(alu_mul_prf_pr_value0),
+						.alu_mul_wr_enable0(alu_mul_prf_wr_enable0),
+						.alu_mul_pr_idx0(alu_mul_prf_pr_idx0),
+						.alu_mul_pr_value0(alu_mul_prf_pr_value0),
 
-						alu_mul_wr_enable1(alu_mul_prf_wr_enable1),
-						alu_mul_pr_idx1(alu_mul_prf_pr_idx1),
-						alu_mul_pr_value1(alu_mul_prf_pr_value1),
+						.alu_mul_wr_enable1(alu_mul_prf_wr_enable1),
+						.alu_mul_pr_idx1(alu_mul_prf_pr_idx1),
+						.alu_mul_pr_value1(alu_mul_prf_pr_value1),
 
-						alu_mem_wr_enable0(alu_mem_prf_wr_enable0),
-						alu_mem_pr_idx0(alu_mem_prf_pr_idx0),
-						alu_mem_pr_value0(alu_mem_prf_pr_value0),
+						.alu_mem_wr_enable0(alu_mem_prf_wr_enable0),
+						.alu_mem_pr_idx0(alu_mem_prf_pr_idx0),
+						.alu_mem_pr_value0(alu_mem_prf_pr_value0),
 
-						alu_mem_wr_enable1(alu_mem_prf_wr_enable1),
-						alu_mem_pr_idx1(alu_mem_prf_pr_idx1),
-						alu_mem_pr_value1(alu_mem_prf_pr_value1),
+						.alu_mem_wr_enable1(alu_mem_prf_wr_enable1),
+						.alu_mem_pr_idx1(alu_mem_prf_pr_idx1),
+						.alu_mem_pr_value1(alu_mem_prf_pr_value1),
 
 						// Outputs
-						alu_sim_pra_value0(prf_alu_sim_pra_value0),
-						alu_sim_pra_value1(prf_alu_sim_pra_value1),
+						.alu_sim_pra_value0(prf_alu_sim_pra_value0),
+						.alu_sim_pra_value1(prf_alu_sim_pra_value1),
 
-						alu_mul_pra_value0(prf_alu_mul_pra_value0),
-						alu_mul_pra_value1(prf_alu_mul_pra_value1),
+						.alu_mul_pra_value0(prf_alu_mul_pra_value0),
+						.alu_mul_pra_value1(prf_alu_mul_pra_value1),
 
-						alu_mem_pra_value0(prf_alu_mem_pra_value0),
-						alu_mem_pra_value1(prf_alu_mem_pra_value1),
+						.alu_mem_pra_value0(prf_alu_mem_pra_value0),
+						.alu_mem_pra_value1(prf_alu_mem_pra_value1),
 
-						alu_sim_prb_value0(prf_alu_sim_prb_value0),
-						alu_sim_prb_value1(prf_alu_sim_prb_value1),
+						.alu_sim_prb_value0(prf_alu_sim_prb_value0),
+						.alu_sim_prb_value1(prf_alu_sim_prb_value1),
 
-						alu_mul_prb_value0(prf_alu_mul_prb_value0),
-						alu_mul_prb_value1(prf_alu_mul_prb_value1),
+						.alu_mul_prb_value0(prf_alu_mul_prb_value0),
+						.alu_mul_prb_value1(prf_alu_mul_prb_value1),
 
-						alu_mem_prb_value0(prf_alu_mem_prb_value0),
-						alu_mem_prb_value1(prf_alu_mem_prb_value1)
-						);
+						.alu_mem_prb_value0(prf_alu_mem_prb_value0),
+						.alu_mem_prb_value1(prf_alu_mem_prb_value1)
+	);
 
 
 	/*
@@ -1216,7 +1200,7 @@ _out
 										.rs_opb_select1(rs_alu_mul_opb_select1),
 										.rs_valid_inst1(rs_alu_mul_valid_inst1),
 
-										.// Outputs
+										// Outputs
 										.cdb_complete0(alu_mul_cdb_complete0),
 										.cdb_dest_ar_idx0(alu_mul_cdb_dest_ar_idx0),
 										.cdb_prf_dest_pr_idx0(alu_mul_cdb_prf_pr_idx0),
