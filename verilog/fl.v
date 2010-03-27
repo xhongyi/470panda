@@ -21,7 +21,7 @@ module free_list (//inputs
 		
 	  	  //outputs
 	 	  rob_rs_mt_pr0, //new registers
-		  rob_rs_mt_pr1,
+		  rob_rs_mt_pr1
 		  //debug output
   		 );
 
@@ -78,6 +78,7 @@ always @* begin
       next_head = 7'd1;
     else
       next_head = head + 7'd2;
+	end
   else if (rob_retire_num == 2'd1)
     if (head == 7'd95)
       next_head = 7'd0;
