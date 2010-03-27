@@ -59,30 +59,25 @@ module testbench;
   wire [31:0] id_IR1;
   wire        id_valid_inst0;
   wire        id_valid_inst1;
-	wire [63:0] rs_NPC0;
-  wire [63:0] rs_NPC1;
-  wire [31:0] rs_IR0;
-  wire [31:0] rs_IR1;
-  wire        rs_valid_inst0;
-  wire        rs_valid_inst1;
-	wire [63:0] alu_sim_NPC0;
-  wire [63:0] alu_sim_NPC1;
-  wire [31:0] alu_sim_IR0;
-  wire [31:0] alu_sim_IR1;
-  wire        alu_sim_valid_inst0;
-  wire        alu_sim_valid_inst1;
-	wire [63:0] alu_mul_NPC0;
-  wire [63:0] alu_mul_NPC1;
-  wire [31:0] alu_mul_IR0;
-  wire [31:0] alu_mul_IR1;
-  wire        alu_mul_valid_inst0;
-  wire        alu_mul_valid_inst1;
-	wire [63:0] alu_mem_NPC0;
-  wire [63:0] alu_mem_NPC1;
-  wire [31:0] alu_mem_IR0;
-  wire [31:0] alu_mem_IR1;
-  wire        alu_mem_valid_inst0;
-  wire        alu_mem_valid_inst1;
+
+	wire [63:0] rs_sim_NPC0;
+  wire [63:0] rs_sim_NPC1;
+  wire [31:0] rs_sim_IR0;
+  wire [31:0] rs_sim_IR1;
+  wire        rs_sim_valid_inst0;
+  wire        rs_sim_valid_inst1;
+	wire [63:0] rs_mul_NPC0;
+  wire [63:0] rs_mul_NPC1;
+  wire [31:0] rs_mul_IR0;
+  wire [31:0] rs_mul_IR1;
+  wire        rs_mul_valid_inst0;
+  wire        rs_mul_valid_inst1;
+	wire [63:0] rs_mem_NPC0;
+  wire [63:0] rs_mem_NPC1;
+  wire [31:0] rs_mem_IR0;
+  wire [31:0] rs_mem_IR1;
+  wire        rs_mem_valid_inst0;
+  wire        rs_mem_valid_inst1;
 	wire	[5:0]	cdb_broadcast;
 	wire	[6:0] cdb_pr_tag_0;
 	wire	[6:0] cdb_pr_tag_1;
@@ -100,85 +95,84 @@ module testbench;
 	reg	 [8*7:0] if_instr1_str;
 	reg  [8*7:0] id_instr0_str;
 	reg	 [8*7:0] id_instr1_str;
-	reg  [8*7:0] rs_instr0_str;
-	reg	 [8*7:0] rs_instr1_str;
-	reg  [8*7:0] alu_sim_instr0_str;
-	reg	 [8*7:0] alu_sim_instr1_str;
-	reg  [8*7:0] alu_mul_instr0_str;
-	reg	 [8*7:0] alu_mul_instr1_str;
-	reg  [8*7:0] alu_mem_instr0_str;
-	reg	 [8*7:0] alu_mem_instr1_str;
+
+	reg  [8*7:0] rs_sim_instr0_str;
+	reg	 [8*7:0] rs_sim_instr1_str;
+	reg  [8*7:0] rs_mul_instr0_str;
+	reg	 [8*7:0] rs_mul_instr1_str;
+	reg  [8*7:0] rs_mem_instr0_str;
+	reg	 [8*7:0] rs_mem_instr1_str;
   
 
 
   // Instantiate the Pipeline
-  pipeline pipeline_0 (// Inputs
-                       .clock             (clock),
-                       .reset             (reset),
-                       .mem2proc_response (mem2proc_response),
-                       .mem2proc_data     (mem2proc_data),
-                       .mem2proc_tag      (mem2proc_tag),
+ pipeline testee (// Inputs
+                 clock,
+                 reset,
+                 mem2proc_response,
+                 mem2proc_data,
+                 mem2proc_tag,
+                 
+                 // Outputs
+                 proc2mem_command,
+                 proc2mem_addr,
+                 proc2mem_data,
 
-                        // Outputs
-                       .proc2mem_command  (proc2mem_command),
-                       .proc2mem_addr     (proc2mem_addr),
-                       .proc2mem_data     (proc2mem_data),
+                 pipeline_completed_insts,
+                 pipeline_error_status,
+                 pipeline_commit_wr_data,
+                 pipeline_commit_wr_idx,
+                 pipeline_commit_wr_en,
+                 pipeline_commit_NPC,
 
-                       .pipeline_completed_insts(pipeline_completed_insts),
-                       .pipeline_error_status(pipeline_error_status),
-                       .pipeline_commit_wr_data(pipeline_commit_wr_data),
-                       .pipeline_commit_wr_idx(pipeline_commit_wr_idx),
-                       .pipeline_commit_wr_en(pipeline_commit_wr_en),
-                       .pipeline_commit_NPC(pipeline_commit_NPC),
 
-                       .if_NPC0(NPC_out0),
-											 .if_NPC1(NPC_out1),
-                       .if_IR0(IR_out0),
-											 .if_IR1(IR_out1),
-                       .if_valid_inst0(if_valid_inst0),
-											 .if_valid_inst1(if_valid_inst1),
-                       .id_NPC0(id_NPC0),
-											 .id_NPC1(id_NPC1),
-                       .id_IR0(id_IR0),
-											 .id_IR1(id_IR1),
-                       .id_valid_inst0(id_valid_inst0),
-											 .id_valid_inst1(id_valid_inst1),
-                       .rs_NPC0(rs_NPC0),
-											 .rs_NPC1(rs_NPC1),
-                       .rs_IR0(rs_IR0),
-											 .rs_IR1(rs_IR1),
-                       .rs_valid_inst0(rs_valid_inst0),
-										   .rs_valid_inst1(rs_valid_inst1),
-                       .alu_sim_NPC0(alu_NPC0),
-											 .alu_sim_NPC1(alu_NPC1),
-                       .alu_sim_IR0(alu_IR0),
-                       .alu_sim_IR1(alu_IR1),
-                       .alu_sim_valid_inst0(alu_valid_inst0),
-											 .alu_sim_valid_inst1(alu_valid_inst1),
-											 .alu_mul_NPC0(alu_NPC0),
-											 .alu_mul_NPC1(alu_NPC1),
-                       .alu_mul_IR0(alu_IR0),
-                       .alu_mul_IR1(alu_IR1),
-                       .alu_mul_valid_inst0(alu_valid_inst0),
-											 .alu_mul_valid_inst1(alu_valid_inst1),
-											 .alu_mem_NPC0(alu_NPC0),
-											 .alu_mem_NPC1(alu_NPC1),
-                       .alu_mem_IR0(alu_IR0),
-                       .alu_mem_IR1(alu_IR1),
-                       .alu_mem_valid_inst0(alu_valid_inst0),
-											 .alu_mem_valid_inst1(alu_valid_inst1),
-                       .cdb_broadcast(cdb_broadcast),
-											 .cdb_pr_tag0(cdb_pr_tag0),
-										   .cdb_pr_tag1(cdb_pr_tag1),
-											 .cdb_pr_tag2(cdb_pr_tag2),
-											 .cdb_pr_tag3(cdb_pr_tag3),
-											 .cdb_pr_tag4(cdb_pr_tag4),
-											 .cdb_pr_tag5(cdb_pr_tag5),
-											 .rob_retire_num(rob_retire_num),
-											 .rob_retire_tag_a(rob_retire_tag_a),
-											 .rob_retire_tag_b(rob_retire_tag_b)
-														
-                      );
+                 // testing hooks (these must be exported so we can test
+                 // the synthesized version) data is tested by looking at
+                 // the final values in memory
+								 if_NPC0,
+								 if_IR0,
+								 if_valid_inst0,
+								 id_NPC0,
+								 id_IR0,
+								 id_valid_inst0,
+								 rs_sim_NPC0,
+								 rs_sim_IR0,
+								 rs_sim_valid_inst0,
+								 rs_mul_NPC0,
+								 rs_mul_IR0,
+								 rs_mul_valid_inst0,
+								 rs_mem_NPC0,
+								 rs_mem_IR0,
+								 rs_mem_valid_inst0,
+
+								 if_NPC1,
+								 if_IR1,
+								 if_valid_inst1,
+								 id_NPC1,
+								 id_IR1,
+								 id_valid_inst1,
+								 rs_sim_NPC1,
+								 rs_sim_IR1,
+								 rs_sim_valid_inst1,
+								 rs_mul_NPC1,
+								 rs_mul_IR1,
+								 rs_mul_valid_inst1,
+								 rs_mem_NPC1,
+								 rs_mem_IR1,
+								 rs_mem_valid_inst1,
+
+								 cdb_broadcast,
+								 cdb_pr_tag0,
+								 cdb_pr_tag1,
+								 cdb_pr_tag2,
+								 cdb_pr_tag3,
+								 cdb_pr_tag4,
+								 cdb_pr_tag5,
+								 rob_retire_num,
+								 rob_retire_tag_a,
+								 rob_retire_tag_b
+
+                );
 
 
   // Instantiate the Data Memory
@@ -356,14 +350,13 @@ module testbench;
 		if_instr1_str  = get_instr_string(if_IR1, if_valid_inst0);
 		id_instr0_str  = get_instr_string(id_IR0, id_valid_inst0);
 		id_instr1_str  = get_instr_string(id_IR1, id_valid_inst1);
-		rs_instr0_str  = get_instr_string(rs_IR0, rs_valid_inst0);
-		rs_instr1_str  = get_instr_string(rs_IR1, rs_valid_inst0);
-		alu_sim_instr0_str  = get_instr_string(alu_sim_IR0, alu_sim_valid_inst0);
-		alu_sim_instr1_str  = get_instr_string(alu_sim_IR1, alu_sim_valid_inst0);
-		alu_mul_instr0_str  = get_instr_string(alu_mul_IR0, alu_mul_valid_inst0);
-		alu_mul_instr1_str  = get_instr_string(alu_mul_IR1, alu_mul_valid_inst0);
-		alu_mem_instr0_str  = get_instr_string(alu_mem_IR0, alu_mem_valid_inst0);
-		alu_mem_instr1_str  = get_instr_string(alu_mem_IR1, alu_mem_valid_inst0);
+		
+		rs_sim_instr0_str  = get_instr_string(rs_sim_IR0, rs_sim_valid_inst0);
+		rs_sim_instr1_str  = get_instr_string(rs_sim_IR1, rs_sim_valid_inst0);
+		rs_mul_instr0_str  = get_instr_string(rs_mul_IR0, rs_mul_valid_inst0);
+		rs_mul_instr1_str  = get_instr_string(rs_mul_IR1, rs_mul_valid_inst0);
+		rs_mem_instr0_str  = get_instr_string(rs_mem_IR0, rs_mem_valid_inst0);
+		rs_mem_instr1_str  = get_instr_string(rs_mem_IR1, rs_mem_valid_inst0);
    
   end
 
