@@ -228,8 +228,8 @@ module alu_sim(// Inputs
   reg [1:0]		rs_alu_avail;
 	
 	//Update registers
-	reg [63:0] next_prf_result0;   // ALU result
-	reg [63:0] next_prf_result1;   // ALU result
+	wire [63:0] next_prf_result0;   // ALU result
+	wire [63:0] next_prf_result1;   // ALU result
 	reg 			next_prf_write_enable0;
 	reg				next_prf_write_enable1;
 	reg				next_cdb_complete0;
@@ -270,11 +270,12 @@ module alu_sim(// Inputs
 		next_cdb_complete1 = 1;
 		next_cdb_dest_ar_idx0 = rs_dest_ar_idx0;
 		next_cdb_dest_ar_idx1 = rs_dest_ar_idx1;
-		next_cdb_dest_pr_idx0 = rs_dest_pr_idx0;
-		next_cdb_dest_pr_idx1 = rs_dest_pr_idx1;
+		next_cdb_prf_dest_pr_idx0 = rs_dest_pr_idx0;
+		next_cdb_prf_dest_pr_idx1 = rs_dest_pr_idx1;
 		next_rs_alu_avail = 2'b11;
 		next_cdb_complete0 = rs_valid_inst0;
 		next_cdb_complete1 = rs_valid_inst1;
+  end
   always @*
   begin
     case (rs_opa_select0)
@@ -335,14 +336,14 @@ module alu_sim(// Inputs
    // instantiate the branch condition tester
    //
   brcond brcond0 (// Inputs
-                .opa(rs_pra0),       // always check regA value
+                .opa(prf_pra0),       // always check regA value
                 .func(rs_IR0[28:26]), // inst bits to determine check
 
                 // Output
                 .cond(brcond_result0)
                );
   brcond brcond1 (// Inputs
-                .opa(rs_pra1),       // always check regA value
+                .opa(prf_pra1),       // always check regA value
                 .func(rs_IR1[28:26]), // inst bits to determine check
 
                 // Output
@@ -392,6 +393,7 @@ module alu_sim(// Inputs
 			prf_write_enable1 <= `SD next_prf_write_enable1;
 			rs_alu_avail <= `SD next_rs_alu_avail;
 		end
+  end
 
 endmodule // module ex_stage
 
