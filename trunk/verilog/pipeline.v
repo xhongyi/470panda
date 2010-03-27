@@ -31,21 +31,49 @@
                  // testing hooks (these must be exported so we can test
                  // the synthesized version) data is tested by looking at
                  // the final values in memory
-                 if_NPC_out,
-                 if_IR_out,
-                 if_valid_inst_out,
-                 if_id_NPC,
-                 if_id_IR,
-                 if_id_valid_inst,
-                 id_ex_NPC,
-                 id_ex_IR,
-                 id_ex_valid_inst,
-                 ex_mem_NPC,
-                 ex_mem_IR,
-                 ex_mem_valid_inst,
-                 mem_wb_NPC,
-                 mem_wb_IR,
-                 mem_wb_valid_inst
+								 if_NPC0,
+								 if_IR0,
+								 if_valid_inst0,
+								 id_NPC0,
+								 id_IR0,
+								 id_valid_inst0,
+								 rs_sim_NPC0,
+								 rs_sim_IR0,
+								 rs_sim_valid_inst0,
+								 rs_mul_NPC0,
+								 rs_mul_IR0,
+								 rs_mul_valid_inst0,
+								 rs_mem_NPC0,
+								 rs_mem_IR0,
+								 rs_mem_valid_inst0,
+
+								 if_NPC1,
+								 if_IR1,
+								 if_valid_inst1,
+								 id_NPC1,
+								 id_IR1,
+								 id_valid_inst1,
+								 rs_sim_NPC1,
+								 rs_sim_IR1,
+								 rs_sim_valid_inst1,
+								 rs_mul_NPC1,
+								 rs_mul_IR1,
+								 rs_mul_valid_inst1,
+								 rs_mem_NPC1,
+								 rs_mem_IR1,
+								 rs_mem_valid_inst1,
+
+								 cdb_broadcast,
+								 cdb_pr_tag0,
+								 cdb_pr_tag1,
+								 cdb_pr_tag2,
+								 cdb_pr_tag3,
+								 cdb_pr_tag4,
+								 cdb_pr_tag5,
+								 rob_retire_num,
+								 rob_retire_tag_a,
+								 rob_retire_tag_b
+
                 );
 
 
@@ -66,21 +94,121 @@
   output        pipeline_commit_wr_en;
   output [63:0] pipeline_commit_NPC;
 
-  output [63:0] if_NPC_out; //proc2Imem_addr
-  output [31:0] if_IR_out;
-  output        if_valid_inst_out;
-  output [63:0] if_id_NPC;
-  output [31:0] if_id_IR;
-  output        if_id_valid_inst;
-  output [63:0] id_ex_NPC;
-  output [31:0] id_ex_IR;
-  output        id_ex_valid_inst;
-  output [63:0] ex_mem_NPC;
-  output [31:0] ex_mem_IR;
-  output        ex_mem_valid_inst;
-  output [63:0] mem_wb_NPC;
-  output [31:0] mem_wb_IR;
-  output        mem_wb_valid_inst;
+  output [63:0] if_NPC0; //proc2Imem_addr
+  output [31:0] if_IR0;
+  output        if_valid_inst0;
+  output [63:0] id_NPC0;
+  output [31:0] id_IR0;
+  output        id_valid_inst0;
+	output [63:0] rs_sim_NPC0;
+	output [31:0]	rs_sim_IR0;
+	output				rs_sim_valid_inst0;
+	output [63:0] rs_mul_NPC0;
+	output [31:0]	rs_mul_IR0;
+	output				rs_mul_valid_inst0;
+	output [63:0] rs_mem_NPC0;
+	output [31:0]	rs_mem_IR0;
+	output				rs_mem_valid_inst0;
+	output [63:0]	alu_sim_NPC0;
+	output [31:0]	alu_sim_IR0;
+	output				alu_sim_valid_inst0;
+	output [63:0]	alu_mul_NPC0;
+	output [31:0]	alu_mul_IR0;
+	output				alu_mul_valid_inst0;
+	output [63:0]	alu_mem_NPC0;
+	output [31:0]	alu_mem_IR0;
+	output				alu_mem_valid_inst0;
+
+  output [63:0] if_NPC1; //proc2Imem_addr
+  output [31:0] if_IR1;
+  output        if_valid_inst1;
+  output [63:0] id_NPC1;
+  output [31:0] id_IR1;
+  output        id_valid_inst1;
+	output [63:0] rs_sim_NPC1;
+	output [31:0]	rs_sim_IR1;
+	output				rs_sim_valid_inst1;
+	output [63:0] rs_mul_NPC1;
+	output [31:0]	rs_mul_IR1;
+	output				rs_mul_valid_inst1;
+	output [63:0] rs_mem_NPC1;
+	output [31:0]	rs_mem_IR1;
+	output				rs_mem_valid_inst1;
+	output [63:0]	alu_sim_NPC1;
+	output [31:0]	alu_sim_IR1;
+	output				alu_sim_valid_inst1;
+	output [63:0]	alu_mul_NPC1;
+	output [31:0]	alu_mul_IR1;
+	output				alu_mul_valid_inst1;
+	output [63:0]	alu_mem_NPC1;
+	output [31:0]	alu_mem_IR1;
+	output				alu_mem_valid_inst1;
+
+	output	[5:0]	cdb_broadcast,
+	output	[6:0]	cdb_pr_tag0,
+	output	[6:0]	cdb_pr_tag1,
+	output	[6:0]	cdb_pr_tag2,
+	output	[6:0]	cdb_pr_tag3,
+	output	[6:0]	cdb_pr_tag4,
+	output	[6:0]	cdb_pr_tag5,
+	output	[1:0]	rob_retire_num,
+	output	[6:0]	rob_retire_tag_a,
+	output	[6:0]	rob_retire_tag_b
+
+	assign if_NPC0						= if_id_NPC0;
+	assign if_IR0							= if_id_IR0;
+	assign if_valid_inst0			= if_id_valid_inst0;
+	assign id_NPC0						= id_rs_NPC0;
+	assign id_IR0							= id_rs_IR0;
+	assign id_valid_inst0			= id_rs_rob_mt_valid_inst0;
+	assign rs_sim_NPC0				= rs_alu_sim_NPC0;
+	assign rs_sim_IR0					= rs_alu_sim_IR0;
+	assign rs_sim_valid_inst0 = rs_alu_sim_valid_inst0;
+	assign rs_mul_NPC0				= rs_alu_mul_NPC0;
+	assign rs_mul_IR0					= rs_alu_mul_IR0;
+	assign rs_mul_valid_inst0 = rs_alu_mul_valid_inst0;
+	assign rs_mem_NPC0				= rs_alu_mem_NPC0;
+	assign rs_mem_IR0					= rs_alu_mem_IR0;
+	assign rs_mem_valid_inst0 = rs_alu_mem_valid_inst0;
+	assign alu_sim_NPC0				= alu_
+	assign alu_sim_IR0
+	assign alu_sim_valid_inst0
+	assign alu_mul_NPC0
+	assign alu_mul_IR0
+	assign alu_mul_valid_inst0
+	assign alu_mem_NPC0
+	assign alu_mem_IR0
+	assign alu_mem_valid_inst0
+
+	assign if_NPC1
+	assign if_IR1
+	assign if_valid_inst1
+	assign id_NPC1
+	assign id_IR1
+	assign id_valid_inst1
+	assign rs_NPC1
+	assign rs_IR1
+	assign rs_valid_inst1
+	assign alu_sim_NPC1
+	assign alu_sim_IR1
+	assign alu_sim_valid_inst1
+	assign alu_mul_NPC1
+	assign alu_mul_IR1
+	assign alu_mul_valid_inst1
+	assign alu_mem_NPC1
+	assign alu_mem_IR1
+	assign alu_mem_valid_inst1
+
+	assign cdb_broadcast				= cdb_rs_rob_mt_broadcast;
+	assign cdb_pr_tag0					= cdb_rs_rob_mt_pr_tag0;
+	assign cdb_pr_tag1					= cdb_rs_rob_mt_pr_tag1;
+	assign cdb_pr_tag2					= cdb_rs_rob_mt_pr_tag2;
+	assign cdb_pr_tag3					= cdb_rs_rob_mt_pr_tag3;
+	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
+	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
+	assign rob_retire_num				= rob_fl_rob_retire_num;
+	assign rob_retire_tag_a			= rob_fl_retire_tag_a;
+	assign rob_retire_tag_b			= rob_fl_retire_tag_b;
 
 	/*
 	 * Output from IF
@@ -140,8 +268,8 @@
 	wire					id_rs_cond_branch1;
 	wire					id_rs_uncond_branch0;
 	wire					id_rs_uncond_branch1;
-	wire					id_rs_halt0;
-	wire					id_rs_halt1;
+	wire					id_rs_rob_halt0;
+	wire					id_rs_rob_halt1;
 
 	wire					id_rs_rob_mt_illegal_inst0;
 	wire					id_rs_rob_mt_illegal_inst1;
@@ -323,14 +451,14 @@ _out
 	/*
 	 * Outputs from physical register file
 	 */
-	wire	[63:0]	alu_sim_pra_value0,
-	wire	[63:0]	alu_sim_pra_value1,
+	wire	[63:0]	prf_alu_sim_pra_value0,
+	wire	[63:0]	prf_alu_sim_pra_value1,
 
-	wire	[63:0]	alu_mem_pra_value0,
-	wire	[63:0]	alu_mem_pra_value1,
+	wire	[63:0]	prf_alu_mem_pra_value0,
+	wire	[63:0]	prf_alu_mem_pra_value1,
 
-	wire	[63:0]	alu_mul_pra_value0,
-	wire	[63:0]	alu_mul_pra_value1,
+	wire	[63:0]	prf_alu_mul_pra_value0,
+	wire	[63:0]	prf_alu_mul_pra_value1,
 
 
 	/*
@@ -359,10 +487,35 @@ _out
 	/*
 	 * Outputs from simple ALU
 	 */
-
+  wire	 [63:0] alu_sim_prf_value0;   // ALU result
+  wire	 [63:0] alu_sim_prf_value1;   // ALU result
+	wire	 				alu_sim_prf_write_enable0;
+	wire					alu_sim_prf_write_enable1;
+	wire					alu_sim_cdb_complete0;
+	wire					alu_sim_cdb_complete1;
+	wire					alu_sim_cdb_dest_ar_idx0;
+	wire					alu_sim_cdb_dest_ar_idx1;
+	wire					alu_sim_cdb_prf_pr_idx0;
+	wire					alu_sim_cdb_prf_pr_idx1;
+	wire					alu_sim_cdb_exception0;
+	wire				  alu_sim_cdb_exception1;
+  wire	 [1:0]	alu_sim_rs_avail;
 	/*
 	 * Outputs from multiplier
 	 */
+  wire	 [63:0] alu_mul_prf_result0;   // ALU result
+  wire	 [63:0] alu_mul_prf_result1;   // ALU result
+	wire	 				alu_mul_prf_write_enable0;
+	wire					alu_mul_prf_write_enable1;
+	wire					alu_mul_cdb_complete0;
+	wire					alu_mul_cdb_complete1;
+	wire					alu_mul_cdb_dest_ar_idx0;
+	wire					alu_mul_cdb_dest_ar_idx1;
+	wire					alu_mul_cdb_prf_dest_pr_idx0;
+	wire					alu_mul_cdb_prf_dest_pr_idx1;
+	wire					alu_mul_cdb_exception0;
+	wire				  alu_mul_cdb_exception1;
+  wire	 [1:0]	alu_mul_rs_avail;
 
 	/*
 	 * Output from memory ALU
@@ -488,7 +641,7 @@ _out
 
 					.rs_cond_branch0(id_rs_cond_branch0),
 					.rs_uncond_branch0(id_rs_uncond_branch0),
-					.rs_halt0(id_rs_halt0),
+					.rs_halt0(id_rs_rob_halt0),
 
 					.rs_rob_mt_illegal_inst0(id_rs_rob_mt_illegal_inst0),
 					.rs_rob_mt_valid_inst0(id_rs_rob_mt_valid_inst0),
@@ -517,7 +670,7 @@ _out
 
 					.rs_cond_branch1(id_rs_cond_branch1),
 					.rs_uncond_branch1(id_rs_uncond_branch1),
-					.rs_halt1(id_rs_halt1),
+					.rs_halt1(id_rs_rob_halt1),
 
 					.rs_rob_mt_illegal_inst1(id_rs_rob_mt_illegal_inst1),
 					.rs_rob_mt_valid_inst1(id_rs_rob_mt_valid_inst1),
@@ -534,10 +687,13 @@ _out
 
 					 .fl_pr0(fl_rob_pr0),
 					 .mt_p0told(mt_rob_p0told),
-					 .id_valid_inst0(id_rob_valid_inst0),
+					 .id_valid_inst0(id_rs_rob_mt_valid_inst0),
+					 .id_halt0(id_rs_rob_halt0),
+
 					 .fl_pr1(fl_rob_pr1),
 					 .mt_p1told(mt_rob_p1told),
-					 .id_valid_inst1(id_rob_valid_inst1),
+					 .id_valid_inst1(id_rs_rob_mt_valid_inst1),
+					 .id_halt1(id_rs_rob_halt1),
 
 					 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
 					 
@@ -645,7 +801,7 @@ _out
 					.id_wr_mem0(id_rs_wr_mem0),
 					.id_cond_branch0(id_rs_cond_branch0),
 					.id_uncond_branch0(id_rs_uncond_branch0),
-					.id_halt0(id_rs_halt0),
+					.id_halt0(id_rs_rob_halt0),
 					.id_illegal_inst0(id_rs_rob_mt_illegal_inst0),
 					.id_valid_inst0(id_rs_rob_mt_valid_inst0),
 
@@ -661,7 +817,7 @@ _out
 					.id_wr_mem1(id_rs_wr_mem1),
 					.id_cond_branch1(id_rs_cond_branch1),
 					.id_uncond_branch1(id_rs_uncond_branch1),
-					.id_halt1(id_rs_halt1),
+					.id_halt1(id_rs_rob_halt1),
 					.id_illegal_inst1(id_rs_rob_mt_illegal_inst1),
 					.id_valid_inst1(id_rs_rob_mt_valid_inst1),
 
@@ -874,7 +1030,7 @@ _out
 						rs_alu_mem_prb_idx1(rs_alu_mem_prf_prb_idx1),
 
 						alu_sim_wr_enable0(alu_sim_prf_wr_enable0),
-						alu_sim_pr_idx0(alu_sim_prf_pr_idx0),
+						alu_sim_pr_idx0(alu_sim_cdb_prf_pr_idx0),
 						alu_sim_pr_value0(alu_sim_prf_pr_value0),
 
 						alu_sim_wr_enable1(alu_sim_prf_wr_enable1),
@@ -979,3 +1135,103 @@ _out
 						.rob_exception4(cdb_rob_exception4),
 						.rob_exception5(cdb_rob_exception5)
 	);
+
+	/*
+	 * ALU simple
+	 */
+
+	alu_sim alu_sim0(// Inputs
+										.clock(clock),
+										.reset(alu_sim_reset),
+										
+										.rs_NPC0(rs_alu_sim_NPC0),
+										.rs_IR0(rs_alu_sim_IR0),
+										.prf_pra0(prf_alu_sim_pra_value0),
+										.prf_prb0(prf_alu_sim_prb_valu0),
+										.rs_dest_ar_idx0(rs_alu_sim_dest_ar_idx0),
+										.rs_dest_pr_idx0(rs_alu_sim_dest_pr_idx0),
+										.rs_opa_select0(rs_alu_sim_opa_select0),
+										.rs_opb_select0(rs_alu_sim_opb_select0),
+										.rs_alu_func0(rs_alu_sim_alu_func0),
+										.rs_cond_branch0(rs_alu_sim_cond_branc0),
+										.rs_uncond_branch0(rs_alu_sim_uncond_branch0),
+										.rs_branch_taken0(rs_alu_sim_branch_taken0),
+										.rs_pred_addr0(rs_alu_sim_pred_addr0),
+										.rs_valid_inst0(rs_alu_sim_valid_inst0),
+
+										.rs_NPC1(rs_alu_sim_NPC1),
+										.rs_IR1(rs_alu_sim_IR1),
+										.prf_pra1(prf_alu_sim_pra_value1),
+										.prf_prb1(prf_alu_sim_prb_valu1),
+										.rs_dest_ar_idx1(rs_alu_sim_dest_ar_idx1),
+										.rs_dest_pr_idx1(rs_alu_sim_dest_pr_idx1),
+										.rs_opa_select1(rs_alu_sim_opa_select1),
+										.rs_opb_select1(rs_alu_sim_opb_select1),
+										.rs_alu_func1(rs_alu_sim_alu_func1),
+										.rs_cond_branch1(rs_alu_sim_cond_branc1),
+										.rs_uncond_branch1(rs_alu_sim_uncond_branch1),
+										.rs_branch_taken1(rs_alu_sim_branch_taken1),
+										.rs_pred_addr1(rs_alu_sim_pred_addr1),
+										.rs_valid_inst1(rs_alu_sim_valid_inst1),
+
+										// Outputs
+										.cdb_complete0(alu_sim_cdb_complete0),
+										.cdb_dest_ar_idx0(alu_sim_cdb_dest_ar_idx0),
+										.cdb_prf_dest_pr_idx0(alu_sim_cdb_prf_pr_idx0),
+										.cdb_exception0(alu_sim_cdb_exception0),
+										.prf_result0(alu_sim_prf_value0),
+										.prf_write_enable0(alu_sim_prf_write_enable0),
+
+										.cdb_complete1(alu_sim_cdb_complete1),
+										.cdb_dest_ar_idx1(alu_sim_cdb_dest_ar_idx1),
+										.cdb_prf_dest_pr_idx1(alu_sim_cdb_prf_pr_idx1),
+										.cdb_exception1(alu_sim_cdb_exception1),
+										.prf_result1(alu_sim_prf_value0),
+										.prf_write_enable1(alu_sim_prf_write_enable1),
+
+										.rs_alu_avail(alu_sim_rs_avail)
+										);
+
+	alu_mul alu_mul0( // Inputs
+										.clock(clock),
+										.reset(alu_mul_reset),
+
+										.rs_NPC0(rs_alu_mul_NPC0),
+										.rs_IR0(rs_alu_mul_IR0),
+										.prf_pra0(prf_alu_mul_pra_value0),
+										.prf_prb0(prf_alu_mul_prb_valu0),
+										.rs_dest_ar_idx0(rs_alu_mul_dest_ar_idx0),
+										.rs_dest_pr_idx0(rs_alu_mul_dest_pr_idx0),
+										.rs_opa_select0(rs_alu_mul_opa_select0),
+										.rs_opb_select0(rs_alu_mul_opb_select0),
+										.rs_valid_inst0(rs_alu_mul_valid_inst0),
+
+										.rs_NPC1(rs_alu_mul_NPC1),
+										.rs_IR1(rs_alu_mul_IR1),
+										.prf_pra1(prf_alu_mul_pra_value1),
+										.prf_prb1(prf_alu_mul_prb_valu1),
+										.rs_dest_ar_idx1(rs_alu_mul_dest_ar_idx1),
+										.rs_dest_pr_idx1(rs_alu_mul_dest_pr_idx1),
+										.rs_opa_select1(rs_alu_mul_opa_select1),
+										.rs_opb_select1(rs_alu_mul_opb_select1),
+										.rs_valid_inst1(rs_alu_mul_valid_inst1),
+
+										.// Outputs
+										.cdb_complete0(alu_mul_cdb_complete0),
+										.cdb_dest_ar_idx0(alu_mul_cdb_dest_ar_idx0),
+										.cdb_prf_dest_pr_idx0(alu_mul_cdb_prf_pr_idx0),
+										.cdb_exception0(alu_mul_cdb_exception0),
+										.prf_result0(alu_mul_prf_value0),
+										.prf_write_enable0(alu_mul_prf_write_enable0),
+
+										.cdb_complete1(alu_mul_cdb_complete1),
+										.cdb_dest_ar_idx1(alu_mul_cdb_dest_ar_idx1),
+										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
+										.cdb_exception1(alu_mul_cdb_exception1),
+										.prf_result1(alu_mul_prf_value0),
+										.prf_write_enable1(alu_mul_prf_write_enable1),
+
+										.rs_alu_avail(alu_mul_rs_avail)
+								);
+
+endmodule
