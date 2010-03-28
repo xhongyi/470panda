@@ -74,7 +74,7 @@ input 				alu_sim_exception1;
 
 input 				alu_mul_complete0;
 input [6:0]   alu_mul_pr_idx0;
-input					alu_mul_ar_idx0;
+input	[4:0]		alu_mul_ar_idx0;
 
 input 				alu_mul_complete1;
 input [6:0]		alu_mul_pr_idx1;

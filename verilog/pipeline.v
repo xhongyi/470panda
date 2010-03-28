@@ -399,13 +399,19 @@
 	 * Outputs from physical register file
 	 */
 	wire	[63:0]	prf_alu_sim_pra_value0;
+	wire	[63:0]	prf_alu_sim_pra_value1;
+	wire	[63:0]	prf_alu_sim_prb_value0;
 	wire	[63:0]	prf_alu_sim_prb_value1;
 
-	wire	[63:0]	prf_alu_mem_pra_value0;
-	wire	[63:0]	prf_alu_mem_prb_value1;
-
 	wire	[63:0]	prf_alu_mul_pra_value0;
+	wire	[63:0]	prf_alu_mul_pra_value1;
+	wire	[63:0]	prf_alu_mul_prb_value0;
 	wire	[63:0]	prf_alu_mul_prb_value1;
+
+	wire	[63:0]	prf_alu_mem_pra_value0;
+	wire	[63:0]	prf_alu_mem_pra_value1;
+	wire	[63:0]	prf_alu_mem_prb_value0;
+	wire	[63:0]	prf_alu_mem_prb_value1;
 
 
 	/*
@@ -441,8 +447,8 @@
 	wire					alu_sim_prf_wr_enable1;
 	wire					alu_sim_cdb_complete0;
 	wire					alu_sim_cdb_complete1;
-	wire					alu_sim_cdb_ar_idx0;
-	wire					alu_sim_cdb_ar_idx1;
+	wire		[4:0]	alu_sim_cdb_ar_idx0;
+	wire		[4:0]	alu_sim_cdb_ar_idx1;
 	wire		[6:0]	alu_sim_cdb_prf_pr_idx0;
 	wire		[6:0]	alu_sim_cdb_prf_pr_idx1;
 	wire					alu_sim_cdb_exception0;
