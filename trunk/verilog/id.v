@@ -761,8 +761,8 @@ begin
 		illegal_inst1 	<= `SD 0;
 		valid_inst1			<= `SD 0;
 	end
-	else if (dispatch_num[1] || (dispatch_num[0] && ~valid_inst1)) // Two instructions are dispatched
-		begin
+	else if (dispatch_num[1] || (dispatch_num[0] && ~valid_inst1) || (~valid_inst1 && ~valid_inst0)) // Two instructions are dispatched
+	begin
 		npc0 						<= `SD if_NPC0;
 		ir0 						<= `SD if_IR0;
 		ra_idx0					<= `SD next_ra_idx0;

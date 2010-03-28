@@ -33,7 +33,7 @@ MODULE		= 	pipeline
 
 
 TESTBENCH = 	sys_defs.vh	    \
-#testbench/$(MODULE)_test.v \
+	testbench/$(MODULE)_test.v \
 	 testbench/mem.v						\
 	 testbench/pipe_print.c
 
