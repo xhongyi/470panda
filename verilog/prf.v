@@ -109,24 +109,24 @@ input					alu_mem_wr_enable0;
 input	[6:0]		alu_mem_pr_idx0;
 input	[63:0]	alu_mem_pr_value0;
 
-input					alu_mem_wr_enable1,
-input	[6:0]		alu_mem_pr_idx1,
-input	[63:0]	alu_mem_pr_value1,
+input					alu_mem_wr_enable1;
+input	[6:0]		alu_mem_pr_idx1;
+input	[63:0]	alu_mem_pr_value1;
 
 	// Outputs
-output	[63:0]	alu_sim_pra_value0,
-output	[63:0]	alu_sim_pra_value1,
-output	[63:0]	alu_mem_pra_value0,
-output	[63:0]	alu_mem_pra_value1,
-output	[63:0]	alu_mul_pra_value0,
-output	[63:0]	alu_mul_pra_value1,
+output	[63:0]	alu_sim_pra_value0;
+output	[63:0]	alu_sim_pra_value1;
+output	[63:0]	alu_mem_pra_value0;
+output	[63:0]	alu_mem_pra_value1;
+output	[63:0]	alu_mul_pra_value0;
+output	[63:0]	alu_mul_pra_value1;
 
-output	[63:0]	alu_sim_prb_value0,
-output	[63:0]	alu_sim_prb_value1,
-output	[63:0]	alu_mem_prb_value0,
-output	[63:0]	alu_mem_prb_value1,
-output	[63:0]	alu_mul_prb_value0,
-output	[63:0]	alu_mul_prb_value1,
+output	[63:0]	alu_sim_prb_value0;
+output	[63:0]	alu_sim_prb_value1;
+output	[63:0]	alu_mem_prb_value0;
+output	[63:0]	alu_mem_prb_value1;
+output	[63:0]	alu_mul_prb_value0;
+output	[63:0]	alu_mul_prb_value1;
 
 
 //Internal Memory
@@ -179,6 +179,7 @@ begin
 		begin
 			register[i] <= `SD 0;
 		end
+	end
 	else
 	begin
 		for ( i = 0; i < 64; i = i + 1)
