@@ -1163,12 +1163,12 @@ begin
 	begin
 		case (id_IR1[31:26])
 			`MULQ_INST: 
-				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
+				next_alu_type[ent_avail_low_idx] = `ALU_MUL;
 			`LDA_INST, `LDQ_INST, `LDQ_L_INST,
 			`STQ_INST, `STQ_C_INST:
-				next_alu_type[ent_avail_high_idx] = `ALU_MEM;
+				next_alu_type[ent_avail_low_idx] = `ALU_MEM;
 			default:
-				next_alu_type[ent_avail_high_idx] = `ALU_SIM;
+				next_alu_type[ent_avail_low_idx] = `ALU_SIM;
 		endcase
 
 		next_npc[ent_avail_low_idx]					= id_NPC1;

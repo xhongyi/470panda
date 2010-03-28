@@ -192,8 +192,8 @@ module alu_sim(// Inputs
   input         rs_uncond_branch1; // is this an uncond br? from decoder
 	input					rs_branch_taken0;
 	input					rs_branch_taken1;
-	input	[64:0]	rs_pred_addr0;
-	input	[64:0]	rs_pred_addr1;
+	input	[63:0]	rs_pred_addr0;
+	input	[63:0]	rs_pred_addr1;
 	input 				rs_valid_inst0;
 	input					rs_valid_inst1;
 	
@@ -204,13 +204,13 @@ module alu_sim(// Inputs
 	output				prf_write_enable1;
 	output				cdb_complete0;
 	output				cdb_complete1;
-	output				cdb_dest_ar_idx0;
-	output				cdb_dest_ar_idx1;
-	output				cdb_prf_dest_pr_idx0;
-	output				cdb_prf_dest_pr_idx1;
+	output	[4:0]	cdb_dest_ar_idx0;
+	output	[4:0]	cdb_dest_ar_idx1;
+	output	[6:0]	cdb_prf_dest_pr_idx0;
+	output	[6:0]	cdb_prf_dest_pr_idx1;
 	output				cdb_exception0;
 	output			  cdb_exception1;
-  output [1:0]		rs_alu_avail;
+  output [1:0]	rs_alu_avail;
 	
 	//Output Registers
 	reg [63:0] prf_result0;   // ALU result
@@ -219,10 +219,10 @@ module alu_sim(// Inputs
 	reg				prf_write_enable1;
 	reg				cdb_complete0;
 	reg				cdb_complete1;
-	reg				cdb_dest_ar_idx0;
-	reg				cdb_dest_ar_idx1;
-	reg				cdb_prf_dest_pr_idx0;
-	reg				cdb_prf_dest_pr_idx1;
+	reg		[4:0]	cdb_dest_ar_idx0;
+	reg		[4:0]	cdb_dest_ar_idx1;
+	reg		[6:0]	cdb_prf_dest_pr_idx0;
+	reg		[6:0]	cdb_prf_dest_pr_idx1;
 	reg				cdb_exception0;
 	reg			  cdb_exception1;
   reg [1:0]		rs_alu_avail;

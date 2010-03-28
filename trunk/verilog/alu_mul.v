@@ -141,10 +141,10 @@ module alu_mul(
 	output				prf_write_enable1;
 	output				cdb_complete0;
 	output				cdb_complete1;
-	output				cdb_dest_ar_idx0;
-	output				cdb_dest_ar_idx1;
-	output				cdb_prf_dest_pr_idx0;
-	output				cdb_prf_dest_pr_idx1;
+	output	[4:0]	cdb_dest_ar_idx0;
+	output	[4:0]	cdb_dest_ar_idx1;
+	output	[6:0]	cdb_prf_dest_pr_idx0;
+	output	[6:0]	cdb_prf_dest_pr_idx1;
 	output				cdb_exception0;
 	output			  cdb_exception1;
   output [1:0]	rs_alu_avail;
