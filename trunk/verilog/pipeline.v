@@ -482,7 +482,10 @@
 	wire		ic_reset;
 	wire		dc_reset;
 
-
+	// Default assignment
+	//
+	// To be changed in the future
+	//
 	assign proc2mem_command		= `BUS_NONE;
 	assign porc2mem_addr			= 0;
 	assign porc2mem_data			= 0;
