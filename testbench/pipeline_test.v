@@ -13,10 +13,10 @@
 extern void print_header(string str);
 extern void print_cycles();
 /*
-extern void print_stage(string div, int inst, int npc, int valid_inst);
+extern void print_stage(string div, int inst, int npc, int valid_inst);*/
 extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-											*/
+											
 extern void print_membus(int proc2mem_command, int mem2proc_response,
                          int proc2mem_addr_hi, int proc2mem_addr_lo,
                          int proc2mem_data_hi, int proc2mem_data_lo);
