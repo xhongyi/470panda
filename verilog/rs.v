@@ -1159,6 +1159,7 @@ begin
 		next_ent_taken[ent_avail_high_idx]		= 1;
 	end
 
+
 	if (id_valid_inst1 & ~id_illegal_inst1)
 	begin
 		case (id_IR1[31:26])
