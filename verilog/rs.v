@@ -1127,7 +1127,7 @@ begin
 		case (id_IR0[31:26])
 			`MULQ_INST: 
 				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
-			`LDA_INST, `LDQ_INST, `LDQ_L_INST,
+			`LDQ_INST, `LDQ_L_INST,
 			`STQ_INST, `STQ_C_INST:
 				next_alu_type[ent_avail_high_idx] = `ALU_MEM;
 			default:
@@ -1165,7 +1165,7 @@ begin
 		case (id_IR1[31:26])
 			`MULQ_INST: 
 				next_alu_type[ent_avail_low_idx] = `ALU_MUL;
-			`LDA_INST, `LDQ_INST, `LDQ_L_INST,
+			`LDQ_INST, `LDQ_L_INST,
 			`STQ_INST, `STQ_C_INST:
 				next_alu_type[ent_avail_low_idx] = `ALU_MEM;
 			default:
