@@ -161,7 +161,8 @@ assign alu_mem_prb_value1 = register[rs_alu_mem_prb_idx1];
 
 always @*
 begin
-	next_register = register;
+	for (i = 0; i < 96; i = i+1)
+		next_register[i] = register[i];
 	if(alu_sim_wr_enable0) next_register[alu_sim_pr_idx0] = alu_sim_pr_value0;
 	if(alu_sim_wr_enable1) next_register[alu_sim_pr_idx1] = alu_sim_pr_value1;
 	if(alu_mul_wr_enable0) next_register[alu_mul_pr_idx0] = alu_mul_pr_value0;
