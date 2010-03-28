@@ -849,7 +849,7 @@ begin
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
 		end
-	else if (dispatch_num == 2'b0 && valid_inst0)
+	else if (dispatch_num == 2'b0 && valid_inst0 && ~valid_inst1)
 	begin
 		npc1 						<= `SD if_NPC0;
 		ir1 						<= `SD if_IR0;
@@ -871,7 +871,6 @@ begin
 		halt1 					<= `SD next_halt0;
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
-
 	end
 end
 
