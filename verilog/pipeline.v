@@ -137,6 +137,25 @@
 	output	[6:0]	rob_retire_tag_a;
 	output	[6:0]	rob_retire_tag_b;
 
+	/*
+	 * Output from cache mem
+	 */
+  wire [63:0] proc2Dmem_addr, proc2Imem_addr;
+  wire [1:0]  proc2Dmem_command, proc2Imem_command;
+  wire [3:0]  Imem2proc_response, Dmem2proc_response;
+
+	/*
+	 * Output from icache
+	 */
+  wire [63:0] cachemem_data;
+  wire        cachemem_valid;
+  wire  [6:0] Icache_rd_idx;
+  wire [21:0] Icache_rd_tag;
+  wire  [6:0] Icache_wr_idx;
+  wire [21:0] Icache_wr_tag;
+  wire        Icache_wr_en;
+  wire [63:0] Icache_data_out, proc2Icache_addr;
+  wire        Icache_valid_out;
 
 	/*
 	 * Output from IF
@@ -205,7 +224,7 @@
 	wire					id_rs_rob_mt_valid_inst1;
 
 	wire		[1:0]	id_rs_rob_mt_dispatch_num;
-	wire		[1:0]	id_isnt_need_num;
+	wire		[1:0]	id_if_isnt_need_num;
 
 	/*
 	 * Output from Map Table
@@ -241,7 +260,7 @@
 	 * Output from RS
 	 */
 	// Dispatch outputs
-	wire		[1:0]	rs_id_rs_cap;
+	wire		[1:0]	rs_id_cap;
 
 	// Issue outputs
 	wire	 [63:0]	rs_alu_sim_NPC0;
@@ -481,23 +500,34 @@
 	wire		cdb_reset;
 	wire		ic_reset;
 	wire		dc_reset;
+	wire		cachemem_reset;
+	wire		icache_reset;
 
 	// Default assignment
 	//
 	// To be changed in the future
-	//
+
 	assign proc2mem_command		= `BUS_NONE;
-	assign porc2mem_addr			= 0;
-	assign porc2mem_data			= 0;
+	assign porc2mem_addr			= 64'b0;
+	assign porc2mem_data			= 64'b0;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
-	assign pipeline_commit_wr_idx		= 0;
-	assign pipeline_commit_wr_data	= 0;
+	assign pipeline_commit_wr_idx		= 64'b0;
+	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
-	assign pipeline_commit_NPC			= 0;
+	assign pipeline_commit_NPC			= 64'b0;
+
+	assign btb_if_pred_addr0				= 64'b0;
+	assign btb_if_pred_addr1				= 64'b0;
+
+	assign proc2Dmem_addr						= 64'b0;
+	assign proc2Dmem_command				= `BUS_NONE;
 
 
+
+
+	// Outputs of pipeline
 	assign if_NPC0						= if_id_NPC0;
 	assign if_IR0							= if_id_IR0;
 	assign if_valid_inst0			= if_id_valid_inst0;
@@ -554,7 +584,52 @@
 	assign	cdb_reset 		= reset;
 	assign	ic_reset 			= reset;
 	assign	dc_reset 			= reset;
+	assign	cachemem_reset= reset;
+	assign	icache_reset	= reset;
 
+
+  // Actual cache (data and tag RAMs)
+  cachemem128x64 cachememory (// inputs
+                              .clock(clock),
+                              .reset(cachemem_reset),
+                              .wr1_en(Icache_wr_en),
+                              .wr1_idx(Icache_wr_idx),
+                              .wr1_tag(Icache_wr_tag),
+                              .wr1_data(mem2proc_data),
+                                  
+                              .rd1_idx(Icache_rd_idx),
+                              .rd1_tag(Icache_rd_tag),
+
+                              // outputs
+                              .rd1_data(cachemem_data),
+                              .rd1_valid(cachemem_valid)
+                             );   
+
+  // Cache controller
+  icache icache_0(// inputs 
+                  .clock(clock),
+                  .reset(icache_reset),
+
+                  .Imem2proc_response(Imem2proc_response),
+                  .Imem2proc_data(mem2proc_data),
+                  .Imem2proc_tag(mem2proc_tag),
+
+                  .proc2Icache_addr(proc2Icache_addr),
+                  .cachemem_data(cachemem_data),
+                  .cachemem_valid(cachemem_valid),
+
+                   // outputs
+                  .proc2Imem_command(proc2Imem_command),
+                  .proc2Imem_addr(proc2Imem_addr),
+
+                  .Icache_data_out(Icache_data_out),
+                  .Icache_valid_out(Icache_valid_out),
+                  .current_index(Icache_rd_idx),
+                  .current_tag(Icache_rd_tag),
+                  .last_index(Icache_wr_idx),
+                  .last_tag(Icache_wr_tag),
+                  .data_write_enable(Icache_wr_en)
+                 );
 
 	// IF module
 	if_mod if_mod0 (// Inputs
@@ -563,16 +638,16 @@
 								.bht_branch_taken0(bht_if_branch_taken0),
 								.bht_branch_taken1(bht_if_branch_taken1),
 								.btb_pred_addr0(btb_if_pred_addr0),
-								.btb_pred_addr1(btb_if_pred_aadr0),
-								.Imem2proc_data(Imem2proc_data),
-								.Imem_valid(Imem_valid),
-								.id_dispatch_num(id_if_need_num), //Danger: inconsistent interface
+								.btb_pred_addr1(btb_if_pred_aadr1),
+								.Imem2proc_data(Icache_data_out),
+								.Imem_valid(Icache_valid_out),
+								.id_dispatch_num(id_if_inst_need_num), //Danger: inconsistent interface
 
 								.id_NPC0(if_id_NPC0),
 								.id_NPC1(if_id_NPC1),
 								.id_IR0(if_id_IR0),
 								.id_IR1(if_id_IR1),
-								.proc2Imem_addr(if_NPC_out),
+								.proc2Imem_addr(proc2Icache_addr),
 								.id_valid_inst0(if_id_valid_inst0),
 								.id_valid_inst1(if_id_valid_inst1),
 
@@ -672,25 +747,25 @@
 					 .clock(clock),
 					 .reset(rob_reset),
 
-					 .fl_pr0(fl_rob_pr0),
+					 .fl_pr0(fl_rob_rs_mt_pr0),
 					 .mt_p0told(mt_rob_p0told),
 					 .id_valid_inst0(id_rs_rob_mt_valid_inst0),
 					 .id_halt0(id_rs_rob_halt0),
 
-					 .fl_pr1(fl_rob_pr1),
+					 .fl_pr1(fl_rob_rs_mt_pr1),
 					 .mt_p1told(mt_rob_p1told),
 					 .id_valid_inst1(id_rs_rob_mt_valid_inst1),
 					 .id_halt1(id_rs_rob_halt1),
 
 					 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
 					 
-					 .cdb_pr_ready(cdb_rob_broadcast),
-					 .cdb_pr_tag_0(cdb_rob_pr_tag0),
-					 .cdb_pr_tag_1(cdb_rob_pr_tag1),
-					 .cdb_pr_tag_2(cdb_rob_pr_tag2),
-					 .cdb_pr_tag_3(cdb_rob_pr_tag3),
-					 .cdb_pr_tag_4(cdb_rob_pr_tag4),
-					 .cdb_pr_tag_5(cdb_rob_pr_tag5),
+					 .cdb_pr_ready(cdb_rs_rob_mt_broadcast),
+					 .cdb_pr_tag_0(cdb_rs_rob_mt_pr_tag0),
+					 .cdb_pr_tag_1(cdb_rs_rob_mt_pr_tag1),
+					 .cdb_pr_tag_2(cdb_rs_rob_mt_pr_tag2),
+					 .cdb_pr_tag_3(cdb_rs_rob_mt_pr_tag3),
+					 .cdb_pr_tag_4(cdb_rs_rob_mt_pr_tag4),
+					 .cdb_pr_tag_5(cdb_rs_rob_mt_pr_tag5),
 					
 					 // Outputs
 					 .id_cap(rob_id_cap),
@@ -734,12 +809,12 @@
 				 .cdb_pr_tag3(cdb_rs_rob_mt_pr_tag3),
 				 .cdb_pr_tag4(cdb_rs_rob_mt_pr_tag4),
 				 .cdb_pr_tag5(cdb_rs_rob_mt_pr_tag5),
-				 .cdb_ar_tag0(cdb_rs_rob_mt_ar_tag0),
-				 .cdb_ar_tag1(cdb_rs_rob_mt_ar_tag1),
-				 .cdb_ar_tag2(cdb_rs_rob_mt_ar_tag2),
-				 .cdb_ar_tag3(cdb_rs_rob_mt_ar_tag3),
-				 .cdb_ar_tag4(cdb_rs_rob_mt_ar_tag4),
-				 .cdb_ar_tag5(cdb_rs_rob_mt_ar_tag5),
+				 .cdb_ar_tag0(cdb_mt_ar_tag0),
+				 .cdb_ar_tag1(cdb_mt_ar_tag1),
+				 .cdb_ar_tag2(cdb_mt_ar_tag2),
+				 .cdb_ar_tag3(cdb_mt_ar_tag3),
+				 .cdb_ar_tag4(cdb_mt_ar_tag4),
+				 .cdb_ar_tag5(cdb_mt_ar_tag5),
 
 				// Outputs
 				 .rob_p0told(mt_rob_p0told),
@@ -836,7 +911,7 @@
 					.cdb_pr_tag5(cdb_rs_rob_mt_pr_tag5),
 
 
-					.id_rs_cap(rs_id_rs_cap),
+					.id_rs_cap(rs_id_cap),
 
 					.alu_sim_NPC0(rs_alu_sim_NPC0),
 					.alu_sim_IR0(rs_alu_sim_IR0),
