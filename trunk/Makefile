@@ -46,7 +46,9 @@ SIMFILES =	verilog/$(MODULE).v	\
 						verilog/mt.v \
 						verilog/fl.v \
 						verilog/alu_sim.v \
-						verilog/alu_mul.v 
+						verilog/alu_mul.v \
+						verilog/prf.v \
+						verilog/cdb.v
 
 SYNFILES = synth/$(MODULE).vg
 
