@@ -638,7 +638,7 @@
 								.bht_branch_taken0(bht_if_branch_taken0),
 								.bht_branch_taken1(bht_if_branch_taken1),
 								.btb_pred_addr0(btb_if_pred_addr0),
-								.btb_pred_addr1(btb_if_pred_aadr1),
+								.btb_pred_addr1(btb_if_pred_addr1),
 								.Imem2proc_data(Icache_data_out),
 								.Imem_valid(Icache_valid_out),
 								.id_dispatch_num(id_if_inst_need_num), //Danger: inconsistent interface
@@ -782,9 +782,10 @@
 	mt mt0(// Inputs
 				 .clock(clock),
 				 .reset(mt_reset),
-				 .id_dispatch_num(id_rs_rob_mt_dispatch),
+				 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
 
-				 .fl_pr0(fl_mt_pr0),
+				 .fl_pr0(fl_rob_rs_mt_pr0),
+				 .fl_pr1(fl_rob_rs_mt_pr1),
 
 				 .id_valid_inst0(id_rs_rob_mt_valid_inst0),
 				 .id_opa_select0(id_rs_mt_opa_select0),

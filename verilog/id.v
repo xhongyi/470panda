@@ -849,10 +849,29 @@ begin
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
 		end
-	else
+	else if (dispatch_num == 2'b0 && valid_inst0)
 	begin
-		valid_inst0			<= `SD 0;
-		valid_inst1			<= `SD 0;
+		npc1 						<= `SD if_NPC0;
+		ir1 						<= `SD if_IR0;
+		ra_idx1					<= `SD next_ra_idx0;
+		rb_idx1 				<= `SD next_rb_idx0;
+		rc_idx1 				<= `SD next_rc_idx0;
+		branch_taken1		<= `SD if_branch_taken0;
+		pred_addr1			<= `SD if_pred_addr0;
+		opa_select1 		<= `SD next_opa_select0;
+		opb_select1 		<= `SD next_opb_select0;
+		dest_idx1 			<= `SD next_dest_idx0;
+		alu_func1 			<= `SD next_alu_func0;
+		rd_mem1 				<= `SD next_rd_mem0;
+		wr_mem1 				<= `SD next_wr_mem0;
+		ldl_mem1 				<= `SD next_ldl_mem0;
+		stc_mem1 				<= `SD next_stc_mem0;
+		cond_branch1 		<= `SD next_cond_branch0;
+		uncond_branch1 	<= `SD next_uncond_branch0;
+		halt1 					<= `SD next_halt0;
+		illegal_inst1 	<= `SD next_illegal_inst0;
+		valid_inst1 		<= `SD next_valid_inst0;
+
 	end
 end
 
