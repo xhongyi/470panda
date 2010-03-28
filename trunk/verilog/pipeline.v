@@ -411,6 +411,7 @@
 	/*
 	 * Outputs from CDB
 	 */
+
 	wire	[`CDB_WIDTH-1:0]	cdb_rs_rob_mt_broadcast;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag0;
 	wire		[6:0]	cdb_rs_rob_mt_pr_tag1;
