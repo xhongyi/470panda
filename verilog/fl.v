@@ -11,7 +11,7 @@
 //If 0 request and 2 retire, then shift in by 2.
 //If 0 request and 1 retire, then shift in by 1.
 
-module free_list (//inputs
+module fl (//inputs
 		  clock,
 		  reset,
 		  id_dispatch_num,

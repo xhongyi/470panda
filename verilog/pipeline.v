@@ -763,8 +763,9 @@
 					.rob_retire_tag_0(rob_fl_retire_tag_a),
 					.rob_retire_tag_1(rob_fl_retire_tag_b),
 
+					// Outputs
 					.rob_rs_mt_pr0(fl_rob_rs_mt_pr0),
-					.rob_rs_mt_pr0(fl_rob_rs_mt_pr0)
+					.rob_rs_mt_pr1(fl_rob_rs_mt_pr1)
 			);
 
 	// RS
@@ -1079,12 +1080,10 @@
 						.alu_mul_complete0(alu_mul_cdb_complete0),
 						.alu_mul_pr_idx0(alu_mul_cdb_pr_idx0),
 						.alu_mul_ar_idx0(alu_mul_cdb_ar_idx0),
-						.alu_mul_exception0(alu_mul_cdb_exception0),
 
 						.alu_mul_complete1(alu_mul_cdb_complete1),
 						.alu_mul_pr_idx1(alu_mul_cdb_pr_idx1),
 						.alu_mul_ar_idx1(alu_mul_cdb_ar_idx1),
-						.alu_mul_exception1(alu_mul_cdb_exception1),
 
 						.alu_mem_complete0(alu_mem_cdb_complete0),
 						.alu_mem_pr_idx0(alu_mem_cdb_pr_idx0),
