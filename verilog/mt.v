@@ -67,12 +67,12 @@ module mt (// Inputs
 	input 	[6:0]	fl_pr1;
 
 	// If a2 or b2 is not valid, the default value for pr is 0
-	input id_valid_inst0;
-	input id_valid_inst1;
-	input id_opa_select0;
-	input id_opa_select1;
-	input id_opb_select0;
-	input id_opb_select1;
+	input 				id_valid_inst0;
+	input 				id_valid_inst1;
+	input 	[1:0]	id_opa_select0;
+	input 	[1:0]	id_opa_select1;
+	input 	[1:0]	id_opb_select0;
+	input 	[1:0]	id_opb_select1;
 	
 	input	[4:0]	id_ra_idx0;
 	input	[4:0]	id_ra_idx1;

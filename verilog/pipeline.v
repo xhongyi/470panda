@@ -168,8 +168,8 @@
 	wire					if_id_valid_inst1;
 	wire					if_id_branch_taken0;
 	wire					if_id_branch_taken1;
-	wire	 [64:0]	if_id_pred_addr0;
-	wire	 [64:0]	if_id_pred_addr1;
+	wire	 [63:0]	if_id_pred_addr0;
+	wire	 [63:0]	if_id_pred_addr1;
 
 	/*
 	 * Output from ID
@@ -224,7 +224,7 @@
 	wire					id_rs_rob_mt_valid_inst1;
 
 	wire		[1:0]	id_rs_rob_mt_dispatch_num;
-	wire		[1:0]	id_if_isnt_need_num;
+	wire		[1:0]	id_if_inst_need_num;
 
 	/*
 	 * Output from Map Table
@@ -399,13 +399,13 @@
 	 * Outputs from physical register file
 	 */
 	wire	[63:0]	prf_alu_sim_pra_value0;
-	wire	[63:0]	prf_alu_sim_pra_value1;
+	wire	[63:0]	prf_alu_sim_prb_value1;
 
 	wire	[63:0]	prf_alu_mem_pra_value0;
-	wire	[63:0]	prf_alu_mem_pra_value1;
+	wire	[63:0]	prf_alu_mem_prb_value1;
 
 	wire	[63:0]	prf_alu_mul_pra_value0;
-	wire	[63:0]	prf_alu_mul_pra_value1;
+	wire	[63:0]	prf_alu_mul_prb_value1;
 
 
 	/*
@@ -436,30 +436,30 @@
 	 */
   wire	 [63:0] alu_sim_prf_value0;   // ALU result
   wire	 [63:0] alu_sim_prf_value1;   // ALU result
-	wire	 				alu_sim_prf_write_enable0;
-	wire					alu_sim_prf_write_enable1;
+	wire	 				alu_sim_prf_wr_enable0;
+	wire					alu_sim_prf_wr_enable1;
 	wire					alu_sim_cdb_complete0;
 	wire					alu_sim_cdb_complete1;
-	wire					alu_sim_cdb_dest_ar_idx0;
-	wire					alu_sim_cdb_dest_ar_idx1;
-	wire					alu_sim_cdb_prf_pr_idx0;
-	wire					alu_sim_cdb_prf_pr_idx1;
+	wire					alu_sim_cdb_ar_idx0;
+	wire					alu_sim_cdb_ar_idx1;
+	wire		[6:0]	alu_sim_cdb_prf_pr_idx0;
+	wire		[6:0]	alu_sim_cdb_prf_pr_idx1;
 	wire					alu_sim_cdb_exception0;
 	wire				  alu_sim_cdb_exception1;
   wire	 [1:0]	alu_sim_rs_avail;
 	/*
 	 * Outputs from multiplier
 	 */
-  wire	 [63:0] alu_mul_prf_result0;   // ALU result
-  wire	 [63:0] alu_mul_prf_result1;   // ALU result
-	wire	 				alu_mul_prf_write_enable0;
-	wire					alu_mul_prf_write_enable1;
+  wire	 [63:0] alu_mul_prf_value0;   // ALU result
+  wire	 [63:0] alu_mul_prf_value1;   // ALU result
+	wire	 				alu_mul_prf_wr_enable0;
+	wire					alu_mul_prf_wr_enable1;
 	wire					alu_mul_cdb_complete0;
 	wire					alu_mul_cdb_complete1;
-	wire					alu_mul_cdb_dest_ar_idx0;
-	wire					alu_mul_cdb_dest_ar_idx1;
-	wire					alu_mul_cdb_prf_dest_pr_idx0;
-	wire					alu_mul_cdb_prf_dest_pr_idx1;
+	wire		[4:0]	alu_mul_cdb_ar_idx0;
+	wire		[4:0]	alu_mul_cdb_ar_idx1;
+	wire		[6:0]	alu_mul_cdb_prf_pr_idx0;
+	wire		[6:0]	alu_mul_cdb_prf_pr_idx1;
 	wire					alu_mul_cdb_exception0;
 	wire				  alu_mul_cdb_exception1;
   wire	 [1:0]	alu_mul_rs_avail;
@@ -467,7 +467,21 @@
 	/*
 	 * Output from memory ALU
 	 */
+  wire	 [63:0] alu_mem_prf_value0 = 64'b0;   // ALU result
+	wire	 				alu_mem_prf_wr_enable0 = 0;
+	wire					alu_mem_cdb_complete0 = 0;
+	wire		[4:0]	alu_mem_cdb_ar_idx0 = 0;
+	wire		[6:0]	alu_mem_cdb_prf_pr_idx0 = 0;
+	wire					alu_mem_cdb_exception0 = 0;
 
+  wire	 [63:0] alu_mem_prf_value1 = 64'b0;   // ALU result
+	wire	 				alu_mem_prf_wr_enable1 = 0;
+	wire					alu_mem_cdb_complete1 = 0;
+	wire		[4:0]	alu_mem_cdb_ar_idx1 = 0;
+	wire		[6:0]	alu_mem_cdb_prf_pr_idx1 = 0;
+	wire					alu_mem_cdb_exception1 = 0;
+
+  wire	 [1:0]	alu_mem_rs_avail;
 	/*
 	 * Outputs from branch history table
 	 */
@@ -503,6 +517,12 @@
 	wire		cachemem_reset;
 	wire		icache_reset;
 
+	/*
+	 * Output from BTB
+	 */
+	wire	 [63:0]	btb_if_pred_addr0 = 64'b0;
+	wire	 [63:0]	btb_if_pred_addr1 = 64'b0;
+
 	// Default assignment
 	//
 	// To be changed in the future
@@ -517,9 +537,6 @@
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
 	assign pipeline_commit_NPC			= 64'b0;
-
-	assign btb_if_pred_addr0				= 64'b0;
-	assign btb_if_pred_addr1				= 64'b0;
 
 	assign proc2Dmem_addr						= 64'b0;
 	assign proc2Dmem_command				= `BUS_NONE;
@@ -770,8 +787,8 @@
 					 // Outputs
 					 .id_cap(rob_id_cap),
 					 
-					 .fl_retire_tag_a(rob_fl_retire_a),
-					 .fl_retire_tag_b(rob_fl_retire_b),
+					 .fl_retire_tag_a(rob_fl_retire_tag_a),
+					 .fl_retire_tag_b(rob_fl_retire_tag_b),
 					 .fl_retire_num(rob_fl_retire_num),
 
 					 .retire_halt(rob_retire_halt)
@@ -793,7 +810,7 @@
 
 				 .id_ra_idx0(id_rs_mt_ra_idx0),
 				 .id_rb_idx0(id_rs_mt_rb_idx0),
-				 .id_dest_idx0(id_rs_mt_idxt_idx0),
+				 .id_dest_idx0(id_rs_mt_dest_idx0),
 
 				 .id_valid_inst1(id_rs_rob_mt_valid_inst1),
 				 .id_opa_select1(id_rs_mt_opa_select1),
@@ -801,7 +818,7 @@
 
 				 .id_ra_idx1(id_rs_mt_ra_idx1),
 				 .id_rb_idx1(id_rs_mt_rb_idx1),
-				 .id_dest_idx1(id_rs_mt_idxt_idx1),
+				 .id_dest_idx1(id_rs_mt_dest_idx1),
 
 				 .cdb_broadcast(cdb_rs_rob_mt_broadcast),
 				 .cdb_pr_tag0(cdb_rs_rob_mt_pr_tag0),
@@ -917,8 +934,8 @@
 					.alu_sim_NPC0(rs_alu_sim_NPC0),
 					.alu_sim_IR0(rs_alu_sim_IR0),
 
-					.alu_sim_branch_taken0(alu_sim_branch_taken0),
-					.alu_sim_pred_addr0(alu_sim_pred_addr0),
+					.alu_sim_branch_taken0(rs_alu_sim_branch_taken0),
+					.alu_sim_pred_addr0(rs_alu_sim_pred_addr0),
 
 					.alu_sim_prf_pra_idx0(rs_alu_sim_prf_pra_idx0), 
 					.alu_sim_prf_prb_idx0(rs_alu_sim_prf_prb_idx0),
@@ -943,8 +960,8 @@
 					.alu_sim_NPC1(rs_alu_sim_NPC1),
 					.alu_sim_IR1(rs_alu_sim_IR1),
 
-					.alu_sim_branch_taken1(alu_sim_branch_taken1),
-					.alu_sim_pred_addr1(alu_sim_pred_addr1),
+					.alu_sim_branch_taken1(rs_alu_sim_branch_taken1),
+					.alu_sim_pred_addr1(rs_alu_sim_pred_addr1),
 
 					.alu_sim_prf_pra_idx1(rs_alu_sim_prf_pra_idx1), 
 					.alu_sim_prf_prb_idx1(rs_alu_sim_prf_prb_idx1),
@@ -969,8 +986,8 @@
 					.alu_mul_NPC0(rs_alu_mul_NPC0),
 					.alu_mul_IR0(rs_alu_mul_IR0),
 
-					.alu_mul_branch_taken0(alu_mul_branch_taken0),
-					.alu_mul_pred_addr0(alu_mul_pred_addr0),
+					.alu_mul_branch_taken0(rs_alu_mul_branch_taken0),
+					.alu_mul_pred_addr0(rs_alu_mul_pred_addr0),
 
 					.alu_mul_prf_pra_idx0(rs_alu_mul_prf_pra_idx0), 
 					.alu_mul_prf_prb_idx0(rs_alu_mul_prf_prb_idx0),
@@ -995,8 +1012,8 @@
 					.alu_mul_NPC1(rs_alu_mul_NPC1),
 					.alu_mul_IR1(rs_alu_mul_IR1),
 
-					.alu_mul_branch_taken1(alu_mul_branch_taken1),
-					.alu_mul_pred_addr1(alu_mul_pred_addr1),
+					.alu_mul_branch_taken1(rs_alu_mul_branch_taken1),
+					.alu_mul_pred_addr1(rs_alu_mul_pred_addr1),
 
 					.alu_mul_prf_pra_idx1(rs_alu_mul_prf_pra_idx1), 
 					.alu_mul_prf_prb_idx1(rs_alu_mul_prf_prb_idx1),
@@ -1021,8 +1038,8 @@
 					.alu_mem_NPC0(rs_alu_mem_NPC0),
 					.alu_mem_IR0(rs_alu_mem_IR0),
 
-					.alu_mem_branch_taken0(alu_mem_branch_taken0),
-					.alu_mem_pred_addr0(alu_mem_pred_addr0),
+					.alu_mem_branch_taken0(rs_alu_mem_branch_taken0),
+					.alu_mem_pred_addr0(rs_alu_mem_pred_addr0),
 
 					.alu_mem_prf_pra_idx0(rs_alu_mem_prf_pra_idx0), 
 					.alu_mem_prf_prb_idx0(rs_alu_mem_prf_prb_idx0),
@@ -1047,8 +1064,8 @@
 					.alu_mem_NPC1(rs_alu_mem_NPC1),
 					.alu_mem_IR1(rs_alu_mem_IR1),
 
-					.alu_mem_branch_taken1(alu_mem_branch_taken1),
-					.alu_mem_pred_addr1(alu_mem_pred_addr1),
+					.alu_mem_branch_taken1(rs_alu_mem_branch_taken1),
+					.alu_mem_pred_addr1(rs_alu_mem_pred_addr1),
 
 					.alu_mem_prf_pra_idx1(rs_alu_mem_prf_pra_idx1), 
 					.alu_mem_prf_prb_idx1(rs_alu_mem_prf_prb_idx1),
@@ -1095,27 +1112,27 @@
 
 						.alu_sim_wr_enable0(alu_sim_prf_wr_enable0),
 						.alu_sim_pr_idx0(alu_sim_cdb_prf_pr_idx0),
-						.alu_sim_pr_value0(alu_sim_prf_pr_value0),
+						.alu_sim_pr_value0(alu_sim_prf_value0),
 
 						.alu_sim_wr_enable1(alu_sim_prf_wr_enable1),
-						.alu_sim_pr_idx1(alu_sim_prf_pr_idx1),
-						.alu_sim_pr_value1(alu_sim_prf_pr_value1),
+						.alu_sim_pr_idx1(alu_sim_cdb_prf_pr_idx1),
+						.alu_sim_pr_value1(alu_sim_prf_value1),
 
 						.alu_mul_wr_enable0(alu_mul_prf_wr_enable0),
-						.alu_mul_pr_idx0(alu_mul_prf_pr_idx0),
-						.alu_mul_pr_value0(alu_mul_prf_pr_value0),
+						.alu_mul_pr_idx0(alu_mul_cdb_prf_pr_idx0),
+						.alu_mul_pr_value0(alu_mul_prf_value0),
 
 						.alu_mul_wr_enable1(alu_mul_prf_wr_enable1),
-						.alu_mul_pr_idx1(alu_mul_prf_pr_idx1),
-						.alu_mul_pr_value1(alu_mul_prf_pr_value1),
+						.alu_mul_pr_idx1(alu_mul_cdb_prf_pr_idx1),
+						.alu_mul_pr_value1(alu_mul_prf_value1),
 
 						.alu_mem_wr_enable0(alu_mem_prf_wr_enable0),
-						.alu_mem_pr_idx0(alu_mem_prf_pr_idx0),
-						.alu_mem_pr_value0(alu_mem_prf_pr_value0),
+						.alu_mem_pr_idx0(alu_mem_cdb_prf_pr_idx0),
+						.alu_mem_pr_value0(alu_mem_prf_value0),
 
 						.alu_mem_wr_enable1(alu_mem_prf_wr_enable1),
-						.alu_mem_pr_idx1(alu_mem_prf_pr_idx1),
-						.alu_mem_pr_value1(alu_mem_prf_pr_value1),
+						.alu_mem_pr_idx1(alu_mem_cdb_prf_pr_idx1),
+						.alu_mem_pr_value1(alu_mem_prf_value1),
 
 						// Outputs
 						.alu_sim_pra_value0(prf_alu_sim_pra_value0),
@@ -1147,30 +1164,30 @@
 						.reset(cdb_reset),
 						
 						.alu_sim_complete0(alu_sim_cdb_complete0),
-						.alu_sim_pr_idx0(alu_sim_cdb_pr_idx0),
+						.alu_sim_pr_idx0(alu_sim_cdb_prf_pr_idx0),
 						.alu_sim_ar_idx0(alu_sim_cdb_ar_idx0),
 						.alu_sim_exception0(alu_sim_cdb_exception0),
 
 						.alu_sim_complete1(alu_sim_cdb_complete1),
-						.alu_sim_pr_idx1(alu_sim_cdb_pr_idx1),
+						.alu_sim_pr_idx1(alu_sim_cdb_prf_pr_idx1),
 						.alu_sim_ar_idx1(alu_sim_cdb_ar_idx1),
 						.alu_sim_exception1(alu_sim_cdb_exception1),
 
 						.alu_mul_complete0(alu_mul_cdb_complete0),
-						.alu_mul_pr_idx0(alu_mul_cdb_pr_idx0),
+						.alu_mul_pr_idx0(alu_mul_cdb_prf_pr_idx0),
 						.alu_mul_ar_idx0(alu_mul_cdb_ar_idx0),
 
 						.alu_mul_complete1(alu_mul_cdb_complete1),
-						.alu_mul_pr_idx1(alu_mul_cdb_pr_idx1),
+						.alu_mul_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 						.alu_mul_ar_idx1(alu_mul_cdb_ar_idx1),
 
 						.alu_mem_complete0(alu_mem_cdb_complete0),
-						.alu_mem_pr_idx0(alu_mem_cdb_pr_idx0),
+						.alu_mem_pr_idx0(alu_mem_cdb_prf_pr_idx0),
 						.alu_mem_ar_idx0(alu_mem_cdb_ar_idx0),
 						.alu_mem_exception0(alu_mem_cdb_exception0),
 
 						.alu_mem_complete1(alu_mem_cdb_complete1),
-						.alu_mem_pr_idx1(alu_mem_cdb_pr_idx1),
+						.alu_mem_pr_idx1(alu_mem_cdb_prf_pr_idx1),
 						.alu_mem_ar_idx1(alu_mem_cdb_ar_idx1),
 						.alu_mem_exception1(alu_mem_cdb_exception1),
 
@@ -1209,13 +1226,13 @@
 										.rs_NPC0(rs_alu_sim_NPC0),
 										.rs_IR0(rs_alu_sim_IR0),
 										.prf_pra0(prf_alu_sim_pra_value0),
-										.prf_prb0(prf_alu_sim_prb_valu0),
+										.prf_prb0(prf_alu_sim_prb_value0),
 										.rs_dest_ar_idx0(rs_alu_sim_dest_ar_idx0),
 										.rs_dest_pr_idx0(rs_alu_sim_dest_pr_idx0),
 										.rs_opa_select0(rs_alu_sim_opa_select0),
 										.rs_opb_select0(rs_alu_sim_opb_select0),
-										.rs_alu_func0(rs_alu_sim_alu_func0),
-										.rs_cond_branch0(rs_alu_sim_cond_branc0),
+										.rs_alu_func0(rs_alu_sim_func0),
+										.rs_cond_branch0(rs_alu_sim_cond_branch0),
 										.rs_uncond_branch0(rs_alu_sim_uncond_branch0),
 										.rs_branch_taken0(rs_alu_sim_branch_taken0),
 										.rs_pred_addr0(rs_alu_sim_pred_addr0),
@@ -1224,13 +1241,13 @@
 										.rs_NPC1(rs_alu_sim_NPC1),
 										.rs_IR1(rs_alu_sim_IR1),
 										.prf_pra1(prf_alu_sim_pra_value1),
-										.prf_prb1(prf_alu_sim_prb_valu1),
+										.prf_prb1(prf_alu_sim_prb_value1),
 										.rs_dest_ar_idx1(rs_alu_sim_dest_ar_idx1),
 										.rs_dest_pr_idx1(rs_alu_sim_dest_pr_idx1),
 										.rs_opa_select1(rs_alu_sim_opa_select1),
 										.rs_opb_select1(rs_alu_sim_opb_select1),
-										.rs_alu_func1(rs_alu_sim_alu_func1),
-										.rs_cond_branch1(rs_alu_sim_cond_branc1),
+										.rs_alu_func1(rs_alu_sim_func1),
+										.rs_cond_branch1(rs_alu_sim_cond_branch1),
 										.rs_uncond_branch1(rs_alu_sim_uncond_branch1),
 										.rs_branch_taken1(rs_alu_sim_branch_taken1),
 										.rs_pred_addr1(rs_alu_sim_pred_addr1),
@@ -1238,18 +1255,18 @@
 
 										// Outputs
 										.cdb_complete0(alu_sim_cdb_complete0),
-										.cdb_dest_ar_idx0(alu_sim_cdb_dest_ar_idx0),
+										.cdb_dest_ar_idx0(alu_sim_cdb_ar_idx0),
 										.cdb_prf_dest_pr_idx0(alu_sim_cdb_prf_pr_idx0),
 										.cdb_exception0(alu_sim_cdb_exception0),
 										.prf_result0(alu_sim_prf_value0),
-										.prf_write_enable0(alu_sim_prf_write_enable0),
+										.prf_write_enable0(alu_sim_prf_wr_enable0),
 
 										.cdb_complete1(alu_sim_cdb_complete1),
-										.cdb_dest_ar_idx1(alu_sim_cdb_dest_ar_idx1),
+										.cdb_dest_ar_idx1(alu_sim_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_sim_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_sim_cdb_exception1),
 										.prf_result1(alu_sim_prf_value0),
-										.prf_write_enable1(alu_sim_prf_write_enable1),
+										.prf_write_enable1(alu_sim_prf_wr_enable1),
 
 										.rs_alu_avail(alu_sim_rs_avail)
 										);
@@ -1261,7 +1278,7 @@
 										.rs_NPC0(rs_alu_mul_NPC0),
 										.rs_IR0(rs_alu_mul_IR0),
 										.prf_pra0(prf_alu_mul_pra_value0),
-										.prf_prb0(prf_alu_mul_prb_valu0),
+										.prf_prb0(prf_alu_mul_prb_value0),
 										.rs_dest_ar_idx0(rs_alu_mul_dest_ar_idx0),
 										.rs_dest_pr_idx0(rs_alu_mul_dest_pr_idx0),
 										.rs_opa_select0(rs_alu_mul_opa_select0),
@@ -1271,7 +1288,7 @@
 										.rs_NPC1(rs_alu_mul_NPC1),
 										.rs_IR1(rs_alu_mul_IR1),
 										.prf_pra1(prf_alu_mul_pra_value1),
-										.prf_prb1(prf_alu_mul_prb_valu1),
+										.prf_prb1(prf_alu_mul_prb_value1),
 										.rs_dest_ar_idx1(rs_alu_mul_dest_ar_idx1),
 										.rs_dest_pr_idx1(rs_alu_mul_dest_pr_idx1),
 										.rs_opa_select1(rs_alu_mul_opa_select1),
@@ -1280,14 +1297,14 @@
 
 										// Outputs
 										.cdb_complete0(alu_mul_cdb_complete0),
-										.cdb_dest_ar_idx0(alu_mul_cdb_dest_ar_idx0),
+										.cdb_dest_ar_idx0(alu_mul_cdb_ar_idx0),
 										.cdb_prf_dest_pr_idx0(alu_mul_cdb_prf_pr_idx0),
 										.cdb_exception0(alu_mul_cdb_exception0),
 										.prf_result0(alu_mul_prf_value0),
 										.prf_write_enable0(alu_mul_prf_write_enable0),
 
 										.cdb_complete1(alu_mul_cdb_complete1),
-										.cdb_dest_ar_idx1(alu_mul_cdb_dest_ar_idx1),
+										.cdb_dest_ar_idx1(alu_mul_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_mul_cdb_exception1),
 										.prf_result1(alu_mul_prf_value0),

@@ -44,7 +44,7 @@ input					bht_branch_taken1;
 input  [63:0] btb_pred_addr0;   // target pc: use if take_branch is TRUE
 input  [63:0] btb_pred_addr1;
 input  [63:0] Imem2proc_data;     // Data coming back from instruction-memory
-input  [1:0]  Imem_valid;
+input  			  Imem_valid;
 input  [1:0]  id_dispatch_num;		//Whether RS and ROB are busy
 
 output [63:0] proc2Imem_addr;     // Address sent to Instruction memory
@@ -56,8 +56,8 @@ output        id_valid_inst0;
 output				id_valid_inst1;
 output				id_branch_taken0;
 output				id_branch_taken1;
-output				id_pred_addr0;
-output				id_pred_addr1;
+output [63:0]	id_pred_addr0;
+output [63:0]	id_pred_addr1;
 reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
