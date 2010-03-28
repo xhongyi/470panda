@@ -563,7 +563,7 @@
 								.btb_pred_addr1(btb_if_pred_aadr0),
 								.Imem2proc_data(Imem2proc_data),
 								.Imem_valid(Imem_valid),
-								.id_inst_need_num(id_if_need_num),
+								.id_dispatch_num(id_if_need_num), //Danger: inconsistent interface
 
 								.id_NPC0(if_id_NPC0),
 								.id_NPC1(if_id_NPC1),
