@@ -234,11 +234,11 @@ module alu_sim(// Inputs
 	reg				next_prf_write_enable1;
 	reg				next_cdb_complete0;
 	reg				next_cdb_complete1;
-	reg				next_cdb_dest_ar_idx0;
-	reg				next_cdb_dest_ar_idx1;
-	reg				next_cdb_prf_dest_pr_idx0;
-	reg				next_cdb_prf_dest_pr_idx1;
-	reg				next_cdb_exception0;
+	reg	[4:0]	next_cdb_dest_ar_idx0;
+	reg	[4:0]	next_cdb_dest_ar_idx1;
+	reg	[6:0]	next_cdb_prf_dest_pr_idx0;
+	reg	[6:0]	next_cdb_prf_dest_pr_idx1;
+	reg	    	next_cdb_exception0;
 	reg			  next_cdb_exception1;
   reg [1:0]		next_rs_alu_avail;
 	
