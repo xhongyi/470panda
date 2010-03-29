@@ -68,65 +68,46 @@ module testbench;
   reg  [8*7:0] mem_instr_str;
   reg  [8*7:0] wb_instr_str;
 
+pipeline testee(// Inputs
+                 clock,
+                 reset,
+                 mem2proc_response,
+                 mem2proc_data,
+                 mem2proc_tag,
+                 
+                 // Outputs
+                 proc2mem_command,
+                 proc2mem_addr,
+                 proc2mem_data,
 
-  // Instantiate the Pipeline
-  pipeline pipeline_0 (// Inputs
-                       .clock             (clock),
-                       .reset             (reset),
-                       .mem2proc_response (mem2proc_response),
-                       .mem2proc_data     (mem2proc_data),
-                       .mem2proc_tag      (mem2proc_tag),
+                 pipeline_completed_insts,
+                 pipeline_error_status,
+                 pipeline_commit_wr_data,
+                 pipeline_commit_wr_idx,
+                 pipeline_commit_wr_en,
+                 pipeline_commit_NPC,
 
-                        // Outputs
-                       .proc2mem_command  (proc2mem_command),
-                       .proc2mem_addr     (proc2mem_addr),
-                       .proc2mem_data     (proc2mem_data),
 
-                       .pipeline_completed_insts(pipeline_completed_insts),
-                       .pipeline_error_status(pipeline_error_status),
-                       .pipeline_commit_wr_data(pipeline_commit_wr_data),
-                       .pipeline_commit_wr_idx(pipeline_commit_wr_idx),
-                       .pipeline_commit_wr_en(pipeline_commit_wr_en),
-                       .pipeline_commit_NPC(pipeline_commit_NPC),
-
-                       .if_NPC0(NPC_out0),
-											 .if_NPC1(NPC_out1),
-                       .if_IR0(IR_out0),
-											 .if_IR1(IR_out1),
-                       .if_valid_inst0(if_valid_inst0),
-											 .if_valid_inst1(if_valid_inst1),
-                       .id_NPC0(id_NPC0),
-											 .id_NPC1(id_NPC1),
-                       .id_IR0(id_IR0),
-											 .id_IR1(id_IR1),
-                       .id_valid_inst0(id_valid_inst0),
-											 .id_valid_inst1(id_valid_inst1),
-                       .rs_NPC0(rs_NPC0),
-											 .rs_NPC1(rs_NPC1),
-                       .rs_IR0(rs_IR0),
-											 .rs_IR1(rs_IR1),
-                       .rs_valid_inst0(rs_valid_inst0),
-										   .rs_valid_inst1(rs_valid_inst1),
-                       .alu_NPC0(alu_NPC0),
-											 .alu_NPC1(alu_NPC1),
-                       .alu_IR0(alu_IR0),
-                       .alu_IR1(alu_IR1),
-                       .alu_valid_inst0(alu_valid_inst0),
-											 .alu_valid_inst1(alu_valid_inst1),
-                       .cpl_NPC0(cpl_NPC0),
-											 .cpl_NPC1(cpl_NPC1),
-                       .cpl_IR0(cpl_IR0),
-											 .cpl_IR1(cpl_IR1),
-                       .cpl_valid_inst0(cpl_valid_inst0),
-											 .cpl_valid_inst1(cpl_valid_inst1),
-											 .ret_NPC0(ret_NPC0),
-											 .ret_NPC1(ret_NPC1),
-											 .ret_IR0(ret_IR0),
-											 .ret_IR1(ret_IR1),
-                       .ret_valid_inst0(ret_valid_inst0),
-											 .ret_valid_inst1(ret_valid_inst1),
-                      );
-
+                 // testing hooks (these must be exported so we can test
+                 // the synthesized version) data is tested by looking at
+                 // the final values in memory
+                 if_NPC_out,
+                 if_IR_out,
+                 if_valid_inst_out,
+                 if_id_NPC,
+                 if_id_IR,
+                 if_id_valid_inst,
+                 id_ex_NPC,
+                 id_ex_IR,
+                 id_ex_valid_inst,
+                 ex_mem_NPC,
+                 ex_mem_IR,
+                 ex_mem_valid_inst,
+                 mem_wb_NPC,
+                 mem_wb_IR,
+                 mem_wb_valid_inst
+                );
+  
 
   // Instantiate the Data Memory
   mem memory (// Inputs
