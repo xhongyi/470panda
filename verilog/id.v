@@ -692,8 +692,8 @@ assign rs_mt_ra_idx1			= ra_idx1;
 assign rs_mt_rb_idx1			= rb_idx1;
 assign rs_mt_rc_idx1			= rc_idx1;
 
-assign rs_branch_taken0		= branch_taken0;
-assign rs_pred_addr0			= pred_addr0;
+assign rs_branch_taken1		= branch_taken1;
+assign rs_pred_addr1			= pred_addr1;
 
 assign rs_mt_opa_select1 	= opa_select1;
 assign rs_mt_opb_select1	= opb_select1;
