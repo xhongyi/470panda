@@ -58,12 +58,8 @@ SYNFILES = synth/$(MODULE).vg
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 		testbench/visual_c_hooks.c
 
-synth/$(MODULE).vg:        $(SIMFILES) synth/$(MODULE).tcl  #synth/prien.vg #synth/cachemem128x64.vg
-	cd synth && dc_shell-t -f ./$(MODULE).tcl | tee $(MODULE)_synth.out 
-
-#synth/prien.vg:  verilog/prien.v
-#	cd synth && dc_shell-t -f ./prien.tcl | tee prien_synth.out
- 
+synth/$(MODULE).vg:        $(SIMFILES) synth/pipeline.tcl synth/cachemem128x64.vg  
+	cd synth && dc_shell-t -f ./pipeline.tcl | tee pipeline_synth.out 
 
 synth/cachemem128x64.vg:  verilog/cachemem.v
 	cd synth && dc_shell-t -f ./icache.tcl | tee cachemem128x64_synth.out
