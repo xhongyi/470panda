@@ -515,5 +515,9 @@ module testbench;
     end
   endfunction
 
+always @*
+begin
+#10000 $finish;	
+end	
 endmodule  // module testbench
 
