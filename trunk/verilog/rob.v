@@ -158,11 +158,12 @@ end
 	//check rs_avail:
 	//update tag with fl , told with mt at tail
   $display("dispatch_num is ", dispatch_num);
+  id_cap = full? 2'd0 : almost_full? 2'd1 :2'd2;
 	case (dispatch_num) 
 		2'b00:
 		begin
 		$display("did not dispatch");	
-			id_cap = 2'b0;
+			//id_cap = 2'b0;
  			next_tail = tail;
 		end
 		2'b01:
@@ -172,7 +173,7 @@ end
 			next_told[tail] = p0told;
 			next_ready[tail] = ~valid_inst0;
 			next_halt[tail] = halt0;
-			id_cap = 2'b1;
+			//id_cap = 2'b1;
 			next_tail = (tail == 6'd63)? 6'd0 : tail + 6'b1;
 		end
 		2'b10,2'b11:
@@ -186,7 +187,7 @@ end
 			next_halt[tail_plus_one] = halt1;
 			next_ready[tail] = ~valid_inst0;
 			next_ready[tail_plus_one] = ~valid_inst1;
-		  id_cap = 2'b10;
+		  //id_cap = 2'b10;
 			next_tail = (tail == 6'd62) ? 6'd0 : (tail == 6'd63) ? 6'd1 : tail + 6'd2;
 		end
 	endcase

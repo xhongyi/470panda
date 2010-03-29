@@ -17,7 +17,7 @@ module if_test;
   reg  [63:0] ex_mem_target_pc1;
   reg  [63:0] Imem2proc_data;     // Data coming back from instruction-memory
   reg  [1:0]  Imem_valid;
-  reg  [1:0]  busy;		//Whether RS and ROB are busy
+  reg  [1:0]  id_dispatch_num;		//Whether RS and ROB are busy
 
   wire [63:0] proc2Imem_addr;     // Address sent to Instruction memory
   wire [63:0] id_NPC;         // PC of instruction after fetched (PC+4).
@@ -36,25 +36,29 @@ module if_test;
 	// For test case
 	reg					correct;
 
-	if_mod if_0(// Inputs
-                clock,
-                reset,
-                ex_mem_take_branch0,
-				ex_mem_take_branch1,
-                ex_mem_target_pc0,
-				ex_mem_target_pc1,
-                Imem2proc_data,
-                Imem_valid,
-				busy,
-                    
-                // Outputs
-                id_NPC,        // PC+4 of fetched instruction		//PC+8 of fetched instruction
-                id_IR0,         // fetched instruction out
+	if_mod testee(// Inputs
+				clock,
+				reset,
+				bht_branch_taken0,
+				bht_branch_taken1,
+				btb_pred_addr0,
+				btb_pred_addr1,
+				Imem2proc_data,
+				Imem_valid,
+				id_dispatch_num,
+
+				// Outputs
+				id_NPC,        // PC+4 of fetched instruction
+				id_IR0,         // fetched instruction out
 				id_IR1,		//  second fetched instruction out
-                proc2Imem_addr,
-                id_valid_inst0,
+				proc2Imem_addr,
+				id_branch_taken0,
+				id_branch_taken1,
+				id_pred_addr0,
+				id_pred_addr1,
+				id_valid_inst0,
 				id_valid_inst1  // when low, instruction is garbage
-               );
+				);
 	// Generate System Clock
 	always
 	begin
@@ -65,7 +69,7 @@ module if_test;
 	// Compare the results with the correct ones
 	always @(posedge clock)
 	begin
-		$monitor("Time: %4.0f\n\nInput\n reset: %b\n ex_mem_take_branch0: %b\n ex_mem_take_branch1: %b\n ex_mem_target_pc0: %b\n ex_mem_target_pc1: %b\n Imem2proc_data: %b\n Imem_valid: %b\n busy: %b\n id_NPC: %b\n  id_IR0: %b\n id_IR1: %b\n proc2Imem_addr: %b\n id_valid_inst0: %b\n id_valid_inst1: %b\n\n", $time, reset, ex_mem_take_branch0, ex_mem_take_branch1, ex_mem_target_pc0, ex_mem_target_pc1, Imem2proc_data, Imem_valid, busy, id_NPC, id_IR0, id_IR1, proc2Imem_addr, id_valid_inst0, id_valid_inst1);
+		$monitor("Time: %4.0f\n\nInput\n reset: %b\n ex_mem_take_branch0: %b\n ex_mem_take_branch1: %b\n ex_mem_target_pc0: %b\n ex_mem_target_pc1: %b\n Imem2proc_data: %b\n Imem_valid: %b\n id_dispatch_num: %b\n id_NPC: %b\n  id_IR0: %b\n id_IR1: %b\n proc2Imem_addr: %b\n id_valid_inst0: %b\n id_valid_inst1: %b\n\n", $time, reset, ex_mem_take_branch0, ex_mem_take_branch1, ex_mem_target_pc0, ex_mem_target_pc1, Imem2proc_data, Imem_valid, id_dispatch_num, id_NPC, id_IR0, id_IR1, proc2Imem_addr, id_valid_inst0, id_valid_inst1);
 
 		#(`VERILOG_CLOCK_PERIOD/4.0);
 
@@ -122,7 +126,7 @@ module if_test;
 		ex_mem_target_pc1 = 4;
 		Imem2proc_data = 0;
 		Imem_valid = 1;
-		busy = 2;
+		id_dispatch_num = 2;
 		@(negedge clock)
 		reset = 0;
 		@(negedge clock)
@@ -132,11 +136,12 @@ module if_test;
 		ex_mem_target_pc1 = 8;
 		Imem2proc_data = 64'h0123456789abcdef;
 		Imem_valid = 1;
-		busy = 0;
+		id_dispatch_num = 0;
 		@(negedge clock)
-		busy = 1;
+		id_dispatch_num = 1;
 		@ (negedge clock)
-		busy = 2;
+		Imem2proc_data = 64'h4043040440220403;
+		id_dispatch_num = 2;
 		@(negedge clock)
 		$finish;
 	end
