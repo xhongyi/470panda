@@ -534,9 +534,19 @@
 	//
 	// To be changed in the future
 
-	assign proc2mem_command		= `BUS_NONE;
-	assign porc2mem_addr			= 64'b0;
-	assign porc2mem_data			= 64'b0;
+	
+  assign proc2mem_command =
+           (proc2Dmem_command==`BUS_NONE)?proc2Imem_command:proc2Dmem_command;
+  assign proc2mem_addr =
+           (proc2Dmem_command==`BUS_NONE)?proc2Imem_addr:proc2Dmem_addr;
+	assign proc2mem_data			= 64'b0;
+	
+	
+	
+	assign Dmem2proc_response = 
+      (proc2Dmem_command==`BUS_NONE) ? 0 : mem2proc_response;
+  assign Imem2proc_response =
+      (proc2Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;

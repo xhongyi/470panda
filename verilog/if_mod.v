@@ -44,7 +44,7 @@ input					bht_branch_taken1;
 input  [63:0] btb_pred_addr0;   // target pc: use if take_branch is TRUE
 input  [63:0] btb_pred_addr1;
 input  [63:0] Imem2proc_data;     // Data coming back from instruction-memory
-input  			  Imem_valid;
+input  [1:0]  Imem_valid;
 input  [1:0]  id_dispatch_num;		//Whether RS and ROB are busy
 
 output [63:0] proc2Imem_addr;     // Address sent to Instruction memory
@@ -56,15 +56,15 @@ output        id_valid_inst0;
 output				id_valid_inst1;
 output				id_branch_taken0;
 output				id_branch_taken1;
-output [63:0]	id_pred_addr0;
-output [63:0]	id_pred_addr1;
+output				id_pred_addr0;
+output				id_pred_addr1;
 reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
 wire   [63:0] next_PC;
 wire          PC_enable;
 wire          next_ready_for_valid;
-wire [1:0] busy =  2'd2 - id_dispatch_num;
+//wire [1:0] busy =  2'd2 - id_dispatch_num;
 assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
 //
 // this mux is because the Imem gives us 64 bits not 32 bits
@@ -77,18 +77,18 @@ assign PC_plus_8 = PC_reg + 8;
 // the next sequential PC (PC+4) if no branch
 // (halting is handled with the enable PC_enable;
 
-assign next_PC = busy[1] ? PC_reg: busy[0] ? PC_plus_4 : PC_plus_8;
+assign next_PC = id_dispatch_num[1] ? PC_plus_8: id_dispatch_num[0] ? PC_plus_4 : PC_reg;
 
 // The take-branch signal must override stalling (otherwise it may be lost)
 assign PC_enable0 = id_valid_inst0 ;//| bht_branch_taken0;
 assign PC_enable1 = id_valid_inst1 ;//| bht_branch_taken1;
     // Pass PC+4 down pipeline w/instruction
 	// I don't know what is going on here.......
-assign id_NPC0 = busy[1] ? PC_reg : busy[0] ? PC_plus_4 : PC_plus_8;
-assign id_NPC1 = PC_plus_8;//the second PC always output PC_plus_8, busy[0] tells if the output is to be taken.
+assign id_NPC0 = (id_dispatch_num[1] |id_dispatch_num[0]) ? PC_plus_4 : PC_reg;
+assign id_NPC1 = PC_plus_8;
 
-assign    id_valid_inst0 =  ~busy[1];
-assign	  id_valid_inst1 =  ~(busy[1]|busy[0]);	
+assign id_valid_inst0 = id_dispatch_num[0]|id_dispatch_num[1];
+assign id_valid_inst1 = id_dispatch_num[1];
 
 
 
