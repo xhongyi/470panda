@@ -79,15 +79,15 @@ module testbench;
   wire        rs_mem_valid_inst0;
   wire        rs_mem_valid_inst1;
 	wire	[5:0]	cdb_broadcast;
-	wire	[6:0] cdb_pr_tag_0;
-	wire	[6:0] cdb_pr_tag_1;
-	wire	[6:0] cdb_pr_tag_2;
-	wire	[6:0] cdb_pr_tag_3;
-	wire	[6:0] cdb_pr_tag_4;
-	wire	[6:0] cdb_pr_tag_5;
+	wire	[6:0] cdb_pr_tag0;
+	wire	[6:0] cdb_pr_tag1;
+	wire	[6:0] cdb_pr_tag2;
+	wire	[6:0] cdb_pr_tag3;
+	wire	[6:0] cdb_pr_tag4;
+	wire	[6:0] cdb_pr_tag5;
 	wire  [1:0] rob_retire_num;
-	wire  [1:0] rob_retire_tag_a;
-	wire	[1:0] rob_retire_tag_b;
+	wire  [6:0] rob_retire_tag_a;
+	wire	[6:0] rob_retire_tag_b;
 	
 	
   // Strings to hold instruction opcode
