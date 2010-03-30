@@ -180,7 +180,7 @@ end
 	//checklist:
 	//check each bit of cdb_pr_ready
 	//if any bit of cdb_pr_ready == 1, search the hold file for ready bit.
-	if(cre_pr_ready[0] ==1 )
+	if(cdb_pr_ready[0] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
@@ -189,48 +189,48 @@ end
 			else next_ready[index] = 0;
 		end
 	end
-	if(cre_pr_ready[1] ==1 )
+	if(cdb_pr_ready[1] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cre_pr_tag_1 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_1 == tag[index]) next_ready[index] = 1;
 			else next_ready[index] = 0;
 		end
 	end	
-	if(cre_pr_ready[2] ==1 )
+	if(cdb_pr_ready[2] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cre_pr_tag_2 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_2 == tag[index]) next_ready[index] = 1;
 			else next_ready[index] = 0;
 		end				
 	end	
-	if(cre_pr_ready[3] ==1 )
+	if(cdb_pr_ready[3] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cre_pr_tag_3 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_3 == tag[index]) next_ready[index] = 1;
 			else next_ready[index] = 0;
 		end				
 	end	
-	if(cre_pr_ready[4] ==1 )
+	if(cdb_pr_ready[4] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cre_pr_tag_4 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_4 == tag[index]) next_ready[index] = 1;
 			else next_ready[index] = 0;
 		end				
 	end	
-	if(cre_pr_ready[5] ==1 )
+	if(cdb_pr_ready[5] ==1 )
 	begin
 
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cre_pr_tag_5 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_5 == tag[index]) next_ready[index] = 1;
 			else next_ready[index] = 0;
 		end	
 	end	
