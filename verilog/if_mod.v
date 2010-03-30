@@ -62,10 +62,16 @@ reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
 wire	 [63:0] PC_plus_8;
-wire   [63:0] next_PC;
 wire          PC_enable0;
 wire					PC_enable1;
 wire          next_ready_for_valid;
+
+
+reg		 [63:0]	next_PC;
+reg						id_valid_inst0;
+reg						id_valid_inst1;
+
+
 //wire [1:0] busy =  2'd2 - id_dispatch_num;
 assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
 //
@@ -79,18 +85,53 @@ assign PC_plus_8 = PC_reg + 8;
 // the next sequential PC (PC+4) if no branch
 // (halting is handled with the enable PC_enable;
 
-assign next_PC = Imem_valid&id_dispatch_num[1] ? PC_plus_8: Imem_valid&id_dispatch_num[0] ? PC_plus_4 : PC_reg;
+//assign next_PC = id_dispatch_num[1] ? PC_plus_8: id_dispatch_num[0] ? PC_plus_4 : PC_reg;
+
+always @*
+begin
+	if (Imem_valid)
+	begin
+		if (PC_reg[2])
+		begin
+			id_valid_inst0 = 1;
+			id_valid_inst1 = 0;
+			if (id_dispatch_num[0] | id_dispatch_num[1])
+				next_PC = PC_plus_4;
+			else
+				next_PC = PC_reg;
+		end
+		else
+		begin
+			id_valid_inst0 = 1;
+			id_valid_inst1 = 1;
+			if (id_dispatch_num[1])
+				next_PC = PC_plus_8;
+			else if (id_dispatch_num[0])
+				next_PC = PC_plus_4;
+			else
+				next_PC = PC_reg;
+		end
+	end
+	else
+	begin
+		next_PC = PC_reg;
+		id_valid_inst0 = 0;
+		id_valid_inst1 = 0;
+	end
+end
 
 // The take-branch signal must override stalling (otherwise it may be lost)
 assign PC_enable0 = id_valid_inst0 ;//| bht_branch_taken0;
 assign PC_enable1 = id_valid_inst1 ;//| bht_branch_taken1;
     // Pass PC+4 down pipeline w/instruction
 	// I don't know what is going on here.......
-assign id_NPC0 = (id_dispatch_num[1] |id_dispatch_num[0]) ? PC_plus_4 : PC_reg;
+//assign id_NPC0 = (id_dispatch_num[1] |id_dispatch_num[0]) ? PC_plus_4 : PC_reg;
+//assign id_NPC1 = PC_plus_8;
+assign id_NPC0 = PC_plus_4;
 assign id_NPC1 = PC_plus_8;
 
-assign id_valid_inst0 = Imem_valid;
-assign id_valid_inst1 = Imem_valid&~PC_reg[2];
+//assign id_valid_inst0 = Imem_valid;
+//assign id_valid_inst1 = Imem_valid&~PC_reg[2];
 
 
 
