@@ -1,4 +1,4 @@
-`timescale 1ns/100ps
+
 
 
 //////////////////////////////////////////////////////////
@@ -63,7 +63,6 @@ input [6:0] cdb_pr_tag_5; //Note: the bandwidth is CDB_WIDTH;
 input id_halt0;
 input	id_halt1;
 
-
 output [1:0] id_cap;
 
 output [6:0] fl_retire_tag_a;
@@ -102,24 +101,7 @@ reg [1:0] dispatch_num;
 reg halt0;
 reg halt1;
 
-
-reg [5:0] pr_ready; //Note: the bandwidth is CDB_WIDTH;
-reg [6:0] pr_tag_0;
-reg [6:0] pr_tag_1;
-reg [6:0] pr_tag_2;
-reg [6:0] pr_tag_3; 
-reg [6:0] pr_tag_4;
-reg [6:0] pr_tag_5; //Note: the bandwidth is CDB_WIDTH;
 reg retire_halt;
-
-
-
-
-
-
-
-
-
 
 //Update State
 reg [63:0] next_ready;
@@ -128,8 +110,6 @@ reg [6:0] next_told [63:0];
 reg [5:0] next_head;
 reg [5:0] next_tail;
 reg [63:0] next_halt;
-
-
 
 integer index, jindex, kindex;
 
@@ -171,7 +151,7 @@ end
 			$display("dispatched one");
 			next_tag[tail] = pr0;
 			next_told[tail] = p0told;
-			next_ready[tail] = ~valid_inst0;
+			next_ready[tail] = ~valid_inst0; 
 			next_halt[tail] = halt0;
 			//id_cap = 2'b1;
 			next_tail = (tail == 6'd63)? 6'd0 : tail + 6'b1;
@@ -200,53 +180,59 @@ end
 	//checklist:
 	//check each bit of cdb_pr_ready
 	//if any bit of cdb_pr_ready == 1, search the hold file for ready bit.
-	if(pr_ready[0] ==1 )
+	if(cre_pr_ready[0] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(pr_tag_0 == tag[index]) next_ready[index] = 1;
+			if(cdb_pr_tag_0 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
+		end
+	end
+	if(cre_pr_ready[1] ==1 )
+	begin
+				
+		for (index = 0; index < 64; index = index + 1)
+		begin					//Note: the two tags COULD be the same
+			if(cre_pr_tag_1 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
+		end
+	end	
+	if(cre_pr_ready[2] ==1 )
+	begin
+				
+		for (index = 0; index < 64; index = index + 1)
+		begin					//Note: the two tags COULD be the same
+			if(cre_pr_tag_2 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
 		end				
 	end	
-	if(pr_ready[1] ==1 )
+	if(cre_pr_ready[3] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(pr_tag_1 == tag[index]) next_ready[index] = 1;
+			if(cre_pr_tag_3 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
 		end				
 	end	
-	if(pr_ready[2] ==1 )
+	if(cre_pr_ready[4] ==1 )
 	begin
 				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(pr_tag_2 == tag[index]) next_ready[index] = 1;
+			if(cre_pr_tag_4 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
 		end				
 	end	
-	if(pr_ready[3] ==1 )
+	if(cre_pr_ready[5] ==1 )
 	begin
-				
+
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(pr_tag_3 == tag[index]) next_ready[index] = 1;
-		end				
-	end	
-	if(pr_ready[4] ==1 )
-	begin
-				
-		for (index = 0; index < 64; index = index + 1)
-		begin					//Note: the two tags COULD be the same
-			if(pr_tag_4 == tag[index]) next_ready[index] = 1;
-		end				
-	end	
-	if(pr_ready[5] ==1 )
-	begin
-				
-		for (index = 0; index < 64; index = index + 1)
-		begin					//Note: the two tags COULD be the same
-			if(pr_tag_5 == tag[index]) next_ready[index] = 1;
-		end				
+			if(cre_pr_tag_5 == tag[index]) next_ready[index] = 1;
+			else next_ready[index] = 0;
+		end	
 	end	
 	//end of complete
 
@@ -305,7 +291,7 @@ begin //of sequential logic
 		 halt1 <= `SD 0;
 		for (index = 0; index < 64; index = index + 1)
 		begin
-			
+			halt [kindex] <= `SD 1'h0;
 			tag[index] <= `SD 7'h0;
 			told[index] <= `SD 7'h0;
 			ready[index] <= `SD 1'h0;
@@ -316,6 +302,7 @@ begin //of sequential logic
 	begin
 			for (kindex = 0; kindex < 64; kindex = kindex + 1)
 			begin
+				halt [kindex] <= `SD next_halt[kindex];
 				tag[kindex] <= `SD next_tag[kindex];
 				told[kindex] <= `SD next_told[kindex];
 				ready[kindex] <= `SD next_ready[kindex];
@@ -332,9 +319,21 @@ begin //of sequential logic
 			 dispatch_num <= `SD id_dispatch_num;
 			 halt0 <= `SD id_halt0;
 			 halt1 <= `SD id_halt1;
-			
 	end
 end//of sequential logic
+
+genvar IDX;
+generate
+	for(IDX=0; IDX<32; IDX=IDX+1)
+	begin : foo
+		wire [6:0] TAG = tag[IDX];  //64 tags, 7 bits each.
+		wire [6:0] TOLD = told[IDX];
+		wire [6:0] NEXT_TAG = next_tag[IDX];  //64 tags, 7 bits each.
+		wire [6:0] NEXT_TOLD = next_told[IDX];
+	end
+
+endgenerate
+
 
 endmodule
 	
