@@ -16,8 +16,6 @@ module fl (//inputs
 		  reset,
 		  id_dispatch_num,
 		  rob_retire_num,
-		  rob_retire_tag_0,
-		  rob_retire_tag_1,
 		
 	  	  //outputs
 	 	  rob_rs_mt_pr0, //new registers
@@ -28,7 +26,6 @@ module fl (//inputs
 input clock, reset;
 input [1:0] id_dispatch_num;
 input [1:0] rob_retire_num;
-input [6:0] rob_retire_tag_0, rob_retire_tag_1;
 
 output [6:0]rob_rs_mt_pr0, rob_rs_mt_pr1;
 
@@ -91,8 +88,8 @@ end
 
 always @(posedge clock) begin
   if (reset) begin
-    head <= 7'd32;
-    tail <= 7'd95;
+    head <= 7'd95;
+    tail <= 7'd32;
   end
   else begin
     head <= next_head;
