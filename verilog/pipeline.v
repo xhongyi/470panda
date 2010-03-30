@@ -923,14 +923,14 @@
 
 					.fl_pr_dest_idx0(fl_rob_rs_mt_pr0),
 					.mt_pra_idx0(mt_rs_pr_a1),
-					.mt_prb_idx0(mt_rs_pr_b1),
+					.mt_prb_idx0(mt_rs_pr_a2),
 					.mt_pra_ready0(mt_rs_pr_a1_ready),
-					.mt_prb_ready0(mt_rs_pr_b1_ready),
+					.mt_prb_ready0(mt_rs_pr_a2_ready),
 
 					.fl_pr_dest_idx1(fl_rob_rs_mt_pr1),
-					.mt_pra_idx1(mt_rs_pr_a2),
+					.mt_pra_idx1(mt_rs_pr_b1),
 					.mt_prb_idx1(mt_rs_pr_b2),
-					.mt_pra_ready1(mt_rs_pr_a2_ready),
+					.mt_pra_ready1(mt_rs_pr_b1_ready),
 					.mt_prb_ready1(mt_rs_pr_b2_ready),
 
 					.alu_sim_avail(alu_sim_rs_avail), 
