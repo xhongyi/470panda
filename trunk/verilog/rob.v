@@ -131,18 +131,18 @@ end
 	//checklist:
 	//check rs_avail:
 	//update tag with fl , told with mt at tail
-  $display("id_dispatch_num is ", id_dispatch_num);
+  
   id_cap = full? 2'd0 : almost_full? 2'd1 :2'd2;
 	case (id_dispatch_num) 
 		2'b00:
 		begin
-		$display("did not dispatch");	
+		
 			//id_cap = 2'b0;
  			next_tail = tail;
 		end
 		2'b01:
 		begin
-			$display("dispatched one");
+			
 			next_tag[tail] = fl_pr0;
 			next_told[tail] = mt_p0told;
 			next_ready[tail] = ~id_valid_inst0; 
@@ -153,7 +153,7 @@ end
 		end
 		2'b10,2'b11:
 		begin
-			$display("dispatched two");
+			
 			next_tag[tail] = fl_pr0;
 			next_told[tail] = mt_p0told;
 			next_halt[tail] = id_halt0;
@@ -168,9 +168,7 @@ end
 			next_tail = (tail == 6'd62) ? 6'd0 : (tail == 6'd63) ? 6'd1 : tail + 6'd2;
 		end
 	endcase
-	$display("head is: %h tail is %h  tag[head]: %h tag[tail]: %h ready[head]: ",head, tail,  tag[head], tag[tail], ready[head]);
-	$display("next_head is: %h next_tail is: %h next_tag[head] is: %h, next_tag[tail] is: %h",next_head, next_tail, next_tag[head], next_tag[tail]);
-	$display("fl_pr0 is:%h fl_pr1 is %h mt_p0told is %h mt_p1told is%h id_dispatch_num is %h", fl_pr0, fl_pr1, mt_p0told, mt_p1told, id_dispatch_num);
+	
 	//end of dispatch
 
 	//complete
