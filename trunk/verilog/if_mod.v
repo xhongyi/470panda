@@ -79,7 +79,7 @@ assign PC_plus_8 = PC_reg + 8;
 // the next sequential PC (PC+4) if no branch
 // (halting is handled with the enable PC_enable;
 
-assign next_PC = id_dispatch_num[1] ? PC_plus_8: id_dispatch_num[0] ? PC_plus_4 : PC_reg;
+assign next_PC = Imem_valid&id_dispatch_num[1] ? PC_plus_8: Imem_valid&id_dispatch_num[0] ? PC_plus_4 : PC_reg;
 
 // The take-branch signal must override stalling (otherwise it may be lost)
 assign PC_enable0 = id_valid_inst0 ;//| bht_branch_taken0;
