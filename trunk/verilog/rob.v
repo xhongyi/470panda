@@ -288,7 +288,10 @@ begin //of sequential logic
 				halt [kindex] <= `SD next_halt[kindex];
 				tag[kindex] <= `SD next_tag[kindex];
 				told[kindex] <= `SD next_told[kindex];
-				ready[kindex] <= `SD next_ready[kindex];
+				if (next_halt[kindex])
+					ready[kindex] <= `SD 1;
+				else
+					ready[kindex] <= `SD next_ready[kindex];
 				valid[kindex] <= `SD next_valid[kindex];
 			end
 			
