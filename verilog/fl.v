@@ -16,8 +16,6 @@ module fl (//inputs
 		  reset,
 		  id_dispatch_num,
 		  rob_retire_num,
-		  rob_retire_tag_0,
-		  rob_retire_tag_1,
 		
 	  	  //outputs
 	 	  rob_rs_mt_pr0, //new registers
@@ -28,7 +26,6 @@ module fl (//inputs
 input clock, reset;
 input [1:0] id_dispatch_num;
 input [1:0] rob_retire_num;
-input [6:0] rob_retire_tag_0, rob_retire_tag_1;
 
 output [6:0]rob_rs_mt_pr0, rob_rs_mt_pr1;
 
