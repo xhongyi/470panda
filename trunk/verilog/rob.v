@@ -273,7 +273,7 @@ begin //of sequential logic
 		 tail <= `SD 0;
 		for (index = 0; index < 64; index = index + 1)
 		begin
-			halt [kindex] <= `SD 1'h0;
+			halt [index] <= `SD 1'h0;
 			tag[index] <= `SD 7'h7f;
 			told[index] <= `SD 7'h7f;
 			ready[index] <= `SD 1'h0;
