@@ -67,10 +67,10 @@ wire          PC_enable0;
 wire					PC_enable1;
 wire          next_ready_for_valid;
 //wire [1:0] busy =  2'd2 - id_dispatch_num;
-assign proc2Imem_addr = PC_reg; //{PC_reg[63:3], 3'b0};
+assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
 //
 // this mux is because the Imem gives us 64 bits not 32 bits
-assign id_IR0 = PC_reg[2] ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
+assign id_IR0 = PC_reg[2] ? Imem2proc_data[31:0] : Imem2proc_data[63:32];
 assign id_IR1 = Imem2proc_data[31:0];
 // default next PC value
 assign PC_plus_4 = PC_reg + 4;
@@ -89,8 +89,8 @@ assign PC_enable1 = id_valid_inst1 ;//| bht_branch_taken1;
 assign id_NPC0 = (id_dispatch_num[1] |id_dispatch_num[0]) ? PC_plus_4 : PC_reg;
 assign id_NPC1 = PC_plus_8;
 
-assign id_valid_inst0 = id_dispatch_num[0]|id_dispatch_num[1];
-assign id_valid_inst1 = id_dispatch_num[1];
+assign id_valid_inst0 = Imem_valid;
+assign id_valid_inst1 = Imem_valid&~PC_reg[2];
 
 
 
