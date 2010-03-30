@@ -116,10 +116,10 @@ module mt (// Inputs
 	reg		[31:0]	next_ready_bits;
 	wire 	rob_ar_a_valid = id_valid_inst0;
 	wire	rob_ar_b_valid = id_valid_inst1;
-	wire	rob_ar_a1_valid = (id_valid_inst0) & (id_opa_select0 == 0);
-	wire	rob_ar_a2_valid = (id_valid_inst1) & (id_opa_select1 == 0);
-	wire	rob_ar_b1_valid = (id_valid_inst0) & (id_opb_select0 == 0);
-	wire	rob_ar_b2_valid = (id_valid_inst1) & (id_opb_select1 == 0);
+	wire	rob_ar_a1_valid = (id_valid_inst0) & (id_opa_select0 == `ALU_OPA_IS_REGA);
+	wire	rob_ar_a2_valid = (id_valid_inst0) & (id_opb_select0 == `ALU_OPB_IS_REGB);
+	wire	rob_ar_b1_valid = (id_valid_inst1) & (id_opa_select1 == `ALU_OPA_IS_REGA);
+	wire	rob_ar_b2_valid = (id_valid_inst1) & (id_opb_select1 == `ALU_OPB_IS_REGB);
 	
 
 	wire	[6:0]	pr_tags_next0 = 
