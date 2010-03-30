@@ -54,7 +54,7 @@ module decoder(// Inputs
   reg rd_mem, wr_mem, ldl_mem, stc_mem, cond_branch, uncond_branch;
   reg cpuid, halt, illegal;
 
-  assign valid_inst = valid_inst_in; // & ~illegal;
+  assign valid_inst = valid_inst_in & ~illegal;
   always @*
   begin
       // default control values:

@@ -76,8 +76,8 @@ reg						id_valid_inst1;
 assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
 //
 // this mux is because the Imem gives us 64 bits not 32 bits
-assign id_IR0 = PC_reg[2] ? Imem2proc_data[31:0] : Imem2proc_data[63:32];
-assign id_IR1 = Imem2proc_data[31:0];
+assign id_IR0 = PC_reg[2] ? Imem2proc_data[63:32] : Imem2proc_data[31:0];
+assign id_IR1 = Imem2proc_data[63:32];
 // default next PC value
 assign PC_plus_4 = PC_reg + 4;
 assign PC_plus_8 = PC_reg + 8;
