@@ -89,6 +89,7 @@ reg [6:0] told [63:0];  //64 old tags, 7 bits each.
 reg [5:0] head ; //head position, anywhere between 0 and 63.
 reg [5:0] tail ; //tail position, anywhere between 0 and 63.
 reg [63:0] halt;
+reg [63:0] valid;
 
 //reg inputs
 
@@ -101,11 +102,12 @@ reg [6:0] next_told [63:0];
 reg [5:0] next_head;
 reg [5:0] next_tail;
 reg [63:0] next_halt;
+reg [63:0] next_valid;
 
 integer index, jindex, kindex;
 
-assign full = ((tail==6'd63 && head==6'd0)|(head==tail+6'd1));
-assign almost_full = ((tail==6'd62&&head==6'd0)&&(tail==6'd63&&head==6'd1)&&(head==tail+6'd2));
+assign full = ((tail == head) && (valid[head] != 1'd0));
+assign almost_full = ((tail==6'd63 && head==6'd0)|(head==tail+6'd1));
 
 assign  head_plus_one = (head==6'd63) ? 6'b0 : head + 6'd1;
 assign  tail_plus_one = (tail == 6'd63)? 6'd0 : tail + 6'd1;
@@ -120,6 +122,7 @@ begin
 	next_told[kindex] = told[kindex];
 	next_ready[kindex] = ready[kindex];
 	next_halt[kindex] = halt [kindex];
+	next_valid[kindex] = valid[kindex];
 end
 
 
@@ -144,6 +147,7 @@ end
 			next_told[tail] = mt_p0told;
 			next_ready[tail] = ~id_valid_inst0; 
 			next_halt[tail] = id_halt0;
+			next_valid[tail] = 1'd1;
 			//id_cap = 2'b1;
 			next_tail = (tail == 6'd63)? 6'd0 : tail + 6'b1;
 		end
@@ -158,6 +162,8 @@ end
 			next_halt[tail_plus_one] = id_halt1;
 			next_ready[tail] = ~id_valid_inst0;
 			next_ready[tail_plus_one] = ~id_valid_inst1;
+			next_valid[tail] = 1'd1;
+			next_valid[tail_plus_one] = 1'd1;
 		  //id_cap = 2'b10;
 			next_tail = (tail == 6'd62) ? 6'd0 : (tail == 6'd63) ? 6'd1 : tail + 6'd2;
 		end
@@ -172,57 +178,50 @@ end
 	//check each bit of cdb_pr_ready
 	//if any bit of cdb_pr_ready == 1, search the hold file for ready bit.
 	if(cdb_pr_ready[0] ==1 )
-	begin
-				
+	begin			
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_0 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+			if(cdb_pr_tag_0 == tag[index]) next_ready[index] = 1'b1;
 		end
 	end
+	
 	if(cdb_pr_ready[1] ==1 )
 	begin
-				
 		for (index = 0; index < 64; index = index + 1)
-		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_1 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+		begin 				//Note: the two tags COULD be the same
+			if(cdb_pr_tag_1 == tag[index]) next_ready[index] = 1'b1;
 		end
-	end	
+	end
+	
 	if(cdb_pr_ready[2] ==1 )
-	begin
-				
+	begin	
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_2 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+			if(cdb_pr_tag_2 == tag[index]) next_ready[index] = 1'b1;
 		end				
-	end	
+	end
+	
 	if(cdb_pr_ready[3] ==1 )
-	begin
-				
+	begin	
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_3 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+			if(cdb_pr_tag_3 == tag[index]) next_ready[index] = 1'b1;
 		end				
-	end	
+	end
+
 	if(cdb_pr_ready[4] ==1 )
-	begin
-				
+	begin				
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_4 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+			if(cdb_pr_tag_4 == tag[index]) next_ready[index] = 1'b1;
 		end				
-	end	
+	end
+	
 	if(cdb_pr_ready[5] ==1 )
 	begin
-
 		for (index = 0; index < 64; index = index + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_5 == tag[index]) next_ready[index] = 1;
-			else next_ready[index] = 0;
+			if(cdb_pr_tag_5 == tag[index]) next_ready[index] = 1'b1;
 		end	
 	end	
 	//end of complete
@@ -233,7 +232,7 @@ end
 	//check  if tail and tail_plus_one are ready
 	//if ready, put the tag to retire
 	//if retire is tail, output 
-    if (ready[head] == 1 && ready[head_plus_one] ==1)
+  if (ready[head] == 1 && ready[head_plus_one] ==1)
 	begin
 		next_head =  head + 2;
 		next_ready[head] = 0;
@@ -242,6 +241,8 @@ end
 		fl_retire_tag_b = tag[head_plus_one];
 		fl_retire_num = 2'b10;
 		retire_halt = halt[head] | halt[head_plus_one];
+		next_valid[head] = 1'd0;
+		next_valid[head_plus_one] = 1'd0;
 	end
 	else if (ready[head] == 1)
 	begin
@@ -251,6 +252,7 @@ end
 		fl_retire_tag_b = 7'h7f;
 		fl_retire_num = 2'b01;
 		retire_halt = halt[head];
+		next_valid[head] = 1'd0;
 	end
 	else
 	begin
@@ -277,6 +279,7 @@ begin //of sequential logic
 			tag[index] <= `SD 7'h7f;
 			told[index] <= `SD 7'h7f;
 			ready[index] <= `SD 1'h0;
+			valid[index] <= `SD 1'h0;
 		end
 		//initialization
 	end
@@ -288,6 +291,7 @@ begin //of sequential logic
 				tag[kindex] <= `SD next_tag[kindex];
 				told[kindex] <= `SD next_told[kindex];
 				ready[kindex] <= `SD next_ready[kindex];
+				valid[kindex] <= `SD next_valid[kindex];
 			end
 			
 			head <= `SD next_head;
@@ -297,14 +301,15 @@ end//of sequential logic
 
 genvar IDX;
 generate
-	for(IDX=0; IDX<32; IDX=IDX+1)
+	for(IDX=0; IDX<64; IDX=IDX+1)
 	begin : foo
 		wire [6:0] TAG = tag[IDX];  //64 tags, 7 bits each.
 		wire [6:0] TOLD = told[IDX];
 		wire [6:0] NEXT_TAG = next_tag[IDX];  //64 tags, 7 bits each.
 		wire [6:0] NEXT_TOLD = next_told[IDX];
 	end
-
+wire special0 = (cdb_pr_tag_0 == tag[0]);
+wire special1 = (cdb_pr_tag_1 == tag[1]);
 endgenerate
 
 
