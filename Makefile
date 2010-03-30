@@ -29,7 +29,7 @@ all:    simv
 
 
 
-MODULE		= 	rob
+MODULE		= 	pipeline
 
 
 TESTBENCH = 	sys_defs.vh	    \
