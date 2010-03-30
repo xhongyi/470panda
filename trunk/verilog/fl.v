@@ -11,21 +11,24 @@
 //If 0 request and 2 retire, then shift in by 2.
 //If 0 request and 1 retire, then shift in by 1.
 
-module fl (//inputs
+module free_list (//inputs
 		  clock,
 		  reset,
-		  id_dispatch_num,
+		  rob_dispatch_num,
 		  rob_retire_num,
+		  rob_retire_tag_0,
+		  rob_retire_tag_1,
 		
 	  	  //outputs
 	 	  rob_rs_mt_pr0, //new registers
-		  rob_rs_mt_pr1
+		  rob_rs_mt_pr1,
 		  //debug output
   		 );
 
 input clock, reset;
-input [1:0] id_dispatch_num;
+input [1:0] rob_dispatch_num;
 input [1:0] rob_retire_num;
+input [6:0] rob_retire_tag_0, rob_retire_tag_1;
 
 output [6:0]rob_rs_mt_pr0, rob_rs_mt_pr1;
 
@@ -36,7 +39,7 @@ reg [6:0] rob_rs_mt_pr0, rob_rs_mt_pr1;
 integer i;
 
 always @* begin
-  if (id_dispatch_num == 2'd2) begin
+  if (rob_dispatch_num == 2'd2) begin
     if (tail == 7'd94) begin
       next_tail = 7'd0;
       rob_rs_mt_pr0 = tail;
@@ -53,7 +56,7 @@ always @* begin
       rob_rs_mt_pr1 = tail + 7'd1;
     end
   end
-  else if (id_dispatch_num == 2'd1) begin
+  else if (rob_dispatch_num == 2'd1) begin
     rob_rs_mt_pr0 = tail;
     rob_rs_mt_pr1 = 7'd0;
     if (tail == 7'd95)
@@ -75,7 +78,6 @@ always @* begin
       next_head = 7'd1;
     else
       next_head = head + 7'd2;
-	end
   else if (rob_retire_num == 2'd1)
     if (head == 7'd95)
       next_head = 7'd0;
