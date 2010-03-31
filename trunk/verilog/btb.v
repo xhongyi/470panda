@@ -71,6 +71,11 @@ always @* begin
 	if (tag[if_pc_plus_four[LOG_NUM_BTB_ENTRIES+1:2]] == if_pc_plus_four[TAG_LENGTH+LOG_NUM_BTB_ENTRIES+1:LOG_NUM_BTB_ENTRIES+2])
 		if_pred_addr1 = {if_pc_plus_four[LOG_NUM_BTB_ENTRIES+2], br_displ[if_pc_plus_four[LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
 	
-endmodule
+always @(posedge clock) begin
+	for (i=0; i<NUM_BTB_ENTRIES; i=i+1) begin
+		tag[i] = next_tag[i];
+		br_displ[i] = next_br_displ[i];
+	end
+end
 
-module BHT
+endmodule
