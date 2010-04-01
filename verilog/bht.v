@@ -42,10 +42,15 @@ input	[63:0]													if_valid_inst1;
 input	[63:0]													if_IR0;
 input	[63:0]													if_IR1;
 
-input																	rob_mis_pred;
-input																	rob_mis_pred_pc;
-input																	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_BHR;
-input																	rob_correct_taken;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_BHR;
+input																			rob_correct_taken;
+
+input																	rob_retire_br0;
+input	[63:0]													rob_retire_br_pc0;
+input																	rob_cre_taken0;
+input																	rob_retire_br1;
+input	[63:0]													rob_retire_br_pc1;
+input																	rob_cre_taken1;
 
 output																if_branch_taken0;
 output																if_branch_taken1;
@@ -86,50 +91,61 @@ always @* begin
 	if (is_branch0 && ~is_branch1) begin
 		taken0 = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		next_BHR = {BHR[4:0], taken0};
-		if (taken0) begin //more taken
-			if(~pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | ~pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-				next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
-		end
-		else begin
-			if(pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-				next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
-		end
+
 	end
 //if only is_branch1
 	if (~is_branch0 && is_branch1) begin
 		taken1 = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		next_BHR = {BHR[4:0], taken1};
-		if (taken1) begin //more taken
-			if(~pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | ~pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-				next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
-		end
-		else begin
-			if(pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-				next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
-		end
 	end
 //if both is_branch0 and is_branch1
 	if (is_branch0 && is_branch1) begin
 		taken0 = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		if (taken0) begin
 			next_BHR = {BHR[4:0], 1'b1};
-			if (~pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | ~pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-				next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
 		end
 		else begin
+			inter_BHR = {inter_BHR[4:0], 1'b0}
 			taken1 = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 			next_BHR = {inter_BHR[4:0], taken1};
-			if (taken1) begin //more taken
-				if(~pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | ~pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-					next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
-			end
-			else begin
-				if(pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
-					next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
-			end
 		end
 	end
+
+// change pattern when retire.
+// rob_0
+	if(rob_retire_br0) begin
+		if (rob_cre_taken0) begin //more taken
+			if(~pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 ~pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+				 
+				next_pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+		end
+		else begin
+			if(pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+				 
+				next_pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+		end
+	end
+// rob_1
+	if(rob_retire_br1) begin
+		if (rob_cre_taken1) begin //more taken
+			if(~pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 ~pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+				 
+				next_pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+		end
+		else begin
+			if(pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+				 
+				next_pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+		end
+	end
+
 end
+//end always
+
 
 always @(posedge clock) begin
 	if (reset) begin
