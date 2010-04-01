@@ -21,6 +21,19 @@ module cdb (// Inputs
 						alu_sim_ar_idx1,
 						alu_sim_exception1,
 
+						alu_sim_PC0,
+						alu_sim_actual_addr0,
+						alu_sim_actual_taken0,
+						alu_sim_cond_branch0,
+						alu_sim_uncond_branch0,
+
+						alu_sim_PC1,
+						alu_sim_actual_addr1,
+						alu_sim_actual_taken1,
+						alu_sim_cond_branch1,
+						alu_sim_uncond_branch1,
+						
+
 						alu_mul_complete0,
 						alu_mul_pr_idx0,
 						alu_mul_ar_idx0,
@@ -58,7 +71,20 @@ module cdb (// Inputs
 						rob_exception2,
 						rob_exception3,
 						rob_exception4,
-						rob_exception5
+						rob_exception5,
+
+						rob_PC0,
+						rob_actual_addr0,
+						rob_actual_taken0,
+						rob_cond_branch0,
+						rob_uncond_branch0,
+
+						rob_PC1,
+						rob_actual_addr1,
+						rob_actual_taken1,
+						rob_cond_branch1,
+						rob_uncond_branch1
+
 						);
 input					clock;
 input					reset;
@@ -71,6 +97,18 @@ input					alu_sim_complete1;
 input [6:0]		alu_sim_pr_idx1;
 input	[4:0]		alu_sim_ar_idx1;
 input 				alu_sim_exception1;
+
+input	[63:0]	alu_sim_PC0;
+input	[63:0]	alu_sim_actual_addr0;
+input					alu_sim_actual_taken0;
+input					alu_sim_cond_branch0;
+input					alu_sim_uncond_branch0;
+
+input	[63:0]	alu_sim_PC1;
+input	[63:0]	alu_sim_actual_addr1;
+input					alu_sim_actual_taken1;
+input					alu_sim_cond_branch1;
+input					alu_sim_uncond_branch1;
 
 input 				alu_mul_complete0;
 input [6:0]   alu_mul_pr_idx0;
@@ -111,6 +149,18 @@ output				rob_exception3;
 output				rob_exception4;
 output				rob_exception5;
 
+output	[63:0]	rob_PC0;
+output	[63:0]	rob_actual_addr0;
+output					rob_actual_taken0;
+output					rob_cond_branch0;
+output					rob_uncond_branch0;
+
+output	[63:0]	rob_PC1;
+output	[63:0]	rob_actual_addr1;
+output					rob_actual_taken1;
+output					rob_cond_branch1;
+output					rob_uncond_branch1;
+
 
 reg [5:0]	rs_rob_mt_broadcast;
 reg [6:0]	rs_rob_mt_pr_tag0;
@@ -131,6 +181,18 @@ reg				rob_exception2;
 reg				rob_exception3;
 reg				rob_exception4;
 reg				rob_exception5;
+
+reg	[63:0]	rob_PC0;
+reg	[63:0]	rob_actual_addr0;
+reg					rob_actual_taken0;
+reg					rob_cond_branch0;
+reg					rob_uncond_branch0;
+
+reg	[63:0]	rob_PC1;
+reg	[63:0]	rob_actual_addr1;
+reg					rob_actual_taken1;
+reg					rob_cond_branch1;
+reg					rob_uncond_branch1;
 
 always @ (posedge clock)
 begin
@@ -155,6 +217,18 @@ begin
 			rob_exception3 <= `SD 0;
 			rob_exception4 <= `SD 0;
 			rob_exception5 <= `SD 0;
+
+			rob_PC0	<= `SD 0;
+			rob_actual_addr0	<= `SD 0;
+			rob_actual_taken0	<= `SD 0;
+			rob_cond_branch0	<= `SD 0;
+			rob_uncond_branch0	<= `SD 0;
+
+			rob_PC1	<= `SD 0;
+			rob_actual_addr1	<= `SD 0;
+			rob_actual_taken1	<= `SD 0;
+			rob_cond_branch1	<= `SD 0;
+			rob_uncond_branch1	<= `SD 0;
 		end
 		else
 		begin
@@ -182,6 +256,18 @@ begin
 			rob_exception3 <= `SD 0;
 			rob_exception4 <= `SD alu_mem_exception0;
 			rob_exception5 <= `SD alu_mem_exception1;
+
+			rob_PC0	<= `SD alu_sim_PC0;
+			rob_actual_addr0	<= `SD alu_sim_actual_addr0;
+			rob_actual_taken0	<= `SD alu_sim_actual_taken0;
+			rob_cond_branch0	<= `SD alu_sim_cond_branch0;
+			rob_uncond_branch0	<= `SD alu_sim_uncond_branch0;
+
+			rob_PC1	<= `SD alu_sim_PC1;
+			rob_actual_addr1	<= `SD alu_sim_actual_addr1;
+			rob_actual_taken1	<= `SD alu_sim_actual_taken1;
+			rob_cond_branch1	<= `SD alu_sim_cond_branch1;
+			rob_uncond_branch1	<= `SD alu_sim_uncond_branch1;
 		end
 
 	end	
