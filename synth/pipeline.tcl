@@ -23,7 +23,7 @@ read_file -f verilog [list "../sys_defs.vh" "../verilog/pipeline.v" "../verilog/
 set design_name pipeline
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 30
+set CLK_PERIOD 8
 
 
 #/***********************************************************/
