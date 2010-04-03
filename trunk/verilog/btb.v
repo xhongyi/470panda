@@ -10,13 +10,13 @@ module btb(//inputs
 					
 					if_pc,
 					
-					rob_jump_retire0,
-					rob_jump_retire_pc0,
-					rob_correct_npc0,
+					rob_retire_is_jump0,
+					rob_retire_pc0,
+					rob_cre_npc0,
 
-					rob_jump_retire1,
-					rob_jump_retire_pc1,
-					rob_correct_npc1,			
+					rob_retire_is_jump1,
+					rob_retire_pc1,
+					rob_cre_npc1,
 					
 					//outputs
 					if_pred_addr0,
@@ -35,13 +35,13 @@ input	reset;
 
 input	[63:0]					if_pc;//current PC
 
-input									rob_jump_retire0;//if 0 predicted wrong
-input	[63:0]					rob_jump_retire_pc0;
-input	[63:0]					rob_correct_npc0;
+input									rob_retire_is_jump0;//the retired instruction.
+input	[63:0]					rob_retire_pc0;
+input	[63:0]					rob_cre_npc0;
 
-input									rob_jump_retire1;//if 1 predicted wrong
-input	[63:0]					rob_jump_retire_pc1;
-input	[63:0]					rob_correct_npc1;
+input									rob_retire_is_jump1;//the retired instruction.
+input	[63:0]					rob_retire_pc1;
+input	[63:0]					rob_cre_npc1;
 
 output	[63:0]				if_pred_addr0;//the predictied npc
 output	[63:0]				if_pred_addr1;
@@ -53,13 +53,13 @@ reg	[18:0]						next_br_displ		[`NUM_BTB_ENTRIES-1:0];
 
 wire	[63:0]					if_pc_plus_four;
 
+wire	[63:0]					if_pred_addr0;
+wire	[63:0]					if_pred_addr1;
+
 integer i;
 
-wire	[63:0]				if_pred_addr0;
-wire	[63:0]				if_pred_addr1;
-
-assign if_pred_addr0 = {if_pc[63:`LOG_NUM_BTB_ENTRIES+2], br_displ[if_pc[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
-assign if_pred_addr1 = {if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+2], br_displ[if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+assign if_pred_addr0 = {if_pc[63:`LOG_NUM_BTB_ENTRIES+2], next_br_displ[if_pc[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+assign if_pred_addr1 = {if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+2], next_br_displ[if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
 assign if_pc_plus_four = if_pc + 3'd4;
 
 always @* begin
@@ -69,15 +69,20 @@ always @* begin
 	end
 
 //correct the BTB if there is a mispredicted branch.	
-	if (rob_jump_retire0 && 
-			(tag[rob_jump_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] == 
-			rob_jump_retire_pc0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
-		next_br_displ[rob_jump_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_correct_npc0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2];
-
-	if (rob_jump_retire1 && 
-			(tag[rob_jump_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] == 
-			rob_jump_retire_pc1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
-		next_br_displ[rob_jump_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_correct_npc1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2];
+/*
+	if (rob_retire_is_jump0 && 
+			(tag[rob_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] == 
+			 rob_retire_pc0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
+*/
+	if (rob_retire_is_jump0)
+		next_br_displ[rob_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_cre_npc0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2];
+/*
+	if (rob_retire_is_jump1 && 
+			(tag[rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] == 
+			 rob_retire_pc1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
+*/
+	if (rob_retire_is_jump1)
+		next_br_displ[rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_cre_npc1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2];
 
 /*	
 //give out the predicted target npc
