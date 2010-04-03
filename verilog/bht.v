@@ -8,14 +8,22 @@ module bht(//Inputs
 						if_IR0,
 						if_IR1,
 						
-						rob_mis_pred,
-						rob_mis_pred_pc,
 						rob_BHR,//stored by ROB to use in recovery.
 						rob_correct_taken,
 						
+						rob_retire_is_branch0,
+						rob_retire_pc0,
+						rob_cre_taken0,
+						rob_retire_is_branch1,
+						rob_retire_pc1,
+						rob_cre_taken1,
+						
+						rob_exception,
+						
 						//Outputs
 						if_branch_taken0,
-						if_branch_taken1
+						if_branch_taken1,
+						rob_BHR_out
 						)
 //parameters
 `ifndef	NUM_BHT_PATTERN_ENTRIES
@@ -45,15 +53,18 @@ input	[63:0]													if_IR1;
 input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_BHR;
 input																			rob_correct_taken;
 
-input																	rob_retire_br0;
-input	[63:0]													rob_retire_br_pc0;
+input																	rob_retire_is_branch0;
+input	[63:0]													rob_retire_pc0;
 input																	rob_cre_taken0;
-input																	rob_retire_br1;
-input	[63:0]													rob_retire_br_pc1;
+input																	rob_retire_is_branch1;
+input	[63:0]													rob_retire_pc1;
 input																	rob_cre_taken1;
+
+input																	rob_exception;// when this is high, here is an exception.
 
 output																if_branch_taken0;
 output																if_branch_taken1;
+output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_BHR_out;
 
 reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
 reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	next_BHR;
@@ -62,7 +73,6 @@ reg	[1:0]															next_pattern	[`NUM_BHT_PATTERN_ENTRIES-1:0];
 
 reg																		taken0;
 reg																		taken1;
-integer i;
 
 wire																	if_branch_taken0;
 wire																	if_branch_taken1;
@@ -70,9 +80,13 @@ wire																	if_branch_taken1;
 wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	inter_BHR;
 wire	[63:0]															if_pc_plus_four;
 
+integer i;
+
 assign if_pc_plus_four = if_pc + 3'd4;
 
 assign inter_BHR = {BHR[4:0], 1'b0};//used only when both are predictions and taken0 is 0.
+
+assign rob_BHR_out = BHR;
 
 assign if_branch_taken0 = taken0;
 assign if_branch_taken1 = taken1;
@@ -89,57 +103,57 @@ always @* begin
 
 //if only is_branch0	
 	if (is_branch0 && ~is_branch1) begin
-		taken0 = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+		taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		next_BHR = {BHR[4:0], taken0};
 
 	end
 //if only is_branch1
 	if (~is_branch0 && is_branch1) begin
-		taken1 = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+		taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		next_BHR = {BHR[4:0], taken1};
 	end
 //if both is_branch0 and is_branch1
 	if (is_branch0 && is_branch1) begin
-		taken0 = pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+		taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 		if (taken0) begin
 			next_BHR = {BHR[4:0], 1'b1};
 		end
 		else begin
 			inter_BHR = {inter_BHR[4:0], 1'b0}
-			taken1 = pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
 			next_BHR = {inter_BHR[4:0], taken1};
 		end
 	end
 
 // change pattern when retire.
 // rob_0
-	if(rob_retire_br0) begin
-		if (rob_cre_taken0) begin //more taken
-			if(~pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 ~pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+	if(rob_retire_is_branch0) begin
+		if (rob_cre_taken0) begin //the correct outcome is a taken
+			if(~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 ~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
 				 
-				next_pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
 		end
-		else begin
-			if(pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+		else begin //the correct outcome is a not-taken
+			if(pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
 				 
-				next_pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
 		end
 	end
 // rob_1
-	if(rob_retire_br1) begin
-		if (rob_cre_taken1) begin //more taken
-			if(~pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 ~pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+	if(rob_retire_is_branch1) begin
+		if (rob_cre_taken1) begin //the correct outcome is a taken
+			if(~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 ~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
 				 
-				next_pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
 		end
-		else begin
-			if(pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+		else begin //the correct outcome is a not-taken
+			if(pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
+				 pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
 				 
-				next_pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_br_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
 		end
 	end
 
