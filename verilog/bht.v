@@ -101,30 +101,58 @@ always @* begin
 		next_pattern[i] = pattern[i];
 	end
 
-//if only is_branch0	
-	if (is_branch0 && ~is_branch1) begin
-		taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
-		next_BHR = {BHR[4:0], taken0};
+//if not an exception
+	if(~rob_exception) begin
+	//if only is_branch0	
+		if (is_branch0 && ~is_branch1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+			next_BHR = {BHR[4:0], taken0};
 
-	end
-//if only is_branch1
-	if (~is_branch0 && is_branch1) begin
-		taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
-		next_BHR = {BHR[4:0], taken1};
-	end
-//if both is_branch0 and is_branch1
-	if (is_branch0 && is_branch1) begin
-		taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
-		if (taken0) begin
-			next_BHR = {BHR[4:0], 1'b1};
 		end
-		else begin
-			inter_BHR = {inter_BHR[4:0], 1'b0}
+	//if only is_branch1
+		else if (~is_branch0 && is_branch1) begin
 			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
-			next_BHR = {inter_BHR[4:0], taken1};
+			next_BHR = {BHR[4:0], taken1};
+		end
+	//if both is_branch0 and is_branch1
+		else if (is_branch0 && is_branch1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+			if (taken0) begin
+				next_BHR = {BHR[4:0], 1'b1};
+			end
+			else begin
+				inter_BHR = {BHR[4:0], 1'b0}
+				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^inter_BHR][1];
+				next_BHR = {inter_BHR[4:0], taken1};
+			end
 		end
 	end
+	// now is and exceptions
+	else begin
+	//if only is_branch0	
+		if (is_branch0 && ~is_branch1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
+			next_BHR = {rob_BHR[4:0], taken0};
 
+		end
+	//if only is_branch1
+		else if (~is_branch0 && is_branch1) begin
+			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
+			next_BHR = {rob_BHR[4:0], taken1};
+		end
+	//if both is_branch0 and is_branch1
+		else if (is_branch0 && is_branch1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
+			if (taken0) begin
+				next_BHR = {rob_BHR[4:0], 1'b1};
+			end
+			else begin
+				inter_BHR = {rob_BHR[4:0], 1'b0}
+				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^inter_BHR][1];
+				next_BHR = {inter_BHR[4:0], taken1};
+			end
+		end
+	end
 // change pattern when retire.
 // rob_0
 	if(rob_retire_is_branch0) begin
