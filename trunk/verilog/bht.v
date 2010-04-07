@@ -1,30 +1,38 @@
+//Problem: For those outputs that will give to ROB, they can not be given directly because their value is for next cycle. To solve this problem, those rob_xx need to be buffered in the ifid pipeline register and give to rob during the id stage.
+//BHT should not output to any module rather than if(id?).
+
 module bht(//Inputs
 						clock,
 						reset,
 						
 						if_pc,
-						if_valid_inst0,
-						if_valid_inst1,
-						if_IR0,
-						if_IR1,
-						
-						rob_BHR,//stored by ROB to use in recovery.
-						rob_correct_taken,
-						
-						rob_retire_is_branch0,
-						rob_retire_pc0,
-						rob_cre_taken0,
-						rob_retire_is_branch1,
-						rob_retire_pc1,
-						rob_cre_taken1,
-						
+						if_pc_plus_four,//not implemented yet
+									
+						if_valid_cond0,
+						if_valid_cond1,
+
+						rob_exception_BHR,//stored by ROB to use in recovery.
 						rob_exception,
+						
+						rob_retire_cond0,
+						rob_retire_pc0,
+						rob_reitre_BHR0,
+						rob_actual_taken0,
+						
+						rob_retire_cond1,
+						rob_retire_pc1,
+						rob_reitre_BHR1,
+						rob_actual_taken1,
 						
 						//Outputs
 						if_branch_taken0,
 						if_branch_taken1,
-						rob_BHR_out
-						)
+						if_BHR_out0,//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
+						if_BHR_out1,
+						
+						//debug output
+						BHR
+						);
 //parameters
 `ifndef	NUM_BHT_PATTERN_ENTRIES
 `define	NUM_BHT_PATTERN_ENTRIES	64
@@ -34,10 +42,19 @@ module bht(//Inputs
 `define	LOG_NUM_BHT_PATTERN_ENTRIES 6
 `endif
 //2bit saturated counter parameters
+`ifndef ST_NOT_TAKEN
 `define ST_NOT_TAKEN 2'd0
+`endif
+
+`ifndef	WK_NOT_TAKEN
 `define WK_NOT_TAKEN 2'd1
 `endif
+
+`ifndef	WK_TAKEN
 `define WK_TAKEN 2'd2
+`endif
+
+`ifndef	ST_TAKEN
 `define ST_TAKEN 2'd3
 `endif
 
@@ -45,143 +62,166 @@ input																	clock;
 input																	reset;
 
 input	[63:0]													if_pc;
-input	[63:0]													if_valid_inst0;
-input	[63:0]													if_valid_inst1;
-input	[63:0]													if_IR0;
-input	[63:0]													if_IR1;
+input	[63:0]													if_pc_plus_four;
 
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_BHR;
-input																			rob_correct_taken;
+input																	if_valid_cond0;
+input																	if_valid_cond1;
 
-input																	rob_retire_is_branch0;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_exception_BHR;
+input																			rob_exception;// when this is high, here is an exception.
+
+input																	rob_retire_cond0;
 input	[63:0]													rob_retire_pc0;
-input																	rob_cre_taken0;
-input																	rob_retire_is_branch1;
-input	[63:0]													rob_retire_pc1;
-input																	rob_cre_taken1;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_reitre_BHR0;
+input																	rob_actual_taken0;
 
-input																	rob_exception;// when this is high, here is an exception.
+input																	rob_retire_cond1;
+input	[63:0]													rob_retire_pc1;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_reitre_BHR1;
+input																	rob_actual_taken1;
 
 output																if_branch_taken0;
 output																if_branch_taken1;
-output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_BHR_out;
+output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	if_BHR_out0;
+output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	if_BHR_out1;
 
 reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
 reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	next_BHR;
-reg	[1:0]															pattern				[`NUM_BHT_PATTERN_ENTRIES-1:0];
-reg	[1:0]															next_pattern	[`NUM_BHT_PATTERN_ENTRIES-1:0];
+reg	[1:0]																pattern				[`NUM_BHT_PATTERN_ENTRIES-1:0];
+reg	[1:0]																next_pattern	[`NUM_BHT_PATTERN_ENTRIES-1:0];
 
-reg																		taken0;
-reg																		taken1;
+reg																			taken0;
+reg																			taken1;
 
-wire																	if_branch_taken0;
-wire																	if_branch_taken1;
+reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	if_BHR_out0;
+reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	if_BHR_out1;
 
-wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	inter_BHR;
-wire	[63:0]															if_pc_plus_four;
+reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	inter_BHR;
+//used only when both are predictions and taken0 is 0.
+
+wire																		if_branch_taken0;
+wire																		if_branch_taken1;
 
 integer i;
 
-assign if_pc_plus_four = if_pc + 3'd4;
-
-assign inter_BHR = {BHR[4:0], 1'b0};//used only when both are predictions and taken0 is 0.
-
-assign rob_BHR_out = BHR;
+output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
 
 assign if_branch_taken0 = taken0;
 assign if_branch_taken1 = taken1;
-assign is_branch0 = (if_valid_inst0 & ((if_IR0[31:29] == 3'd6) | (if_IR0[31:29] == 3'd7)) & (if_IR0 != `BR_INST) & (if_IR0 != `BSR_INST))? 1'd1 : 1'd0;//Is conditional branch
-assign is_branch1 = (if_valid_inst1 & ((if_IR1[31:29] == 3'd6) | (if_IR1[31:29] == 3'd7)) & (if_IR1 != `BR_INST) & (if_IR1 != `BSR_INST))? 1'd1 : 1'd0;
 
 always @* begin
 //default
 	next_BHR = BHR;
 	inter_BHR = BHR;
+	taken0 = 1'b0;
+	taken1 = 1'b0;
+	if_BHR_out0 = BHR;
+	if_BHR_out1 = BHR;
 	for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
 		next_pattern[i] = pattern[i];
 	end
 
-//if not an exception
+//if not an exception!!
 	if(~rob_exception) begin
-	//if only is_branch0	
-		if (is_branch0 && ~is_branch1) begin
-			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+	//if only if_valid_cond0	
+		if (if_valid_cond0 && ~if_valid_cond1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
 			next_BHR = {BHR[4:0], taken0};
-
+			if_BHR_out0 = BHR;
+			if_BHR_out1 = next_BHR;
 		end
-	//if only is_branch1
-		else if (~is_branch0 && is_branch1) begin
-			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+	//if only if_valid_cond1
+		else if (~if_valid_cond0 && if_valid_cond1) begin
+			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
 			next_BHR = {BHR[4:0], taken1};
+			if_BHR_out0 = BHR;
+			if_BHR_out1 = BHR;
 		end
-	//if both is_branch0 and is_branch1
-		else if (is_branch0 && is_branch1) begin
-			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1];
+	//if both if_valid_cond0 and if_valid_cond1
+		else if (if_valid_cond0 && if_valid_cond1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
 			if (taken0) begin
 				next_BHR = {BHR[4:0], 1'b1};
+				if_BHR_out0 = BHR;
+				if_BHR_out1 = next_BHR;
 			end
 			else begin
-				inter_BHR = {BHR[4:0], 1'b0}
-				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^inter_BHR][1];
+				inter_BHR = {BHR[4:0], 1'b0};
+				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^inter_BHR][1];
 				next_BHR = {inter_BHR[4:0], taken1};
+				if_BHR_out0 = BHR;
+				if_BHR_out1 = inter_BHR;
 			end
 		end
 	end
-	// now is and exceptions
+	
+// now if there are exceptions!!
 	else begin
-	//if only is_branch0	
-		if (is_branch0 && ~is_branch1) begin
-			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
-			next_BHR = {rob_BHR[4:0], taken0};
-
+	//if only if_valid_cond0	
+		if (if_valid_cond0 && ~if_valid_cond1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_exception_BHR][1];
+			next_BHR = {rob_exception_BHR[4:0], taken0};
+			if_BHR_out0 = rob_exception_BHR;
+			if_BHR_out1 = next_BHR;
 		end
-	//if only is_branch1
-		else if (~is_branch0 && is_branch1) begin
-			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
-			next_BHR = {rob_BHR[4:0], taken1};
+	//if only if_valid_cond1
+		else if (~if_valid_cond0 && if_valid_cond1) begin
+			taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_exception_BHR][1];
+			next_BHR = {rob_exception_BHR[4:0], taken1};
+			if_BHR_out0 = rob_exception_BHR;
+			if_BHR_out1 = rob_exception_BHR;
 		end
-	//if both is_branch0 and is_branch1
-		else if (is_branch0 && is_branch1) begin
-			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^rob_BHR][1];
+	//if both if_valid_cond0 and if_valid_cond1
+		else if (if_valid_cond0 && if_valid_cond1) begin
+			taken0 = next_pattern[if_pc[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_exception_BHR][1];
 			if (taken0) begin
-				next_BHR = {rob_BHR[4:0], 1'b1};
+				next_BHR = {rob_exception_BHR[4:0], 1'b1};
+				if_BHR_out0 = rob_exception_BHR;
+				if_BHR_out1 = next_BHR;
 			end
 			else begin
-				inter_BHR = {rob_BHR[4:0], 1'b0}
-				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^inter_BHR][1];
+				inter_BHR = {rob_exception_BHR[4:0], 1'b0};
+				taken1 = next_pattern[if_pc_plus_four[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^inter_BHR][1];
 				next_BHR = {inter_BHR[4:0], taken1};
+				if_BHR_out0 = rob_exception_BHR;
+				if_BHR_out1 = inter_BHR;
 			end
+		end
+		else begin
+			next_BHR = rob_exception_BHR;
+			if_BHR_out0 = rob_exception_BHR;
+			if_BHR_out1 = rob_exception_BHR;
 		end
 	end
 // change pattern when retire.
 // rob_0
-	if(rob_retire_is_branch0) begin
-		if (rob_cre_taken0) begin //the correct outcome is a taken
-			if(~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 ~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+	if(rob_retire_cond0) begin
+		if (rob_actual_taken0) begin //the correct outcome is a taken
+			if(~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][0] | 
+				 ~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][1])
 				 
-				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] + 2'b1;
 		end
 		else begin //the correct outcome is a not-taken
-			if(pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+			if(pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][0] | 
+				 pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][1])
 				 
-				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] - 2'b1;
 		end
 	end
 // rob_1
-	if(rob_retire_is_branch1) begin
-		if (rob_cre_taken1) begin //the correct outcome is a taken
-			if(~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 ~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+	if(rob_retire_cond1) begin
+		if (rob_actual_taken1) begin //the correct outcome is a taken
+			if(~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][0] | 
+				 ~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][1])
 				 
-				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] + 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] + 2'b1;
 		end
 		else begin //the correct outcome is a not-taken
-			if(pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][0] | 
-				 pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR][1])
+			if(pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][0] | 
+				 pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][1])
 				 
-				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:1]^BHR] - 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] - 2'b1;
 		end
 	end
 
@@ -191,15 +231,26 @@ end
 
 always @(posedge clock) begin
 	if (reset) begin
-		BHR <= LOG_NUM_BHT_PATTERN_ENTRIES'b0;
+		BHR <= `SD `LOG_NUM_BHT_PATTERN_ENTRIES'b0;
 		for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
-			pattern[i] <=	WK_NOT_TAKEN;
+			pattern[i] <= `SD	`WK_NOT_TAKEN;
 		end 
 	end
 	else begin
-		BHR <= next_bht;
+		BHR <= `SD next_BHR;
 		for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
-			pattern <= next_pattern;
+			pattern[i] <= `SD next_pattern[i];
 		end
 	end
 end
+
+genvar IDX;
+generate
+	for(IDX=0; IDX<`NUM_BHT_PATTERN_ENTRIES; IDX=IDX+1)
+	begin : foo
+		wire	[1:0]	PATTERN = pattern[IDX];
+		wire	[1:0]	NEXT_PATTERN = next_pattern[IDX];
+	end
+endgenerate
+
+endmodule
