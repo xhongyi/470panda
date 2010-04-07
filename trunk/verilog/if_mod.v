@@ -18,6 +18,8 @@ module if_mod(// Inputs
 				bht_branch_taken1,
 				btb_pred_addr0,
 				btb_pred_addr1,
+				bht_bhr0,
+				bht_bhr1,
 				Imem2proc_data,
 				Imem_valid,
 				id_dispatch_num,
@@ -33,7 +35,9 @@ module if_mod(// Inputs
 				id_pred_addr0,
 				id_pred_addr1,
 				id_valid_inst0,
-				id_valid_inst1  // when low, instruction is garbage
+				id_valid_inst1,  // when low, instruction is garbage,
+				id_bhr0,
+				id_bhr1
 				);
 
 input         clock;              // system clock
@@ -43,6 +47,8 @@ input         bht_branch_taken0; // taken-branch signal
 input					bht_branch_taken1;
 input  [63:0] btb_pred_addr0;   // target pc: use if take_branch is TRUE
 input  [63:0] btb_pred_addr1;
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] bht_bhr0;
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] bht_bhr1;
 input  [63:0] Imem2proc_data;     // Data coming back from instruction-memory
 input  			  Imem_valid;
 input  [1:0]  id_dispatch_num;		//Whether RS and ROB are busy
@@ -58,6 +64,8 @@ output				id_branch_taken0;
 output				id_branch_taken1;
 output	[63:0]			id_pred_addr0;
 output	[63:0]			id_pred_addr1;
+output [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_bhr0;
+output [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_bhr1;
 reg    [63:0] PC_reg;               // PC we are currently fetching
 
 wire   [63:0] PC_plus_4;
@@ -71,7 +79,8 @@ reg		 [63:0]	next_PC;
 reg						id_valid_inst0;
 reg						id_valid_inst1;
 
-
+assign id_bhr0 = bht_bhr0;
+assign id_bhr1 = bht_bhr1;
 //wire [1:0] busy =  2'd2 - id_dispatch_num;
 assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
 //

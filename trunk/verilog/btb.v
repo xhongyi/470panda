@@ -9,7 +9,7 @@ module btb(//inputs
 					clock,
 					reset,
 					
-					if_pc0,
+					if_pc,
 					if_pc_plus_four,//not implemented yet
 					
 					rob_retire_jump0,

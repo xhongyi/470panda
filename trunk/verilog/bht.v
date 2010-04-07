@@ -16,22 +16,19 @@ module bht(//Inputs
 						
 						rob_retire_cond0,
 						rob_retire_pc0,
-						rob_reitre_BHR0,
+						rob_retire_BHR0,
 						rob_actual_taken0,
 						
 						rob_retire_cond1,
 						rob_retire_pc1,
-						rob_reitre_BHR1,
+						rob_retire_BHR1,
 						rob_actual_taken1,
 						
 						//Outputs
 						if_branch_taken0,
 						if_branch_taken1,
 						if_BHR_out0,//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
-						if_BHR_out1,
-						
-						//debug output
-						BHR
+						if_BHR_out1
 						);
 //parameters
 `ifndef	NUM_BHT_PATTERN_ENTRIES
@@ -72,12 +69,12 @@ input																			rob_exception;// when this is high, here is an exception
 
 input																	rob_retire_cond0;
 input	[63:0]													rob_retire_pc0;
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_reitre_BHR0;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_retire_BHR0;
 input																	rob_actual_taken0;
 
 input																	rob_retire_cond1;
 input	[63:0]													rob_retire_pc1;
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_reitre_BHR1;
+input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_retire_BHR1;
 input																	rob_actual_taken1;
 
 output																if_branch_taken0;
@@ -104,7 +101,7 @@ wire																		if_branch_taken1;
 
 integer i;
 
-output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
+//output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
 
 assign if_branch_taken0 = taken0;
 assign if_branch_taken1 = taken1;
@@ -197,31 +194,31 @@ always @* begin
 // rob_0
 	if(rob_retire_cond0) begin
 		if (rob_actual_taken0) begin //the correct outcome is a taken
-			if(~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][0] | 
-				 ~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][1])
+			if(~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][0] | 
+				 ~pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][1])
 				 
-				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] + 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] + 2'b1;
 		end
 		else begin //the correct outcome is a not-taken
-			if(pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][0] | 
-				 pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0][1])
+			if(pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][0] | 
+				 pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][1])
 				 
-				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR0] - 2'b1;
+				next_pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] = pattern[rob_retire_pc0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] - 2'b1;
 		end
 	end
 // rob_1
 	if(rob_retire_cond1) begin
 		if (rob_actual_taken1) begin //the correct outcome is a taken
-			if(~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][0] | 
-				 ~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][1])
+			if(~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][0] | 
+				 ~pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][1])
 				 
-				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] + 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] + 2'b1;
 		end
 		else begin //the correct outcome is a not-taken
-			if(pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][0] | 
-				 pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1][1])
+			if(pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][0] | 
+				 pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][1])
 				 
-				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_reitre_BHR1] - 2'b1;
+				next_pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] = pattern[rob_retire_pc1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] - 2'b1;
 		end
 	end
 
