@@ -522,6 +522,15 @@
 	wire					alu_mem_cdb_exception1 = 0;
 
   wire	 [1:0]	alu_mem_rs_avail;
+  /*
+	 * Inputs from branch history table
+	 */
+  wire if_bht_valid_cond0;
+  wire if_bht_valid_cond1;
+  wire rob_bht_retire_cond0;
+  wire rob_bht_retire_cond1;
+  
+  
 	/*
 	 * Outputs from branch history table
 	 */
@@ -539,6 +548,8 @@
 	wire 	 [63:0]	btb_if_pred_taken1;
 	wire	 [63:0]	btb_if_pred_addr0 = 64'b0;
 	wire	 [63:0]	btb_if_pred_addr1 = 64'b0;
+	
+	
 
 	/*
 	 * Reset for each module
@@ -850,7 +861,7 @@
 					 .cdb_PC1(cdb_rob_PC1),
 					 .cdb_actual_addr1(cdb_rob_actual_addr1),
 					 .cdb_actual_taken1(cdb_rob_actual_taken1),
-					 .cdb_branch1(cdb_rob_cond_branch1),
+					 .cdb_cond_branch1(cdb_rob_cond_branch1),
 					 .cdb_uncond_branch1(cdb_rob_uncond_branch1),
 
 		
@@ -880,8 +891,8 @@
 					 .btb_uncond_branch1(rob_btb_uncond_branch1),
 				   .retire_exception(rob_retire_exception),
 					 .retire_halt(rob_retire_halt),
-					 .btb_retire_jump_0(rob_btb_retire_jump0),
-					 .btb_retire_jump_1(rob_btb_retire_jump1)
+					 .btb_retire_jump0(rob_btb_retire_jump0),
+					 .btb_retire_jump1(rob_btb_retire_jump1)
 	);
 
 	// Map table
@@ -1415,20 +1426,20 @@
 						.if_pc(if_id_NPC0),
 						.if_pc_plus_four(if_id_NPC1),//not implemented yet
 									
-						.if_valid_cond0(if_id_valid_inst0),
-						.if_valid_cond1,
+						.if_valid_cond0(if_bht_valid_inst0),
+						.if_valid_cond1(if_bht_valid_inst1),
 
 						.rob_exception_BHR(rob_bht_exception_bhr),//stored by ROB to use in recovery.
 						.rob_exception(rob_retire_exception),
 						
-						.rob_retire_cond0,
+						.rob_retire_cond0(rob_bht_retire_cond0),
 						.rob_retire_pc0(rob_btb_bht_PC0),
-						.rob_reitre_BHR0(rob_bht_bhr0),
+						.rob_retire_BHR0(rob_bht_bhr0),
 						.rob_actual_taken0(rob_bht_actual_taken0),
 						
-						.rob_retire_cond1,
+						.rob_retire_cond1(rob_bht_retire_cond1),
 						.rob_retire_pc1(rob_btb_bht_PC1),
-						.rob_reitre_BHR1(rob_bht_bhr1),
+						.rob_retire_BHR1(rob_bht_bhr1),
 						.rob_actual_taken1(rob_bht_actual_taken1),
 						
 						//Outputs
@@ -1436,8 +1447,6 @@
 						.if_branch_taken1(bht_if_branch_taken1),
 						.if_BHR_out0(bht_if_bhr0),//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
 						.if_BHR_out1(bht_if_bhr1)
-						
-						
 						);
 	/*
 	 * Branch Target Buffer
@@ -1446,7 +1455,7 @@
 					.clock(clock),
 					.reset(reset),//btb_reset, although I dont know why
 					
-					.if_pc0(if_id_NPC0),
+					.if_pc(if_id_NPC0),
 					.if_pc_plus_four(if_id_NPC1),//not implemented yet
 					
 					.rob_retire_jump0(rob_btb_retire_jump0),
