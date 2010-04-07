@@ -8,7 +8,8 @@
 //////////////////////////////////////////////////////////
 
 
-
+//Additional Inputs: id_ar_idxs, exceptions, actual_taken, actual_branch_addrs
+//Additional Outputs: mt_retire_ars, fl_retire_num to map table, exception, if_cre_pcs, fl_exception_pr_idxs
 module rob(//inputs
 			reset,
 			clock,

@@ -170,6 +170,8 @@
 	wire					if_id_branch_taken1;
 	wire	 [63:0]	if_id_pred_addr0;
 	wire	 [63:0]	if_id_pred_addr1;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_id_bhr0;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_id_bhr1;
 
 	/*
 	 * Output from ID
@@ -222,6 +224,9 @@
 	wire					id_rs_rob_mt_illegal_inst1;
 	wire					id_rs_rob_mt_valid_inst0;
 	wire					id_rs_rob_mt_valid_inst1;
+	
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr0;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr1;
 
 	wire		[1:0]	id_rs_rob_mt_dispatch_num;
 	wire		[1:0]	id_if_inst_need_num;
@@ -255,7 +260,26 @@
 	wire	 [6:0] rob_fl_retire_tag_b;
 	wire	 [1:0] rob_fl_retire_num;
 	wire				 rob_retire_halt;
-
+	wire  [4:0]  rob_mt_retire_ar_a;
+	wire  [4:0]  rob_mt_retire_ar_b;
+	wire  [4:0]  rob_fl_exception_ar;
+	wire  [6:0]  rob_fl_exception_pr;
+	wire  [63:0] rob_btb_bht_PC0;
+	wire  [63:0] rob_btb_actual_addr0;
+	wire  			 rob_bht_actual_taken0;
+	wire  			 rob_bht_cond_branch0;
+	wire   			 rob_btb_uncond_branch0;
+	wire  [63:0] rob_btb_bht_PC1;
+	wire  [63:0] rob_btb_actual_addr1;
+	wire         rob_bht_actual_taken1;
+	wire   			 rob_bht_cond_branch1;
+	wire         rob_btb_uncond_branch1;
+	wire         rob_retire_exception;
+	wire				 rob_btb_retire_jump0;
+	wire				 rob_btb_retire_jump1;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_bhr0;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_bhr1;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_exception_bhr;
 	/*
 	 * Output from RS
 	 */
@@ -437,7 +461,16 @@
 	wire					cdb_rob_exception3;
 	wire					cdb_rob_exception4;
 	wire					cdb_rob_exception5;
-
+	wire  [63:0]	cdb_rob_PC0;
+	wire  [63:0]	cdb_rob_actual_addr0;
+	wire  				cdb_rob_actual_taken0;
+	wire 					cdb_rob_cond_branch0;
+	wire 					cdb_rob_uncond_branch0;
+	wire  [63:0] 	cdb_rob_PC1;
+	wire  [63:0] 	cdb_rob_actual_addr1;
+	wire 				 	cdb_rob_actual_taken1;
+	wire 				 	cdb_rob_cond_branch1;
+	wire 				 	cdb_rob_uncond_branch1;
 	/*
 	 * Outputs from simple ALU
 	 */
@@ -495,13 +528,17 @@
 
 	wire				bht_if_branch_taken0;
 	wire				bht_if_branch_taken1;
+	wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_if_bhr0;
+  wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_if_bhr1;
 
 	/*
 	 * Outputs from brach target buffer
 	 */
 
-	wire [63:0]	btb_if_pred_taken0;
-	wire [63:0]	btb_if_pred_taken1;
+	wire 	 [63:0]	btb_if_pred_taken0;
+	wire 	 [63:0]	btb_if_pred_taken1;
+	wire	 [63:0]	btb_if_pred_addr0 = 64'b0;
+	wire	 [63:0]	btb_if_pred_addr1 = 64'b0;
 
 	/*
 	 * Reset for each module
@@ -524,11 +561,8 @@
 	wire		cachemem_reset;
 	wire		icache_reset;
 
-	/*
-	 * Output from BTB
-	 */
-	wire	 [63:0]	btb_if_pred_addr0 = 64'b0;
-	wire	 [63:0]	btb_if_pred_addr1 = 64'b0;
+	
+	
 
 	// Default assignment
 	//
@@ -676,7 +710,9 @@
 								.Imem2proc_data(Icache_data_out),
 								.Imem_valid(Icache_valid_out),
 								.id_dispatch_num(id_if_inst_need_num), //Danger: inconsistent interface
-
+								.bht_bhr0(bht_if_bhr0),
+								.bht_bhr1(bht_if_bhr1),
+										//outputs
 								.id_NPC0(if_id_NPC0),
 								.id_NPC1(if_id_NPC1),
 								.id_IR0(if_id_IR0),
@@ -688,7 +724,9 @@
 								.id_branch_taken0(if_id_branch_taken0),
 								.id_pred_addr0(if_id_pred_addr0),
 								.id_branch_taken1(if_id_branch_taken1),
-								.id_pred_addr1(if_id_pred_addr1)
+								.id_pred_addr1(if_id_pred_addr1),
+								.id_bhr0(if_id_bhr0),
+								.id_bhr1(if_id_bhr1)
 		);
 
 		// ID
@@ -702,7 +740,8 @@
 					.if_NPC0(if_id_NPC0),
 					.if_branch_taken0(if_id_branch_taken0),
 					.if_pred_addr0(if_id_pred_addr0),
-
+					.if_bhr0(if_id_bhr0),
+					.if_bhr1(if_id_bhr1),
 					.if_IR1(if_id_IR1),
 					.if_valid_inst1(if_id_valid_inst1),
 					.if_NPC1(if_id_NPC1),
@@ -770,7 +809,8 @@
 
 					.rs_rob_mt_illegal_inst1(id_rs_rob_mt_illegal_inst1),
 					.rs_rob_mt_valid_inst1(id_rs_rob_mt_valid_inst1),
-
+					.rob_bhr0(id_rob_bhr0),
+					.rob_bhr1(id_rob_bhr1),
 					.rs_rob_mt_dispatch_num(id_rs_rob_mt_dispatch_num),
 					.if_inst_need_num(id_if_inst_need_num)
 	);
@@ -792,7 +832,8 @@
 					 .id_halt1(id_rs_rob_halt1),
 
 					 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
-					 
+					 .id_bhr0(id_rob_bhr0),
+					 .id_bhr1(id_rob_bhr1),
 					 .cdb_pr_ready(cdb_rs_rob_mt_broadcast),
 					 .cdb_pr_tag_0(cdb_rs_rob_mt_pr_tag0),
 					 .cdb_pr_tag_1(cdb_rs_rob_mt_pr_tag1),
@@ -800,15 +841,47 @@
 					 .cdb_pr_tag_3(cdb_rs_rob_mt_pr_tag3),
 					 .cdb_pr_tag_4(cdb_rs_rob_mt_pr_tag4),
 					 .cdb_pr_tag_5(cdb_rs_rob_mt_pr_tag5),
-					
+					 .cdb_exception(cdb_rob_exception),
+					 .cdb_PC0(cdb_rob_PC0),
+					 .cdb_actual_addr0(cdb_rob_actual_addr0),
+					 .cdb_actual_taken0(cdb_rob_actual_taken0),
+					 .cdb_cond_branch0(cdb_rob_cond_branch0),
+					 .cdb_uncond_branch0(cdb_rob_uncond_branch0),
+					 .cdb_PC1(cdb_rob_PC1),
+					 .cdb_actual_addr1(cdb_rob_actual_addr1),
+					 .cdb_actual_taken1(cdb_rob_actual_taken1),
+					 .cdb_branch1(cdb_rob_cond_branch1),
+					 .cdb_uncond_branch1(cdb_rob_uncond_branch1),
+
+		
 					 // Outputs
 					 .id_cap(rob_id_cap),
 					 
 					 .fl_retire_tag_a(rob_fl_retire_tag_a),
 					 .fl_retire_tag_b(rob_fl_retire_tag_b),
+					 .mt_retire_ar_a(rob_mt_retire_ar_a),
+					 .mt_retire_ar_b(rob_retire_ar_b),
 					 .fl_retire_num(rob_fl_retire_num),
 
-					 .retire_halt(rob_retire_halt)
+					 .fl_exception_ar(rob_fl_exception_ar),
+					 .fl_exception_pr(rob_fl_exception_pr),
+					 .btb_bht_PC0(rob_btb_bht_PC0),
+					 .btb_actual_addr0(rob_btb_actual_addr0),
+					 .bht_bhr_out0(rob_bht_bhr0),
+					 .bht_bhr_out1(rob_bht_bhr1),
+					 .bht_exception_bhr(rob_bht_exception_bhr),
+					 .bht_actual_taken0(rob_bht_actual_taken0),
+					 .bht_cond_branch0(rob_bht_cond_branch0),
+					 .btb_uncond_branch0(rob_btb_uncond_branch0),
+					 .btb_bht_PC1(rob_btb_bht_PC1),
+					 .btb_actual_addr1(rob_btb_actual_addr1),
+					 .bht_actual_taken1(rob_bht_actual_taken1),
+					 .bht_cond_branch1(rob_bht_cond_branch1),
+					 .btb_uncond_branch1(rob_btb_uncond_branch1),
+				   .retire_exception(rob_retire_exception),
+					 .retire_halt(rob_retire_halt),
+					 .btb_retire_jump_0(rob_btb_retire_jump0),
+					 .btb_retire_jump_1(rob_btb_retire_jump1)
 	);
 
 	// Map table
@@ -1330,4 +1403,68 @@
 										.rs_alu_avail(alu_mul_rs_avail)
 								);
 
+
+
+  /*
+	 * Branch History Table
+	 */
+ bht bht0(//Inputs
+						.clock(clock),
+						.reset(reset),///bht_reset later, tho I dont kno why.....
+						
+						.if_pc(if_id_NPC0),
+						.if_pc_plus_four(if_id_NPC1),//not implemented yet
+									
+						.if_valid_cond0(if_id_valid_inst0),
+						.if_valid_cond1,
+
+						.rob_exception_BHR(rob_bht_exception_bhr),//stored by ROB to use in recovery.
+						.rob_exception(rob_retire_exception),
+						
+						.rob_retire_cond0,
+						.rob_retire_pc0(rob_btb_bht_PC0),
+						.rob_reitre_BHR0(rob_bht_bhr0),
+						.rob_actual_taken0(rob_bht_actual_taken0),
+						
+						.rob_retire_cond1,
+						.rob_retire_pc1(rob_btb_bht_PC1),
+						.rob_reitre_BHR1(rob_bht_bhr1),
+						.rob_actual_taken1(rob_bht_actual_taken1),
+						
+						//Outputs
+						.if_branch_taken0(bht_if_branch_taken0),
+						.if_branch_taken1(bht_if_branch_taken1),
+						.if_BHR_out0(bht_if_bhr0),//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
+						.if_BHR_out1(bht_if_bhr1)
+						
+						
+						);
+	/*
+	 * Branch Target Buffer
+	 */					
+ btb btb0(//inputs
+					.clock(clock),
+					.reset(reset),//btb_reset, although I dont know why
+					
+					.if_pc0(if_id_NPC0),
+					.if_pc_plus_four(if_id_NPC1),//not implemented yet
+					
+					.rob_retire_jump0(rob_btb_retire_jump0),
+					.rob_retire_pc0(rob_btb_bht_PC0),
+					.rob_cre_npc0(rob_btb_actual_addr0),
+
+					.rob_retire_jump1(rob_btb_retire_jump1),
+					.rob_retire_pc1(rob_btb_bht_PC1),
+					.rob_cre_npc1(rob_btb_actual_addr1),
+					
+					//outputs
+					.if_pred_addr0(btb_if_pred_addr0),
+					.if_pred_addr1(btb_if_pred_addr1)
+					);
+					
+					
+					
+					
+					
+					
 endmodule

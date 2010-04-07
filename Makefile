@@ -50,7 +50,9 @@ SIMFILES =	verilog/$(MODULE).v	\
 						verilog/prf.v \
 						verilog/cdb.v \
 						verilog/icache.v \
-						verilog/cachemem.v 
+						verilog/cachemem.v \
+						verilog/btb.v	\
+						verilog/bht.v
 
 SYNFILES = synth/$(MODULE).vg
 

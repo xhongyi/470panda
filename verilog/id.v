@@ -326,7 +326,8 @@ module id (
 				if_valid_inst1,
 				if_NPC0,
 				if_NPC1,
-
+				if_bhr0,
+				if_bhr1,
 				if_branch_taken0,
 				if_branch_taken1,
 				if_pred_addr0,
@@ -380,6 +381,9 @@ module id (
 				rs_uncond_branch1,
 				rs_halt0,
 				rs_halt1,
+				
+				rob_bhr0,
+				rob_bhr1,
 
 				rs_rob_mt_illegal_inst0,
 				rs_rob_mt_illegal_inst1,
@@ -398,7 +402,8 @@ input					if_valid_inst0;
 input					if_valid_inst1;
 input	 [63:0] if_NPC0;
 input	 [63:0]	if_NPC1;
-
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_bhr0;
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_bhr1;
 input					if_branch_taken0;
 input 				if_branch_taken1;
 input	 [63:0]	if_pred_addr0;
@@ -455,6 +460,8 @@ output				rs_rob_mt_illegal_inst0;
 output				rs_rob_mt_illegal_inst1;
 output				rs_rob_mt_valid_inst0;
 output				rs_rob_mt_valid_inst1;
+output [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bhr0;
+output [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bhr1;
 
 output	[1:0]	rs_rob_mt_dispatch_num;
 output	[1:0]	if_inst_need_num;
@@ -595,6 +602,9 @@ assign next_rc_idx0 = if_IR0[4:0];     // inst operand C register index
 assign next_ra_idx1 = if_IR1[25:21];   // inst operand A register index
 assign next_rb_idx1 = if_IR1[20:16];   // inst operand B register index
 assign next_rc_idx1 = if_IR1[4:0];     // inst operand C register index
+
+assign rob_bhr0 = if_bhr0;
+assign rob_bhr1 = if_bhr1;
 
 always @*
 begin
