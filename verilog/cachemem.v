@@ -24,6 +24,7 @@ reg [63:0] data [127:0];
 reg [21:0] tags [127:0]; 
 reg [127:0] valids;
 
+
 assign rd1_data = data[rd1_idx];
 assign rd1_valid = valids[rd1_idx]&&(tags[rd1_idx] == rd1_tag);
 

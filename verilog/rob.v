@@ -40,17 +40,17 @@ module rob(//inputs
 			cdb_pr_tag_5,
 			cdb_exception,
 			//retire
-			cdb_PC0,
-			cdb_actual_addr0,
-			cdb_actual_taken0,
-			cdb_cond_branch0,
-			cdb_uncond_branch0,
+			id_PC0,
+			id_actual_addr0,
+			id_actual_taken0,
+			id_cond_branch0,
+			id_uncond_branch0,
 
-			cdb_PC1,
-			cdb_actual_addr1,
-			cdb_actual_taken1,
-			cdb_cond_branch1,
-			cdb_uncond_branch1,
+			id_PC1,
+			id_actual_addr1,
+			id_actual_taken1,
+			id_cond_branch1,
+			id_uncond_branch1,
 			//outputs
 			//dispatch
 			id_cap,
@@ -104,17 +104,17 @@ input [6:0] cdb_pr_tag_3;
 input [6:0] cdb_pr_tag_4;
 input [6:0] cdb_pr_tag_5; //Note: the bandwidth is CDB_WIDTH;
 
-input [63:0]cdb_PC0;
-input [63:0]cdb_actual_addr0;
-input 			cdb_actual_taken0;
-input				cdb_cond_branch0;
-input				cdb_uncond_branch0;
+input [63:0]id_PC0;
+input [63:0]id_actual_addr0;
+input 			id_actual_taken0;
+input				id_cond_branch0;
+input				id_uncond_branch0;
 
-input [63:0] cdb_PC1;
-input [63:0] cdb_actual_addr1;
-input				 cdb_actual_taken1;
-input				 cdb_cond_branch1;
-input				 cdb_uncond_branch1;
+input [63:0] id_PC1;
+input [63:0] id_actual_addr1;
+input				 id_actual_taken1;
+input				 id_cond_branch1;
+input				 id_uncond_branch1;
 
 input [`CDB_WIDTH-1:0]  cdb_exception;
 
@@ -202,16 +202,16 @@ assign almost_full = ((tail==`ROB_WIDTH-1 && head==0)|(head==tail+`ROB_BITS'b1))
 
 assign  head_plus_one = (head==`ROB_WIDTH-1) ? `ROB_BITS'b0 : head + `ROB_BITS'b1;
 assign  tail_plus_one = (tail == `ROB_WIDTH-1)? `ROB_BITS'b0 : tail + `ROB_BITS'b1;
-assign 	btb_bht_PC0 = cdb_PC0;
-assign  btb_actual_addr0 = cdb_actual_addr0;
-assign	bht_actual_taken0 = cdb_actual_taken0;
-assign  bht_cond_branch0 = cdb_cond_branch0;
-assign  btb_uncond_branch0 = cdb_uncond_branch0;
-assign 	btb_bht_PC1 = cdb_PC1;
-assign  btb_actual_addr1 = cdb_actual_addr1;
-assign	bht_actual_taken1 = cdb_actual_taken1;
-assign  bht_cond_branch1 = cdb_cond_branch1;
-assign  btb_uncond_branch1 = cdb_uncond_branch1;
+assign 	btb_bht_PC0 = id_PC0;
+assign  btb_actual_addr0 = id_actual_addr0;
+assign	bht_actual_taken0 = id_actual_taken0;
+assign  bht_cond_branch0 = id_cond_branch0;
+assign  btb_uncond_branch0 = id_uncond_branch0;
+assign 	btb_bht_PC1 = id_PC1;
+assign  btb_actual_addr1 = id_actual_addr1;
+assign	bht_actual_taken1 = id_actual_taken1;
+assign  bht_cond_branch1 = id_cond_branch1;
+assign  btb_uncond_branch1 = id_uncond_branch1;
 
 
 
@@ -401,7 +401,7 @@ end
 		fl_exception_pr = tag[head_plus_one];
 		bht_exception_bhr = bhr[head_plus_one];
 	end 
-  if (ready[head] == 1 && ready[head_plus_one] ==1)
+  if (ready[head]&ready[head_plus_one]&~exception[head]&~exception[head_plus_one] )
 	begin
 		next_head =  head + 2;
 		next_ready[head] = 0;
@@ -418,7 +418,7 @@ end
 		next_valid[head_plus_one] = 1'd0;
 		
 	end
-	else if (ready[head] == 1)
+	else if (ready[head] &~exception[head])
 	begin
 		next_head = head + 1;
 		next_ready[head] = 0;
