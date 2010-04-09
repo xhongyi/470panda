@@ -249,6 +249,7 @@ module mt (// Inputs
 		begin
 			for (i = 0; i < 32; i=i+1)
 				pr_tags[i] = pr_tags_retired[i];
+			ready_bits <= `SD 32'hffffffff;
 		end
 		else
 		begin
