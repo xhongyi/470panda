@@ -494,6 +494,30 @@ begin
 	end
 	else
 	begin
+		for (i = 0; i < `LEN_STQ; i = i + 1)
+		begin
+			st_addr[i]	<= `SD next_st_addr[i];
+			st_value[i]	<= `SD next_st_value[i];
+		end
+		st_ready	<= `SD next_st_ready;
+		st_head		<= `SD next_st_head;
+		st_tail		<= `SD next_st_tail;
+		st_empty	<= `SD next_st_empty;
+
+		for (i = 0; i < `LEN_LDQ; i = i + 1)
+		begin
+			ld_addr[i]	<= `SD next_ld_addr[i];
+			ld_pr[i]		<= `SD next_ld_pr[i];
+			ld_ar[i]		<= `SD next_ld_ar[i];
+			ld_age[i]		<= `SD next_ld_age[i];
+			ld_match_idx[i]	<= `SD next_ld_match_idx[i];
+		end
+
+		ld_avail	<= `SD next_ld_avail;
+		ld_taken	<= `SD next_ld_taken;
+		ld_old		<= `SD next_ld_old;
+		ld_ready	<= `SD next_ld_ready;
+		ld_match	<= `SD next_ld_match;
 	end
 
 end
