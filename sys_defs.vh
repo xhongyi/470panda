@@ -296,14 +296,21 @@
 `define ALU_MUL			2'b10
 `define	ALU_MEM			2'b11
 
+`define	ZERO_VAL		64'b0 // zero values
+
+/****************************************
+ * 
+ * LSQ
+ *
+ ****************************************/
+`define LEN_STQ			64
+`define BIT_STQ			6
 `define	ZERO_VAL		64'b0 // zero values'
 
-
-
-`ifndef	NUM_BHT_PATTERN_ENTRIES
+/****************************************
+ *
+ * BHT
+ *
+ ****************************************/
 `define	NUM_BHT_PATTERN_ENTRIES	64
-`endif
-
-`ifndef	LOG_NUM_BHT_PATTERN_ENTRIES
 `define	LOG_NUM_BHT_PATTERN_ENTRIES 6
-`endif
