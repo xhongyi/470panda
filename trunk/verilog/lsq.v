@@ -90,10 +90,12 @@ module lsq (// Inputs
 `define	LEN_LDQ 4
 `endif
 
-`ifnedf	BIT_LDQ
+`ifndef	BIT_LDQ
 `define	BIT_LDQ 2
 `endif
 
+input					clock;
+input					reset;
 input					id_rd_mem0;
 input					id_wr_mem0;
 input					id_rd_mem1;
@@ -125,12 +127,12 @@ input					Dcache_avail;
 
 input		[`BIT_STQ-1:0]	rs_issue_age0;
 input		[`BIT_STQ-1:0]	rs_issue_age1;
-input		[`BIT_STQ-1:0]	rs_issue_old0;
-input		[`BIT_STQ-1:0]	rs_issue_old1;
+input										rs_issue_old0;
+input										rs_issue_old1;
 output	[`BIT_STQ-1:0]	rs_disp_age0;
 output	[`BIT_STQ-1:0]	rs_disp_age1;
-output	[`BIT_STQ-1:0]	rs_disp_old0;
-output	[`BIT_STQ-1:0]	rs_disp_old1;
+output									rs_disp_old0;
+output									rs_disp_old1;
 
 output	[1:0]	rs_avail;
 
@@ -142,12 +144,24 @@ output [63:0]	prf_pr_value;
 
 output				Dcache_rd_mem;
 output				Dcache_wr_mem;
-output [63:0]	Dcache_addr
+output [63:0]	Dcache_addr;
 output	[6:0]	Dcache_pr_idx;
 output	[4:0]	Dcache_ar_idx;
 
 output [63:0]	Dcache_st_value0;
 output [63:0]	Dcache_st_value1;
+
+reg						cdb_complete;
+reg			[6:0]	cdb_prf_pr_idx;
+reg			[4:0]	cdb_ar_idx;
+reg						prf_pr_wr_enable;
+reg		 [63:0]	prf_pr_value;
+
+reg						Dcache_rd_mem;
+reg						Dcache_wr_mem;
+reg		 [63:0]	Dcache_addr;
+reg			[6:0]	Dcache_pr_idx;
+reg			[4:0]	Dcache_ar_idx;
 
 reg			[1:0]	rs_avail;
 
@@ -189,7 +203,7 @@ reg		 [`LEN_LDQ-1:0] next_ld_old;
 reg		 [`LEN_LDQ-1:0] next_ld_avail;
 reg		 [`LEN_LDQ-1:0] next_ld_taken;
 reg		 [`LEN_LDQ-1:0] next_ld_ready;
-reg		 [`LEN_LDQ-1:0] next_ld_ready;
+reg		 [`LEN_LDQ-1:0] next_ld_match;
 
 wire									ldq_avail;
 wire	 [`BIT_LDQ-1:0]	ldq_high_idx;
@@ -220,8 +234,8 @@ integer i, j;
 // load properties in the load stage
 assign rs_disp_age0 = st_tail;
 assign rs_disp_old0 = st_empty;
-assign rs_disp_age1 = (ld_wr_mem0)? st_tail + 1: st_tail;
-assign rs_disp_old1 = (ld_wr_mem0)? 0: st_empty;
+assign rs_disp_age1 = (id_wr_mem0)? st_tail + 1: st_tail;
+assign rs_disp_old1 = (id_wr_mem0)? 0: st_empty;
 
 assign Dcache_st_value0 = st_value[st_head];
 assign Dcache_st_value1 = st_value[st_head+1];
@@ -235,6 +249,14 @@ prien_4 prien_ldq_ready(.decode(next_ld_ready),
 												.encode_high(ldq_ready_high),
 												.encode_low(ldq_ready_low),
 												.valid(ldq_ready));
+genvar idx;
+generate
+	for (idx = 0; idx < `LEN_LDQ; idx = idx + 1)
+	begin: foo
+		wire	[`BIT_STQ-1:0] NEXT_LD_AGE 	= next_ld_age[idx];
+		wire	[`BIT_STQ-1:0] LD_AGE			 	= ld_age[idx];
+	end
+endgenerate
 
 always @*
 begin
@@ -298,14 +320,14 @@ begin
 	end
 
 	// Check whether the loads are ready in the load queue
-	for (i = 0; i < LEN_LDQ; i = i+1)
+	for (i = 0; i < `LEN_LDQ; i = i+1)
 	begin
 		ld_age_ext[i] = {1'b0, next_ld_age[i]};
 		if (~next_ld_old[i])
 		begin
 			if (next_ld_age[i] <= st_head)
-				ld_age_ext[i] = {1'b0, next_ld_age[i]} + LEN_STQ;
-			for (j = 0; j < LEN_STQ * 2; j = j+1)
+				ld_age_ext[i] = {1'b0, next_ld_age[i]} + `LEN_STQ;
+			for (j = 0; j < `LEN_STQ * 2; j = j+1)
 			begin
 				if (st_head_ext + j < ld_age_ext[i])
 				begin
@@ -323,69 +345,14 @@ begin
 		end
 	end
 
-	// Send ld either to the cdb or Dcache
-	// There are potential latches
-	if (ldq_ready)
-	begin
-		if (next_ld_match[ldq_ready_high] | next_ld_match[ldq_ready_low])
-			cdb_complete = 1;
-		else
-			cdb_complete = 0;
 
-		if (next_ld_match[ldq_ready_high] & ~ld_cdb_wait)
-		begin
-			cdb_prf_pr_idx	= next_ld_pr[ldq_ready_high];
-			cdb_ar_idx			= next_ld_ar[ldq_ready_high];
-			prf_pr_wr_enable= 1;
-			prf_pr_value		= st_value[next_ld_match_idx[ldq_ready_high]];
 
-			next_ld_avail[ldq_ready_high]	= 1;
-			next_ld_taken[ldq_ready_high] = 0;
-		end
-		else if (Dcache_avail)
-		begin
-			Dcache_rd_mem		= 1;
-			Dcache_wr_mem		= 0;
-			Dcache_addr			= next_ld_addr[ldq_ready_high];
-			Dcache_pr_idx		= next_ld_pr[ldq_ready_high];
-			Dcache_ar_idx		= next_ld_ar[ldq_ready_high];
-
-			next_ld_avail[ldq_ready_high]	= 1;
-			next_ld_taken[ldq_ready_high] = 0;
-		end
-		if (ldq_ready_high != ldq_ready_low)
-		begin	
-			if (next_ld_match[ldq_ready_low] & ~next_ld_match[ldq_ready_high] &
-					~ld_cdb_wait)
-			begin
-				cdb_prf_pr_idx	= next_ld_pr[ldq_ready_low];
-				cdb_ar_idx			= next_ld_ar[ldq_ready_low];
-				prf_pr_wr_enable= 1;
-				prf_pr_value		= st_value[next_ld_match_idx[ldq_ready_low]];
-
-				next_ld_avail[ldq_ready_low]	= 1;
-				next_ld_taken[ldq_ready_low] = 0;
-			end if (Dcache_avail)
-			begin
-				Dcache_rd_mem		= 1;
-				Dcache_wr_mem		= 0;
-				Dcache_addr			= next_ld_addr[ldq_ready_low];
-				Dcache_pr_idx		= next_ld_pr[ldq_ready_low];
-				Dcache_ar_idx		= next_ld_ar[ldq_ready_low];
-
-				next_ld_avail[ldq_ready_low]	= 1;
-				next_ld_taken[ldq_ready_low] = 0;
-			end
-		end
-	end
-end
-
-always @*
-begin
+	// Store part
+	
 	st_head_ext = {1'b0, st_head};
 	st_tail_ext = {1'b0, st_tail};
 	if (st_tail < st_head | (~st_empty && st_tail == st_head))
-		st_tail_ext = {1'b0, st_tail} + LEN_STQ;
+		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
 
 	for (i = 0; i < `LEN_STQ; i = i + 1)
 	begin
@@ -395,10 +362,10 @@ begin
 	next_st_ready	= st_ready;
 
 	// Extend the stq at dispatch
-	if (id_wr_mem0 & ld_wr_mem1)
+	if (id_wr_mem0 & id_wr_mem1)
 	begin
 		next_st_ready[st_tail]		= 0;
-		next_st_ready[st_tail+1]	= 0
+		next_st_ready[st_tail+1]	= 0;
 		next_st_tail 							= st_tail_ext + 2;
 	end
 	else if (id_wr_mem0 | id_wr_mem1)
@@ -434,18 +401,76 @@ begin
 	if (rs_wr_mem0 & rs_valid_inst0)
 	begin
 		next_st_addr[rs_issue_age0]		= rs_mem_addr0;
-		next_st_pr[rs_issue_age0]			= prf_pra_value0;
+		next_st_value[rs_issue_age0]	= prf_pra_value0;
 		next_st_ready[rs_issue_age0]	= 1;
 	end
 	if (rs_wr_mem1 & rs_valid_inst1)
 	begin
 		next_st_addr[rs_issue_age1]		= rs_mem_addr1;
-		next_st_pr[rs_issue_age1]			= prf_pra_value1;
+		next_st_value[rs_issue_age1]	= prf_pra_value1;
 		next_st_ready[rs_issue_age1]	= 1;
 	end
 
-	// complete the ready st
-	if (rs_wr_mem0 & rs_valie_inst0)
+
+
+	// Send ld either to the cdb or Dcache
+	// There are potential latches
+	if (ldq_ready & ~ld_cdb_wait)
+	begin
+		if (next_ld_match[ldq_ready_high] | next_ld_match[ldq_ready_low])
+			cdb_complete = 1;
+		else
+			cdb_complete = 0;
+
+		if (next_ld_match[ldq_ready_high] & ~ld_cdb_wait)
+		begin
+			cdb_complete		= 1;
+			cdb_prf_pr_idx	= next_ld_pr[ldq_ready_high];
+			cdb_ar_idx			= next_ld_ar[ldq_ready_high];
+			prf_pr_wr_enable= 1;
+			prf_pr_value		= st_value[next_ld_match_idx[ldq_ready_high]];
+
+			next_ld_avail[ldq_ready_high]	= 1;
+			next_ld_taken[ldq_ready_high] = 0;
+		end
+		else if (Dcache_avail)
+		begin
+			Dcache_rd_mem		= 1;
+			Dcache_wr_mem		= 0;
+			Dcache_addr			= next_ld_addr[ldq_ready_high];
+			Dcache_pr_idx		= next_ld_pr[ldq_ready_high];
+			Dcache_ar_idx		= next_ld_ar[ldq_ready_high];
+
+			next_ld_avail[ldq_ready_high]	= 1;
+			next_ld_taken[ldq_ready_high] = 0;
+		end
+		if (ldq_ready_high != ldq_ready_low)
+		begin	
+			if (next_ld_match[ldq_ready_low] & ~next_ld_match[ldq_ready_high] &
+					~ld_cdb_wait)
+			begin
+				cdb_complete		= 1;
+				cdb_prf_pr_idx	= next_ld_pr[ldq_ready_low];
+				cdb_ar_idx			= next_ld_ar[ldq_ready_low];
+				prf_pr_wr_enable= 1;
+				prf_pr_value		= st_value[next_ld_match_idx[ldq_ready_low]];
+
+				next_ld_avail[ldq_ready_low]	= 1;
+				next_ld_taken[ldq_ready_low] = 0;
+			end if (Dcache_avail)
+			begin
+				Dcache_rd_mem		= 1;
+				Dcache_wr_mem		= 0;
+				Dcache_addr			= next_ld_addr[ldq_ready_low];
+				Dcache_pr_idx		= next_ld_pr[ldq_ready_low];
+				Dcache_ar_idx		= next_ld_ar[ldq_ready_low];
+
+				next_ld_avail[ldq_ready_low]	= 1;
+				next_ld_taken[ldq_ready_low] = 0;
+			end
+		end
+	end
+	else if (rs_wr_mem0 & rs_valid_inst0)
 	begin
 		cdb_complete			= 1;
 		cdb_prf_pr_idx		= rs_dest_pr_idx0;
@@ -453,13 +478,20 @@ begin
 		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
 		prf_pr_value			= 0;
 	end
-
-	if (rs_wr_mem1 & rs_valie_inst1)
+	else if (rs_wr_mem1 & rs_valid_inst1)
 	begin
 		cdb_complete			= 1;
 		cdb_prf_pr_idx		= rs_dest_pr_idx1;
 		cdb_ar_idx				= rs_dest_ar_idx1;
 		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
+		prf_pr_value			= 0;
+	end
+	else
+	begin
+		cdb_complete			= 0;
+		cdb_prf_pr_idx		= 0;
+		cdb_ar_idx				= 0;
+		prf_pr_wr_enable	= 0;
 		prf_pr_value			= 0;
 	end
 end
@@ -500,8 +532,8 @@ begin
 			st_value[i]	<= `SD next_st_value[i];
 		end
 		st_ready	<= `SD next_st_ready;
-		st_head		<= `SD next_st_head;
-		st_tail		<= `SD next_st_tail;
+		st_head		<= `SD next_st_head[`BIT_STQ-1:0];
+		st_tail		<= `SD next_st_tail[`BIT_STQ-1:0];
 		st_empty	<= `SD next_st_empty;
 
 		for (i = 0; i < `LEN_LDQ; i = i + 1)
