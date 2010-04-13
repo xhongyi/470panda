@@ -253,8 +253,19 @@ genvar idx;
 generate
 	for (idx = 0; idx < `LEN_LDQ; idx = idx + 1)
 	begin: foo
-		wire	[`BIT_STQ-1:0] NEXT_LD_AGE 	= next_ld_age[idx];
-		wire	[`BIT_STQ-1:0] LD_AGE			 	= ld_age[idx];
+		wire	[`BIT_STQ-1:0] 	NEXT_LD_AGE 	= next_ld_age[idx];
+		wire	[`BIT_STQ-1:0] 	LD_AGE			 	= ld_age[idx];
+		wire	[`BIT_STQ-1:0] 	NEXT_LD_READY	= next_ld_ready[idx];
+		wire	[`BIT_STQ-1:0] 	LD_READY			= ld_ready[idx];
+		wire									NEXT_LD_MATCH	= next_ld_match[idx];
+		wire									LD_MATCH			= ld_match[idx];
+		wire									NEXT_ST_READY	= next_st_ready[idx];
+		wire									ST_READY			= st_ready[idx];
+		wire					[63:0]	NEXT_ST_ADDR	= next_st_addr[idx];
+		wire					[63:0]	ST_ADDR				= st_addr[idx];
+		wire					[63:0]	NEXT_ST_VALUE	= next_st_value[idx];
+		wire					[63:0]	ST_VALUE			= st_value[idx];
+		wire	[`BIT_STQ:0]		LD_AGE_EXT		= ld_age_ext[idx];
 	end
 endgenerate
 
@@ -294,8 +305,8 @@ begin
 		if (rs_rd_mem0 & rs_valid_inst0)
 		begin	
 			next_ld_addr[ldq_high_idx]	= rs_mem_addr0;
-			next_ld_pr[ldq_high_idx]		= rs_dest_ar_idx0;
-			next_ld_ar[ldq_high_idx]		= rs_dest_pr_idx0;
+			next_ld_pr[ldq_high_idx]		= rs_dest_pr_idx0;
+			next_ld_ar[ldq_high_idx]		= rs_dest_ar_idx0;
 			next_ld_age[ldq_high_idx]		= rs_issue_age0;
 			next_ld_old[ldq_high_idx]		= rs_issue_old0;
 			next_ld_avail[ldq_high_idx]	= 0;
@@ -306,11 +317,11 @@ begin
 		end
 		if (rs_rd_mem1 & rs_valid_inst1)
 		begin
-			next_ld_addr[ldq_low_idx]		= rs_mem_addr0;
-			next_ld_pr[ldq_low_idx]			= rs_dest_ar_idx0;
-			next_ld_ar[ldq_low_idx]			= rs_dest_pr_idx0;
-			next_ld_age[ldq_low_idx]		= rs_issue_age0;
-			next_ld_old[ldq_low_idx]		= rs_issue_old0;
+			next_ld_addr[ldq_low_idx]		= rs_mem_addr1;
+			next_ld_pr[ldq_low_idx]			= rs_dest_pr_idx1;
+			next_ld_ar[ldq_low_idx]			= rs_dest_ar_idx1;
+			next_ld_age[ldq_low_idx]		= rs_issue_age1;
+			next_ld_old[ldq_low_idx]		= rs_issue_old1;
 			next_ld_avail[ldq_low_idx]	= 0;
 			next_ld_taken[ldq_low_idx]	= 1;	
 			next_ld_ready[ldq_low_idx]	= 1;
@@ -323,7 +334,11 @@ begin
 	for (i = 0; i < `LEN_LDQ; i = i+1)
 	begin
 		ld_age_ext[i] = {1'b0, next_ld_age[i]};
-		if (~next_ld_old[i])
+		if (next_ld_avail[i])
+			next_ld_ready[i] = 0;
+		else if (next_ld_old[i])
+			next_ld_match[i] = 0;
+		else
 		begin
 			if (next_ld_age[i] <= st_head)
 				ld_age_ext[i] = {1'b0, next_ld_age[i]} + `LEN_STQ;
@@ -397,7 +412,7 @@ begin
 	else
 		next_st_empty	= 0;
 
-	// Stq eat the ready stq address and value
+	// Stq eat the ready stq address and value at issue
 	if (rs_wr_mem0 & rs_valid_inst0)
 	begin
 		next_st_addr[rs_issue_age0]		= rs_mem_addr0;
@@ -415,12 +430,50 @@ begin
 
 	// Send ld either to the cdb or Dcache
 	// There are potential latches
+
+	if (rs_wr_mem0 & rs_valid_inst0)
+	begin
+		cdb_complete			= 1;
+		cdb_prf_pr_idx		= rs_dest_pr_idx0;
+		cdb_ar_idx				= rs_dest_ar_idx0;
+		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
+		prf_pr_value			= 0;
+	end
+	else if (rs_wr_mem1 & rs_valid_inst1)
+	begin
+		cdb_complete			= 1;
+		cdb_prf_pr_idx		= rs_dest_pr_idx1;
+		cdb_ar_idx				= rs_dest_ar_idx1;
+		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
+		prf_pr_value			= 0;
+	end
+	else if (~ldq_ready)
+	begin
+		cdb_complete			= 0;
+		cdb_prf_pr_idx		= 0;
+		cdb_ar_idx				= 0;
+		prf_pr_wr_enable	= 0;
+		prf_pr_value			= 0;
+	end
+
+
+	Dcache_rd_mem		= 0;
+	Dcache_wr_mem		= 0;
+	Dcache_addr			= 0;
+	Dcache_pr_idx		= 0;
+	Dcache_ar_idx		= 0;
 	if (ldq_ready & ~ld_cdb_wait)
 	begin
 		if (next_ld_match[ldq_ready_high] | next_ld_match[ldq_ready_low])
 			cdb_complete = 1;
 		else
-			cdb_complete = 0;
+		begin
+			cdb_complete 			= 0;
+			cdb_prf_pr_idx		= 0;
+			cdb_ar_idx				= 0;
+			prf_pr_wr_enable	= 0;
+			prf_pr_value			= 0;
+		end
 
 		if (next_ld_match[ldq_ready_high] & ~ld_cdb_wait)
 		begin
@@ -470,30 +523,8 @@ begin
 			end
 		end
 	end
-	else if (rs_wr_mem0 & rs_valid_inst0)
-	begin
-		cdb_complete			= 1;
-		cdb_prf_pr_idx		= rs_dest_pr_idx0;
-		cdb_ar_idx				= rs_dest_ar_idx0;
-		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
-		prf_pr_value			= 0;
-	end
-	else if (rs_wr_mem1 & rs_valid_inst1)
-	begin
-		cdb_complete			= 1;
-		cdb_prf_pr_idx		= rs_dest_pr_idx1;
-		cdb_ar_idx				= rs_dest_ar_idx1;
-		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
-		prf_pr_value			= 0;
-	end
-	else
-	begin
-		cdb_complete			= 0;
-		cdb_prf_pr_idx		= 0;
-		cdb_ar_idx				= 0;
-		prf_pr_wr_enable	= 0;
-		prf_pr_value			= 0;
-	end
+
+
 end
 
 always @ (posedge clock)
