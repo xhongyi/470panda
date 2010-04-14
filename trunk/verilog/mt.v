@@ -175,17 +175,19 @@ module mt (// Inputs
 
 	assign rs_pr_a1 = pr_tags[id_ra_idx0];
 	assign rs_pr_a2 = pr_tags[id_rb_idx0];
-	assign rs_pr_a1_ready = ready_bits[id_ra_idx0];
-	assign rs_pr_a2_ready = ready_bits[id_rb_idx0];
+	assign rs_pr_a1_ready = ready_bits[id_ra_idx0] | ~rob_ar_a1_valid;
+	assign rs_pr_a2_ready = ready_bits[id_rb_idx0] | ~rob_ar_a2_valid;
 
 	assign rs_pr_b1 = (rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? fl_pr0: 
 																															 pr_tags[id_ra_idx1];
 	assign rs_pr_b2 = (rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? fl_pr0: 
 																												  		 pr_tags[id_rb_idx1];
-	assign rs_pr_b1_ready = (rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? 1'b0: 
-																															 ready_bits[id_ra_idx1];
-	assign rs_pr_b2_ready = (rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? 1'b0: 
-																															 ready_bits[id_rb_idx1];
+	assign rs_pr_b1_ready = ((rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? 1'b0: 
+																															 ready_bits[id_ra_idx1]) |
+										~rob_ar_b1_valid;
+	assign rs_pr_b2_ready = ((rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? 1'b0: 
+																															 ready_bits[id_rb_idx1]) |
+										~rob_ar_b2_valid;
 
 /*	genvar i;
 	generate
