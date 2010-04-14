@@ -241,8 +241,8 @@ module alu_sim(// Inputs
   reg [1:0]		rs_alu_avail;
 	
 	//Update registers
-	wire [63:0] next_prf_result0;   // ALU result
-	wire [63:0] next_prf_result1;   // ALU result
+	reg [63:0] next_prf_result0;
+	reg [63:0] next_prf_result1;
 	reg 			next_prf_write_enable0;
 	reg				next_prf_write_enable1;
 	reg				next_cdb_complete0;
@@ -259,7 +259,8 @@ module alu_sim(// Inputs
   reg					next_cdb_actual_taken0;
   reg					next_cdb_actual_taken1;
 	
-	
+	wire [63:0] alu_result0;//new
+	wire [63:0] alu_result1;//new
 	
 	
 	
@@ -292,10 +293,22 @@ module alu_sim(// Inputs
 		next_rs_alu_avail = 2'b11;
 		next_cdb_complete0 = rs_valid_inst0;
 		next_cdb_complete1 = rs_valid_inst1;
-		next_cdb_actual_addr0 = next_prf_result0;
-		next_cdb_actual_addr1 = next_prf_result1;
+		next_cdb_actual_addr0 = alu_result0;
+		next_cdb_actual_addr1 = alu_result1;
 		next_cdb_actual_taken0 = ex_take_branch_out0;
 		next_cdb_actual_taken1 = ex_take_branch_out1;
+		if (rs_dest_ar_idx0 == `ZERO_REG)
+			next_prf_result0 = 63'd0;
+		else if (ex_take_branch_out0)
+			next_prf_result0 = rs_NPC0;
+		else
+			next_prf_result0 = alu_result0;
+		if (rs_dest_ar_idx1 == `ZERO_REG)
+			next_prf_result1 = 63'd0;
+		else if (ex_take_branch_out1)
+			next_prf_result1 = rs_NPC0;
+		else
+			next_prf_result1 = alu_result1;
   end
   always @*
   begin
@@ -305,7 +318,7 @@ module alu_sim(// Inputs
       `ALU_OPA_IS_NPC:      opa_mux_out0 = rs_NPC0;
       `ALU_OPA_IS_NOT3:     opa_mux_out0 = ~64'h3;
     endcase
-	case (rs_opa_select1)
+		case (rs_opa_select1)
       `ALU_OPA_IS_REGA:     opa_mux_out1 = prf_pra1;
       `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
       `ALU_OPA_IS_NPC:      opa_mux_out1 = rs_NPC1;
@@ -343,7 +356,7 @@ module alu_sim(// Inputs
              .func(rs_alu_func0),
 
              // Output
-             .result(next_prf_result0)
+             .result(alu_result0)
             );
   alu alu_1 (// Inputs
              .opa(opa_mux_out1),
@@ -351,7 +364,7 @@ module alu_sim(// Inputs
              .func(rs_alu_func1),
 
              // Output
-             .result(next_prf_result1)
+             .result(alu_result1)
             );
    //
    // instantiate the branch condition tester
@@ -395,12 +408,12 @@ module alu_sim(// Inputs
 		end
 		if (rs_uncond_branch0)
 		begin
-			if (rs_pred_addr0 != next_prf_result0)
+			if (rs_pred_addr0 != alu_result0)
 				next_cdb_exception0 = 1'd1;
 		end
 		if (rs_uncond_branch1)
 		begin
-			if (rs_pred_addr1 != next_prf_result1)
+			if (rs_pred_addr1 != alu_result1)
 				next_cdb_exception1 = 1'd1;
 		end
 	end//end always
