@@ -69,7 +69,15 @@ module rs(// Inputs
 						cdb_pr_tag2,
 						cdb_pr_tag3,
 						cdb_pr_tag4,
-						cdb_pr_tag5,
+						cdb_pr_tag5,					
+					
+					// LSQ inputs
+						lsq_rs_disp_age0,//new
+						lsq_rs_disp_age1,//new
+						lsq_rs_disp_old0,//new
+						lsq_rs_disp_old1,//new
+											
+// Outputs
 
 					// Dispatch outputs
 						id_rs_cap,
@@ -205,7 +213,12 @@ module rs(// Inputs
 						alu_mem_illegal_inst0,
 						alu_mem_illegal_inst1,
 						alu_mem_valid_inst0,
-						alu_mem_valid_inst1
+						alu_mem_valid_inst1,
+						
+						alu_mem_issue_age0,//new
+						alu_mem_issue_age1,//new
+						alu_mem_issue_old0,//new
+						alu_mem_issue_old1//new
 						);
 
 `ifndef NUM_RS_ENTRIES
@@ -279,6 +292,11 @@ input		[6:0]	cdb_pr_tag2;
 input		[6:0]	cdb_pr_tag3;
 input		[6:0]	cdb_pr_tag4;
 input		[6:0]	cdb_pr_tag5;
+
+input	[`BIT_STQ-1:0]	lsq_rs_disp_age0;//new
+input	[`BIT_STQ-1:0]	lsq_rs_disp_age1;//new
+input									lsq_rs_disp_old0;//new
+input									lsq_rs_disp_old1;//new
 
 
 // Dispatch outputs
@@ -417,6 +435,11 @@ output				alu_mem_illegal_inst1;
 output				alu_mem_valid_inst0;
 output				alu_mem_valid_inst1;
 
+output	[`BIT_STQ-1:0]	alu_mem_issue_age0;//new
+output	[`BIT_STQ-1:0]	alu_mem_issue_age1;//new
+output									alu_mem_issue_old0;//new
+output									alu_mem_issue_old1;//new
+
 reg	 [63:0]	alu_sim_NPC0;
 reg	 [63:0]	alu_sim_NPC1;
 reg	 [31:0] alu_sim_IR0;
@@ -549,6 +572,11 @@ reg					alu_mem_illegal_inst1;
 reg					alu_mem_valid_inst0;
 reg					alu_mem_valid_inst1;
 
+reg	[`BIT_STQ-1:0]	alu_mem_issue_age0;//new
+reg	[`BIT_STQ-1:0]	alu_mem_issue_age1;//new
+reg					alu_mem_issue_old0;//new
+reg					alu_mem_issue_old1;//new
+
 // RS entries
 
 reg		[1:0]	alu_type			[`NUM_RS_ENTRIES-1:0];
@@ -572,6 +600,7 @@ reg					uncond_branch	[`NUM_RS_ENTRIES-1:0];
 reg					halt					[`NUM_RS_ENTRIES-1:0];
 reg					illegal_inst	[`NUM_RS_ENTRIES-1:0];
 reg					valid_inst		[`NUM_RS_ENTRIES-1:0];
+reg	[`BIT_STQ-1:0]	age		[`NUM_RS_ENTRIES-1:0];
 
 reg		[1:0]	next_alu_type				[`NUM_RS_ENTRIES-1:0];
 reg	 [63:0]	next_npc						[`NUM_RS_ENTRIES-1:0];
@@ -594,6 +623,7 @@ reg					next_uncond_branch	[`NUM_RS_ENTRIES-1:0];
 reg					next_halt						[`NUM_RS_ENTRIES-1:0];
 reg					next_illegal_inst		[`NUM_RS_ENTRIES-1:0];
 reg					next_valid_inst			[`NUM_RS_ENTRIES-1:0];
+reg	[`BIT_STQ-1:0]	next_age		[`NUM_RS_ENTRIES-1:0];
 
 
 reg		[1:0]	dispatch_valid_inst;
@@ -604,12 +634,14 @@ reg		[`NUM_RS_ENTRIES-1:0]	mul_ready;
 reg		[`NUM_RS_ENTRIES-1:0]	mem_ready;
 reg		[`NUM_RS_ENTRIES-1:0] ent_taken; // ent means entry
 reg		[`NUM_RS_ENTRIES-1:0] ent_avail;
+reg		[`NUM_RS_ENTRIES-1:0]	old;
 
 reg		[`NUM_RS_ENTRIES-1:0]	next_sim_ready;
 reg		[`NUM_RS_ENTRIES-1:0]	next_mul_ready;
 reg		[`NUM_RS_ENTRIES-1:0]	next_mem_ready;
 reg		[`NUM_RS_ENTRIES-1:0] next_ent_taken;
 reg		[`NUM_RS_ENTRIES-1:0] next_ent_avail;
+reg		[`NUM_RS_ENTRIES-1:0]	next_old;
 
 wire				ready_sim_valid;
 wire	[4:0]	ready_sim_high_idx;
@@ -689,6 +721,7 @@ begin
 		next_halt[i]					= halt[i];
 		next_illegal_inst[i]	= illegal_inst[i];
 		next_valid_inst[i]		= valid_inst[i];
+		next_age[i]						=	age[i];
 	end
 
 	next_sim_ready = sim_ready;
@@ -696,6 +729,7 @@ begin
 	next_mem_ready = mem_ready;
 	next_ent_taken = ent_taken; // ent means entry
 	next_ent_avail = ent_avail;
+	next_old			 = old;
 //--------------------------------------------------------------ISSUE LOGIC
 //////////////////////////////////////////////////////////////////////////////////////////////////Here is the simple alu
 	if (ready_sim_valid) begin
@@ -1002,6 +1036,8 @@ begin
 				alu_mem_halt0					= halt[ready_mem_high_idx];
 				alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
 				alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
+				alu_mem_issue_age0		= age[ready_mem_high_idx];
+				alu_mem_issue_old0		= old[ready_mem_high_idx];
 
 				alu_mem_NPC1					= npc[ready_mem_low_idx];
 				alu_mem_IR1 					= ir[ready_mem_low_idx];
@@ -1021,6 +1057,8 @@ begin
 				alu_mem_halt1					= halt[ready_mem_low_idx];
 				alu_mem_illegal_inst1	= illegal_inst[ready_mem_low_idx];
 				alu_mem_valid_inst1		= valid_inst[ready_mem_low_idx];
+				alu_mem_issue_age1		= age[ready_mem_low_idx];
+				alu_mem_issue_old1		= old[ready_mem_low_idx];
 
 				next_mem_ready[ready_mem_high_idx] = 0;
 				next_mem_ready[ready_mem_low_idx] = 0;
@@ -1049,6 +1087,8 @@ begin
 				alu_mem_halt0					= halt[ready_mem_high_idx];
 				alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
 				alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
+				alu_mem_issue_age0		= age[ready_mem_high_idx];
+				alu_mem_issue_old0		= old[ready_mem_high_idx];
 
 				alu_mem_valid_inst1 	=	0;
 
@@ -1077,6 +1117,8 @@ begin
 			alu_mem_halt0					= halt[ready_mem_high_idx];
 			alu_mem_illegal_inst0	= illegal_inst[ready_mem_high_idx];
 			alu_mem_valid_inst0		= valid_inst[ready_mem_high_idx];
+			alu_mem_issue_age0		= age[ready_mem_high_idx];
+			alu_mem_issue_old0		= old[ready_mem_high_idx];
 
 			alu_mem_valid_inst1 	=	0;
 
@@ -1104,6 +1146,8 @@ begin
 			alu_mem_halt1					= halt[ready_mem_high_idx];
 			alu_mem_illegal_inst1	= illegal_inst[ready_mem_high_idx];
 			alu_mem_valid_inst1		= valid_inst[ready_mem_high_idx];
+			alu_mem_issue_age1		= age[ready_mem_high_idx];
+			alu_mem_issue_old1		= old[ready_mem_high_idx];
 
 			alu_mem_valid_inst0 	=	0;
 
