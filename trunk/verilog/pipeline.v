@@ -6,8 +6,7 @@
  *
  ************************************************************/
 
- `timescale 1ns/100ps
- 
+
  module pipeline (// Inputs
                  clock,
                  reset,
@@ -138,7 +137,7 @@
 	output	[6:0]	rob_retire_tag_b;
 
 	/*
-	 * Output from cache mem
+	 * Input & Output from cache mem
 	 */
   wire [63:0] proc2Dmem_addr, proc2Imem_addr;
   wire [1:0]  proc2Dmem_command, proc2Imem_command;
@@ -160,8 +159,8 @@
 	/*
 	 * Output from IF
 	 */
-	wire	 [63:0]	if_id_NPC0;
-	wire	 [63:0]	if_id_NPC1;
+	wire	 [63:0]	if_id_bht_NPC0;
+	wire	 [63:0]	if_id_bht_NPC1;
 	wire	 [31:0]	if_id_IR0;
 	wire	 [31:0]	if_id_IR1;
 	wire					if_id_valid_inst0;
@@ -170,8 +169,8 @@
 	wire					if_id_branch_taken1;
 	wire	 [63:0]	if_id_pred_addr0;
 	wire	 [63:0]	if_id_pred_addr1;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_id_bhr0;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_id_bhr1;
+	wire					if_bht_valid_cond0;
+	wire					if_bht_valid_cond1;
 
 	/*
 	 * Output from ID
@@ -219,15 +218,15 @@
 	wire					id_rs_uncond_branch1;
 	wire					id_rs_rob_halt0;
 	wire					id_rs_rob_halt1;
+	
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr0;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr1;
 
 	wire					id_rs_rob_mt_illegal_inst0;
 	wire					id_rs_rob_mt_illegal_inst1;
 	wire					id_rs_rob_mt_valid_inst0;
 	wire					id_rs_rob_mt_valid_inst1;
 	
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr0;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] id_rob_bhr1;
-
 	wire		[1:0]	id_rs_rob_mt_dispatch_num;
 	wire		[1:0]	id_if_inst_need_num;
 
@@ -256,30 +255,29 @@
 	 * Output from ROB		'
 	 */
 	wire	 [1:0] rob_id_cap;
-	wire	 [6:0] rob_fl_retire_tag_a;
-	wire	 [6:0] rob_fl_retire_tag_b;
-	wire	 [1:0] rob_fl_retire_num;
-	wire				 rob_retire_halt;
 	wire  [4:0]  rob_mt_retire_ar_a;
 	wire  [4:0]  rob_mt_retire_ar_b;
-	wire  [4:0]  rob_fl_exception_ar;
-	wire  [6:0]  rob_fl_exception_pr;
-	wire  [63:0] rob_btb_bht_PC0;
-	wire  [63:0] rob_btb_actual_addr0;
+	wire	 [6:0] rob_mt_fl_retire_tag_a;
+	wire	 [6:0] rob_mt_fl_retire_tag_b;
+	wire	 [1:0] rob_mt_fl_bht_recover_retire_num;
+
+	wire  			 rob_bht_recover_cond_branch0;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_recover_retire_bhr0;
+	wire  [63:0] rob_bht_recover_NPC0;
 	wire  			 rob_bht_actual_taken0;
-	wire  			 rob_bht_cond_branch0;
-	wire   			 rob_btb_uncond_branch0;
-	wire  [63:0] rob_btb_bht_PC1;
-	wire  [63:0] rob_btb_actual_addr1;
+	wire   			 rob_recover_uncond_branch0;
+	wire  [63:0] rob_recover_actual_addr0;
+
+	wire   			 rob_bht_recover_cond_branch1;
+	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_recover_retire_bhr1;
+	wire  [63:0] rob_bht_recover_NPC1;
 	wire         rob_bht_actual_taken1;
-	wire   			 rob_bht_cond_branch1;
-	wire         rob_btb_uncond_branch1;
-	wire         rob_retire_exception;
-	wire				 rob_btb_retire_jump0;
-	wire				 rob_btb_retire_jump1;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_bhr0;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_bhr1;
-	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_exception_bhr;
+	wire         rob_recover_uncond_branch1;
+	wire  [63:0] rob_recover_actual_addr1;
+	
+	
+	wire         rob_recover_exception;
+	wire				 rob_retire_halt;
 	/*
 	 * Output from RS
 	 */
@@ -461,16 +459,16 @@
 	wire					cdb_rob_exception3;
 	wire					cdb_rob_exception4;
 	wire					cdb_rob_exception5;
-	wire  [63:0]	cdb_rob_PC0;
+
 	wire  [63:0]	cdb_rob_actual_addr0;
 	wire  				cdb_rob_actual_taken0;
-	wire 					cdb_rob_cond_branch0;
-	wire 					cdb_rob_uncond_branch0;
-	wire  [63:0] 	cdb_rob_PC1;
+//	wire 					cdb_rob_cond_branch0;
+//	wire 					cdb_rob_uncond_branch0;
+
 	wire  [63:0] 	cdb_rob_actual_addr1;
 	wire 				 	cdb_rob_actual_taken1;
-	wire 				 	cdb_rob_cond_branch1;
-	wire 				 	cdb_rob_uncond_branch1;
+//	wire 				 	cdb_rob_cond_branch1;
+//	wire 				 	cdb_rob_uncond_branch1;
 	/*
 	 * Outputs from simple ALU
 	 */
@@ -486,6 +484,10 @@
 	wire		[6:0]	alu_sim_cdb_prf_pr_idx1;
 	wire					alu_sim_cdb_exception0;
 	wire				  alu_sim_cdb_exception1;
+	wire	 [63:0]	alu_sim_cdb_actual_addr0;
+	wire	 [63:0]	alu_sim_cdb_actual_addr1;
+	wire					alu_sim_cdb_actual_taken0;
+	wire					alu_sim_cdb_actual_taken1;
   wire	 [1:0]	alu_sim_rs_avail;
 	/*
 	 * Outputs from multiplier
@@ -522,34 +524,47 @@
 	wire					alu_mem_cdb_exception1 = 0;
 
   wire	 [1:0]	alu_mem_rs_avail;
-  /*
-	 * Inputs from branch history table
-	 */
-  wire if_bht_valid_cond0;
-  wire if_bht_valid_cond1;
-  wire rob_bht_retire_cond0;
-  wire rob_bht_retire_cond1;
-  
   
 	/*
-	 * Outputs from branch history table
+	 * Outputs from BHT
 	 */
 
 	wire				bht_if_branch_taken0;
 	wire				bht_if_branch_taken1;
-	wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_if_bhr0;
-  wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_if_bhr1;
+	wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_id_bhr0;
+  wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_id_bhr1;
 
 	/*
-	 * Outputs from brach target buffer
+	 * Outputs from BTB
 	 */
 
-	wire 	 [63:0]	btb_if_pred_taken0;
-	wire 	 [63:0]	btb_if_pred_taken1;
-	wire	 [63:0]	btb_if_pred_addr0 = 64'b0;
-	wire	 [63:0]	btb_if_pred_addr1 = 64'b0;
+	wire	 [63:0]	btb_if_pred_addr0;
+	wire	 [63:0]	btb_if_pred_addr1;
 	
+	/*
+	 * Outputs from Recover
+	 */
+	 
+	wire					recover_if_reset;
+	wire					recover_if_recover;
+	wire	[63:0]	recover_if_recover_addr;
 	
+	wire					recover_bht_reset;
+	wire					recover_bht_recover;
+	wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] recover_bht_bhr;
+	
+	wire					recover_btb_reset;
+	wire					recover_btb_recover;
+	wire					recover_btb_NPC;
+	wire					recover_btb_actual_addr;
+	
+	wire					recover_fl_reset;
+	wire					recover_fl_recover;
+	
+	wire					recover_mt_reset;
+	wire					recover_mt_recover;
+	
+	wire					recover_other_reset;
 
 	/*
 	 * Reset for each module
@@ -571,7 +586,8 @@
 	wire		dc_reset;
 	wire		cachemem_reset;
 	wire		icache_reset;
-
+	wire		bht_reset;
+	wire		btb_reset;
 	
 	
 
@@ -607,7 +623,7 @@
 
 
 	// Outputs of pipeline
-	assign if_NPC0						= if_id_NPC0;
+	assign if_NPC0						= if_id_bht_NPC0;
 	assign if_IR0							= if_id_IR0;
 	assign if_valid_inst0			= if_id_valid_inst0;
 	assign id_NPC0						= id_rs_NPC0;
@@ -623,7 +639,7 @@
 	assign rs_mem_IR0					= rs_alu_mem_IR0;
 	assign rs_mem_valid_inst0 = rs_alu_mem_valid_inst0;
 
-	assign if_NPC1						= if_id_NPC1;
+	assign if_NPC1						= if_id_bht_NPC1;
 	assign if_IR1							= if_id_IR1;
 	assign if_valid_inst1			= if_id_valid_inst1;
 	assign id_NPC1						= id_rs_NPC1;
@@ -646,25 +662,27 @@
 	assign cdb_pr_tag3					= cdb_rs_rob_mt_pr_tag3;
 	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
 	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
-	assign rob_retire_num				= rob_fl_retire_num;
-	assign rob_retire_tag_a			= rob_fl_retire_tag_a;
-	assign rob_retire_tag_b			= rob_fl_retire_tag_b;
+	assign rob_retire_num				= rob_mt_fl_bht_recover_retire_num;
+	assign rob_retire_tag_a			= rob_mt_fl_retire_tag_a;
+	assign rob_retire_tag_b			= rob_mt_fl_retire_tag_b;
 
-	assign	if_reset 			= reset;
-	assign	id_reset 			= reset;
-	assign	mt_reset 			= reset;
-	assign	rob_reset 		= reset;
-	assign	rs_reset 			= reset;
-	assign	fl_reset 			= reset;
-	assign	prf_reset 		= reset;
-	assign	alu_sim_reset = reset;
-	assign	alu_mul_reset = reset;
-	assign	alu_mem_reset = reset;
-	assign	cdb_reset 		= reset;
-	assign	ic_reset 			= reset;
-	assign	dc_reset 			= reset;
-	assign	cachemem_reset= reset;
-	assign	icache_reset	= reset;
+	assign id_reset = recover_other_reset;
+	assign rob_reset = recover_other_reset;
+	assign rs_reset = recover_other_reset;
+	assign prf_reset = recover_other_reset;
+	assign alu_sim_reset = recover_other_reset;
+	assign alu_mul_reset = recover_other_reset;
+	assign alu_mem_reset = recover_other_reset;
+	assign cdb_reset = recover_other_reset;
+	assign ic_reset = recover_other_reset;
+	assign dc_reset = recover_other_reset;
+	assign cachemem_reset = recover_other_reset;
+	assign icache_reset = recover_other_reset;
+	assign mt_reset = recover_mt_reset;
+	assign fl_reset = recover_fl_reset;
+	assign if_reset = recover_if_reset;
+	assign bht_reset = recover_bht_reset;
+	assign btb_reset = recover_btb_reset;
 
 
   // Actual cache (data and tag RAMs)
@@ -720,24 +738,24 @@
 								.btb_pred_addr1(btb_if_pred_addr1),
 								.Imem2proc_data(Icache_data_out),
 								.Imem_valid(Icache_valid_out),
-								.id_dispatch_num(id_if_inst_need_num), //Danger: inconsistent interface
-								.bht_bhr0(bht_if_bhr0),
-								.bht_bhr1(bht_if_bhr1),
+								.id_dispatch_num(id_if_inst_need_num),
+								.recover(recover_if_recover),
+								.recover_addr(recover_if_recover_addr),
+								 //Danger: inconsistent interface
 										//outputs
-								.id_NPC0(if_id_NPC0),
-								.id_NPC1(if_id_NPC1),
+								.id_bht_NPC0(if_id_bht_NPC0),
+								.id_bht_NPC1(if_id_bht_NPC1),
 								.id_IR0(if_id_IR0),
 								.id_IR1(if_id_IR1),
 								.proc2Imem_addr(proc2Icache_addr),
+								.id_branch_taken0(if_id_branch_taken0),
+								.id_branch_taken1(if_id_branch_taken1),
+								.id_pred_addr0(if_id_pred_addr0),
+								.id_pred_addr1(if_id_pred_addr1),
 								.id_valid_inst0(if_id_valid_inst0),
 								.id_valid_inst1(if_id_valid_inst1),
-
-								.id_branch_taken0(if_id_branch_taken0),
-								.id_pred_addr0(if_id_pred_addr0),
-								.id_branch_taken1(if_id_branch_taken1),
-								.id_pred_addr1(if_id_pred_addr1),
-								.id_bhr0(if_id_bhr0),
-								.id_bhr1(if_id_bhr1)
+								.bht_valid_cond0(if_bht_valid_cond0),
+								.bht_valid_cond1(if_bht_valid_cond1)
 		);
 
 		// ID
@@ -747,16 +765,16 @@
 					.reset(id_reset),
 
 					.if_IR0(if_id_IR0),
-					.if_valid_inst0(if_id_valid_inst0),
-					.if_NPC0(if_id_NPC0),
-					.if_branch_taken0(if_id_branch_taken0),
-					.if_pred_addr0(if_id_pred_addr0),
-					.if_bhr0(if_id_bhr0),
-					.if_bhr1(if_id_bhr1),
 					.if_IR1(if_id_IR1),
+					.if_valid_inst0(if_id_valid_inst0),
 					.if_valid_inst1(if_id_valid_inst1),
-					.if_NPC1(if_id_NPC1),
+					.if_NPC0(if_id_bht_NPC0),
+					.if_NPC1(if_id_bht_NPC1),
+					.bht_bhr0(bht_id_bhr0),
+					.bht_bhr1(bht_id_bhr1),
+					.if_branch_taken0(if_id_branch_taken0),
 					.if_branch_taken1(if_id_branch_taken1),
+					.if_pred_addr0(if_id_pred_addr0),
 					.if_pred_addr1(if_id_pred_addr1),
 
 					.rob_cap(rob_id_cap),
@@ -820,6 +838,7 @@
 
 					.rs_rob_mt_illegal_inst1(id_rs_rob_mt_illegal_inst1),
 					.rs_rob_mt_valid_inst1(id_rs_rob_mt_valid_inst1),
+					
 					.rob_bhr0(id_rob_bhr0),
 					.rob_bhr1(id_rob_bhr1),
 					.rs_rob_mt_dispatch_num(id_rs_rob_mt_dispatch_num),
@@ -831,20 +850,30 @@
 	rob rob0(// Inputs
 					 .clock(clock),
 					 .reset(rob_reset),
-
+					 
+					 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
+					 
 					 .fl_pr0(fl_rob_rs_mt_pr0),
 					 .mt_p0told(mt_rob_p0told),
+					 .id_NPC0(id_rs_NPC0),
+					 .id_dest_idx0(id_rs_mt_dest_idx0),
 					 .id_valid_inst0(id_rs_rob_mt_valid_inst0),
+					 .id_cond_branch0(id_rs_cond_branch0),
+					 .id_uncond_branch0(id_rs_uncond_branch0),
 					 .id_halt0(id_rs_rob_halt0),
 
 					 .fl_pr1(fl_rob_rs_mt_pr1),
 					 .mt_p1told(mt_rob_p1told),
+					 .id_NPC1(id_rs_NPC1),
+					 .id_dest_idx1(id_rs_mt_dest_idx1),
 					 .id_valid_inst1(id_rs_rob_mt_valid_inst1),
+					 .id_cond_branch1(id_rs_cond_branch1),
+					 .id_uncond_branch1(id_rs_uncond_branch1),
 					 .id_halt1(id_rs_rob_halt1),
 
-					 .id_dispatch_num(id_rs_rob_mt_dispatch_num),
 					 .id_bhr0(id_rob_bhr0),
 					 .id_bhr1(id_rob_bhr1),
+
 					 .cdb_pr_ready(cdb_rs_rob_mt_broadcast),
 					 .cdb_pr_tag_0(cdb_rs_rob_mt_pr_tag0),
 					 .cdb_pr_tag_1(cdb_rs_rob_mt_pr_tag1),
@@ -852,47 +881,45 @@
 					 .cdb_pr_tag_3(cdb_rs_rob_mt_pr_tag3),
 					 .cdb_pr_tag_4(cdb_rs_rob_mt_pr_tag4),
 					 .cdb_pr_tag_5(cdb_rs_rob_mt_pr_tag5),
-					 .cdb_exception(cdb_rob_exception),
-					 .cdb_PC0(cdb_rob_PC0),
+					 .cdb_exception0(cdb_rob_exception0),
+					 .cdb_exception1(cdb_rob_exception1),
+					 .cdb_exception2(cdb_rob_exception2),
+					 .cdb_exception3(cdb_rob_exception3),
+					 .cdb_exception4(cdb_rob_exception4),
+					 .cdb_exception5(cdb_rob_exception5),
+					 
 					 .cdb_actual_addr0(cdb_rob_actual_addr0),
 					 .cdb_actual_taken0(cdb_rob_actual_taken0),
-					 .cdb_cond_branch0(cdb_rob_cond_branch0),
-					 .cdb_uncond_branch0(cdb_rob_uncond_branch0),
-					 .cdb_PC1(cdb_rob_PC1),
 					 .cdb_actual_addr1(cdb_rob_actual_addr1),
 					 .cdb_actual_taken1(cdb_rob_actual_taken1),
-					 .cdb_cond_branch1(cdb_rob_cond_branch1),
-					 .cdb_uncond_branch1(cdb_rob_uncond_branch1),
 
 		
 					 // Outputs
 					 .id_cap(rob_id_cap),
-					 
-					 .fl_retire_tag_a(rob_fl_retire_tag_a),
-					 .fl_retire_tag_b(rob_fl_retire_tag_b),
-					 .mt_retire_ar_a(rob_mt_retire_ar_a),
-					 .mt_retire_ar_b(rob_retire_ar_b),
-					 .fl_retire_num(rob_fl_retire_num),
 
-					 .fl_exception_ar(rob_fl_exception_ar),
-					 .fl_exception_pr(rob_fl_exception_pr),
-					 .btb_bht_PC0(rob_btb_bht_PC0),
-					 .btb_actual_addr0(rob_btb_actual_addr0),
-					 .bht_bhr_out0(rob_bht_bhr0),
-					 .bht_bhr_out1(rob_bht_bhr1),
-					 .bht_exception_bhr(rob_bht_exception_bhr),
+					 .mt_retire_ar_a(rob_mt_retire_ar_a),
+					 .mt_retire_ar_b(rob_mt_retire_ar_b),	 
+					 .mt_fl_retire_tag_a(rob_mt_fl_retire_tag_a),
+					 .mt_fl_retire_tag_b(rob_mt_fl_retire_tag_b),
+
+					 .mt_fl_bht_recover_retire_num(rob_mt_fl_bht_recover_retire_num),
+
+					 .bht_recover_cond_branch0(rob_bht_recover_cond_branch0),
+					 .bht_recover_retire_bhr0(rob_bht_recover_retire_bhr0),
+					 .bht_recover_NPC0(rob_bht_recover_NPC0),
 					 .bht_actual_taken0(rob_bht_actual_taken0),
-					 .bht_cond_branch0(rob_bht_cond_branch0),
-					 .btb_uncond_branch0(rob_btb_uncond_branch0),
-					 .btb_bht_PC1(rob_btb_bht_PC1),
-					 .btb_actual_addr1(rob_btb_actual_addr1),
+					 .recover_uncond_branch0(rob_recover_uncond_branch0),
+					 .recover_actual_addr0(rob_recover_actual_addr0),
+					 
+					 .bht_recover_cond_branch1(rob_bht_recover_cond_branch1),
+					 .bht_recover_retire_bhr1(rob_bht_recover_retire_bhr1),
+					 .bht_recover_NPC1(rob_bht_recover_NPC1),
 					 .bht_actual_taken1(rob_bht_actual_taken1),
-					 .bht_cond_branch1(rob_bht_cond_branch1),
-					 .btb_uncond_branch1(rob_btb_uncond_branch1),
-				   .retire_exception(rob_retire_exception),
-					 .retire_halt(rob_retire_halt),
-					 .btb_retire_jump0(rob_btb_retire_jump0),
-					 .btb_retire_jump1(rob_btb_retire_jump1)
+					 .recover_uncond_branch1(rob_recover_uncond_branch1),
+					 .recover_actual_addr1(rob_recover_actual_addr1),
+					 
+					 .recover_exception(rob_recover_exception),
+					 .retire_halt(rob_retire_halt)
 	);
 
 	// Map table
@@ -934,6 +961,13 @@
 				 .cdb_ar_tag3(cdb_mt_ar_tag3),
 				 .cdb_ar_tag4(cdb_mt_ar_tag4),
 				 .cdb_ar_tag5(cdb_mt_ar_tag5),
+				 
+				 .recover(recover_mt_recover),
+				 .rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+				 .rob_retire_ar0(rob_mt_retire_ar_a),
+				 .rob_retire_ar1(rob_mt_retire_ar_b),
+				 .rob_retire_pr0(rob_mt_fl_retire_tag_a),
+				 .rob_retire_pr1(rob_mt_fl_retire_tag_b),
 
 				// Outputs
 				 .rob_p0told(mt_rob_p0told),
@@ -956,10 +990,11 @@
 					.clock(clock),
 					.reset(fl_reset),
 					.id_dispatch_num(id_rs_rob_mt_dispatch_num),
-					.rob_retire_num(rob_fl_retire_num),
-					.rob_retire_tag_0(rob_fl_retire_tag_a),
-					.rob_retire_tag_1(rob_fl_retire_tag_b),
-
+					.rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+					.rob_retire_tag_0(rob_mt_fl_retire_tag_a),
+					.rob_retire_tag_1(rob_mt_fl_retire_tag_b),
+					
+					.recover(recover_fl_recover),
 					// Outputs
 					.rob_rs_mt_pr0(fl_rob_rs_mt_pr0),
 					.rob_rs_mt_pr1(fl_rob_rs_mt_pr1)
@@ -1273,6 +1308,11 @@
 						.alu_sim_pr_idx1(alu_sim_cdb_prf_pr_idx1),
 						.alu_sim_ar_idx1(alu_sim_cdb_ar_idx1),
 						.alu_sim_exception1(alu_sim_cdb_exception1),
+						
+						.alu_sim_actual_addr0(alu_sim_cdb_actual_addr0),
+						.alu_sim_actual_taken0(alu_sim_cdb_actual_taken0),
+						.alu_sim_actual_addr1(alu_sim_cdb_actual_addr1),
+						.alu_sim_actual_taken1(alu_sim_cdb_actual_taken1),
 
 						.alu_mul_complete0(alu_mul_cdb_complete0),
 						.alu_mul_pr_idx0(alu_mul_cdb_prf_pr_idx0),
@@ -1313,7 +1353,17 @@
 						.rob_exception2(cdb_rob_exception2),
 						.rob_exception3(cdb_rob_exception3),
 						.rob_exception4(cdb_rob_exception4),
-						.rob_exception5(cdb_rob_exception5)
+						.rob_exception5(cdb_rob_exception5),
+						
+						.rob_actual_addr0(cdb_rob_actual_addr0),
+						.rob_actual_taken0(cdb_rob_actual_taken0),
+//						.rob_cond_branch0(cdb_rob_cond_branch0),
+//						.rob_uncond_branch0(cdb_rob_uncond_branch0),
+
+						.rob_actual_addr1(cdb_rob_actual_addr1),
+						.rob_actual_taken1(cdb_rob_actual_taken1)
+//						.rob_cond_branch1(cdb_rob_cond_branch1),
+//						.rob_uncond_branch1(cdb_rob_uncond_branch1)
 	);
 
 	/*
@@ -1368,6 +1418,11 @@
 										.cdb_exception1(alu_sim_cdb_exception1),
 										.prf_result1(alu_sim_prf_value0),
 										.prf_write_enable1(alu_sim_prf_wr_enable1),
+										
+										.cdb_actual_addr0(alu_sim_cdb_actual_addr0),
+										.cdb_actual_addr1(alu_sim_cdb_actual_addr1),
+										.cdb_actual_taken0(alu_sim_cdb_actual_taken0),
+										.cdb_actual_taken1(alu_sim_cdb_actual_taken1),
 
 										.rs_alu_avail(alu_sim_rs_avail)
 										);
@@ -1421,57 +1476,98 @@
 	 */
  bht bht0(//Inputs
 						.clock(clock),
-						.reset(reset),///bht_reset later, tho I dont kno why.....
+						.reset(bht_reset),///bht_reset later, tho I dont kno why.....
 						
-						.if_pc(if_id_NPC0),
-						.if_pc_plus_four(if_id_NPC1),//not implemented yet
+						.if_NPC0(if_id_bht_NPC0),
+						.if_NPC1(if_id_bht_NPC1),//not implemented yet
 									
 						.if_valid_cond0(if_bht_valid_inst0),
 						.if_valid_cond1(if_bht_valid_inst1),
 
-						.rob_exception_BHR(rob_bht_exception_bhr),//stored by ROB to use in recovery.
-						.rob_exception(rob_retire_exception),
+						.recover_cond(rob_recover_exception),
+						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
 						
-						.rob_retire_cond0(rob_bht_retire_cond0),
-						.rob_retire_pc0(rob_btb_bht_PC0),
-						.rob_retire_BHR0(rob_bht_bhr0),
+						.rob_retire_cond0(rob_bht_recover_cond_branch0),
+						.rob_retire_NPC0(rob_bht_recover_NPC0),
+						.rob_retire_BHR0(rob_bht_recover_retire_bhr0),
 						.rob_actual_taken0(rob_bht_actual_taken0),
 						
-						.rob_retire_cond1(rob_bht_retire_cond1),
-						.rob_retire_pc1(rob_btb_bht_PC1),
-						.rob_retire_BHR1(rob_bht_bhr1),
+						.rob_retire_cond1(rob_bht_recover_cond_branch1),
+						.rob_retire_NPC1(rob_bht_recover_NPC1),
+						.rob_retire_BHR1(rob_bht_recover_retire_bhr1),
 						.rob_actual_taken1(rob_bht_actual_taken1),
 						
 						//Outputs
 						.if_branch_taken0(bht_if_branch_taken0),
 						.if_branch_taken1(bht_if_branch_taken1),
-						.if_BHR_out0(bht_if_bhr0),//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
-						.if_BHR_out1(bht_if_bhr1)
+						.id_bhr0(bht_id_bhr0),//these inputs are given to if rather than rob. These value would eventually be given to ROB by id.
+						.id_bhr1(bht_id_bhr1)
 						);
 	/*
 	 * Branch Target Buffer
 	 */					
  btb btb0(//inputs
 					.clock(clock),
-					.reset(reset),//btb_reset, although I dont know why
+					.reset(btb_reset),//btb_reset, although I dont know why
 					
-					.if_pc(if_id_NPC0),
-					.if_pc_plus_four(if_id_NPC1),//not implemented yet
-					
-					.rob_retire_jump0(rob_btb_retire_jump0),
-					.rob_retire_pc0(rob_btb_bht_PC0),
-					.rob_cre_npc0(rob_btb_actual_addr0),
+					.if_NPC0(if_id_bht_NPC0),
+					.if_NPC1(if_id_bht_NPC1),
 
-					.rob_retire_jump1(rob_btb_retire_jump1),
-					.rob_retire_pc1(rob_btb_bht_PC1),
-					.rob_cre_npc1(rob_btb_actual_addr1),
+					.recover_uncond(recover_btb_recover),
+					.recover_NPC(recover_btb_NPC),
+					.recover_actual_addr(recover_btb_actual_addr),
 					
 					//outputs
 					.if_pred_addr0(btb_if_pred_addr0),
 					.if_pred_addr1(btb_if_pred_addr1)
 					);
-					
-					
+		
+
+	/*
+	 * Branch Target Buffer
+	 */					
+ recover recover(//inputs
+							.clock(clock),
+							.reset(reset),
+
+							.rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+							.rob_exception(rob_recover_exception),
+
+							.rob_cond_branch0(rob_bht_recover_cond_branch0),
+							.rob_bhr0(rob_bht_recover_retire_bhr0),
+							.rob_NPC0(rob_bht_recover_NPC0),
+							.rob_uncond_branch0(rob_recover_uncond_branch0),
+							.rob_actual_addr0(rob_recover_actual_addr0),
+
+							.rob_cond_branch1(rob_bht_recover_cond_branch1),
+							.rob_bhr1(rob_bht_recover_retire_bhr1),
+							.rob_NPC1(rob_bht_recover_NPC1),
+							.rob_uncond_branch1(rob_recover_uncond_branch1),
+							.rob_actual_addr1(rob_recover_actual_addr1),
+							//outputs
+							//if
+							.if_reset(recover_if_reset),
+							.if_recover(recover_if_recover),
+							.if_recover_addr(recover_if_recover_addr),
+							//bht
+							.bht_reset(recover_bht_reset),
+							.bht_recover(recover_bht_recover),
+							.bht_bhr(recover_bht_bhr),
+							//btb
+							.btb_reset(recover_btb_reset),
+							.btb_recover(recover_btb_recover),
+							.btb_NPC(recover_btb_NPC),
+							.btb_actual_addr(recover_btb_actual_addr),
+							//fl
+							.fl_reset(recover_fl_reset),
+							.fl_recover(recover_fl_recover),
+							//mt
+							.mt_reset(recover_mt_reset),
+							.mt_recover(recover_mt_recover),
+							//universal reset: id,rob,rs,alu_sim,alu_mul,cdb
+							.other_reset(recover_other_reset)
+							);
+ 					
 					
 					
 					

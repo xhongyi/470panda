@@ -3,22 +3,21 @@
 
 //currently is implemented as a direct mapped caches with 1024 entries
 
-`timescale 1ns/100ps
 
 module btb(//inputs
 					clock,
 					reset,
 					
-					if_pc,
-					if_pc_plus_four,//not implemented yet
+					if_NPC0,
+					if_NPC1,//not implemented yet
 					
-					rob_retire_jump0,
-					rob_retire_pc0,
-					rob_cre_npc0,
+					recover_uncond,
+					recover_NPC,
+					recover_actual_addr,
 
-					rob_retire_jump1,
-					rob_retire_pc1,
-					rob_cre_npc1,
+//				rob_retire_jump1,
+//				rob_retire_pc1,
+//				rob_cre_npc1,
 					
 					//outputs
 					if_pred_addr0,
@@ -39,16 +38,18 @@ module btb(//inputs
 input	clock;
 input	reset;
 
-input	[63:0]					if_pc;//current PC
-input [63:0]					if_pc_plus_four;
+input	[63:0]					if_NPC0;//current PC
+input [63:0]					if_NPC1;
 
-input									rob_retire_jump0;//the retired instruction.
-input	[63:0]					rob_retire_pc0;
-input	[63:0]					rob_cre_npc0;
+input									recover_uncond;//the retired instruction.
+input	[63:0]					recover_NPC;
+input	[63:0]					recover_actual_addr;
 
+/*
 input									rob_retire_jump1;//the retired instruction.
 input	[63:0]					rob_retire_pc1;
 input	[63:0]					rob_cre_npc1;
+*/
 
 output	[63:0]				if_pred_addr0;//the predictied npc
 output	[63:0]				if_pred_addr1;
@@ -65,8 +66,8 @@ wire	[63:0]					if_pred_addr1;
 
 integer i;
 
-assign if_pred_addr0 = {32'b0, next_br_displ[if_pc[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
-assign if_pred_addr1 = {32'b0, next_br_displ[if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+assign if_pred_addr0 = {32'b0, next_br_displ[if_NPC0[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+assign if_pred_addr1 = {32'b0, next_br_displ[if_NPC1[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
 
 always @* begin
 	for(i=0; i<`NUM_BTB_ENTRIES; i=i+1) begin
@@ -77,27 +78,27 @@ always @* begin
 //correct the BTB if there is a mispredicted branch.	
 /*
 	if (rob_retire_jump0 && 
-			(tag[rob_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] == 
-			 rob_retire_pc0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
+			(tag[recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2]] == 
+			 recover_NPC[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
 */
-	if (rob_retire_jump0)
-		next_br_displ[rob_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_cre_npc0[`LOG_ENTRIES_VALUE+1:2];
+	if (recover_uncond)
+		next_br_displ[recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2]] = recover_actual_addr[`LOG_ENTRIES_VALUE+1:2];
 /*
 	if (rob_retire_jump1 && 
 			(tag[rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] == 
 			 rob_retire_pc1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
-*/
+
 	if (rob_retire_jump1)
 		next_br_displ[rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] = rob_cre_npc1[`LOG_ENTRIES_VALUE+1:2];
 
-/*	
+
 //give out the predicted target npc
 //first by the first instruction is predicted as a branch
-	if (tag[if_pc[`LOG_NUM_BTB_ENTRIES+1:2]] == if_pc[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2])
-		if_pred_addr0 = {if_pc[63:`LOG_NUM_BTB_ENTRIES+2], br_displ[if_pc[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+	if (tag[if_NPC0[`LOG_NUM_BTB_ENTRIES+1:2]] == if_NPC0[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2])
+		if_pred_addr0 = {if_NPC0[63:`LOG_NUM_BTB_ENTRIES+2], br_displ[if_NPC0[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
 	else
-	if (tag[if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+1:2]] == if_pc_plus_four[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2])
-		if_pred_addr1 = {if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+2], br_displ[if_pc_plus_four[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+	if (tag[if_NPC1[`LOG_NUM_BTB_ENTRIES+1:2]] == if_NPC1[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2])
+		if_pred_addr1 = {if_NPC1[`LOG_NUM_BTB_ENTRIES+2], br_displ[if_NPC1[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
 */
 end
 
@@ -124,8 +125,7 @@ generate
 		wire [29:0] BR_DISPL = br_displ[IDX];  //64 tags, 7 bits each.
 		wire [29:0] NEXT_BR_DISPL = next_br_displ[IDX];
 	end
-	wire [`LOG_NUM_BTB_ENTRIES-1:0] RETIRE_ENTRY0 = rob_retire_pc0[`LOG_NUM_BTB_ENTRIES+1:2];
-	wire [`LOG_NUM_BTB_ENTRIES-1:0] RETIRE_RETRY1 = rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2];
+	wire [`LOG_NUM_BTB_ENTRIES-1:0] RETIRE_ENTRY0 = recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2];
 endgenerate
 
 endmodule
