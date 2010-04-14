@@ -283,7 +283,7 @@ begin
 		if (rs_wr_mem0 & rs_wr_mem1)
 			rs_avail	= 2'b01;
 		else
-			rs_avail	= 2'b10;
+			rs_avail	= 2'b11;
 
 	// Store the new ld to ldq
 	
@@ -431,50 +431,46 @@ begin
 
 	// Send ld either to the cdb or Dcache
 	// There are potential latches
+	cdb_complete			= 0;
+	cdb_prf_pr_idx		= 0;
+	cdb_ar_idx				= 0;
+	prf_pr_wr_enable	= 0;
+	prf_pr_value			= 64'b0;
 
 	if (rs_wr_mem0 & rs_valid_inst0)
 	begin
 		cdb_complete			= 1;
 		cdb_prf_pr_idx		= rs_dest_pr_idx0;
 		cdb_ar_idx				= rs_dest_ar_idx0;
-		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
-		prf_pr_value			= 0;
+		prf_pr_wr_enable	= 1; // This solve the ZERO_REG problem. Right?
+		prf_pr_value			= 64'b0;
 	end
 	else if (rs_wr_mem1 & rs_valid_inst1)
 	begin
 		cdb_complete			= 1;
 		cdb_prf_pr_idx		= rs_dest_pr_idx1;
 		cdb_ar_idx				= rs_dest_ar_idx1;
-		prf_pr_wr_enable	= 0; // This solve the ZERO_REG problem. Right?
-		prf_pr_value			= 0;
+		prf_pr_wr_enable	= 1; // This solve the ZERO_REG problem. Right?
+		prf_pr_value			= 64'b0;
 	end
-	else if (~ldq_ready)
-	begin
-		cdb_complete			= 0;
-		cdb_prf_pr_idx		= 0;
-		cdb_ar_idx				= 0;
-		prf_pr_wr_enable	= 0;
-		prf_pr_value			= 0;
-	end
-
 
 	Dcache_rd_mem		= 0;
 	Dcache_wr_mem		= 0;
-	Dcache_addr			= 0;
+	Dcache_addr			= 64'b0;
 	Dcache_pr_idx		= 0;
 	Dcache_ar_idx		= 0;
 	if (ldq_ready & ~ld_cdb_wait)
 	begin
 		if (next_ld_match[ldq_ready_high] | next_ld_match[ldq_ready_low])
 			cdb_complete = 1;
-		else
+	/*	else
 		begin
 			cdb_complete 			= 0;
 			cdb_prf_pr_idx		= 0;
 			cdb_ar_idx				= 0;
 			prf_pr_wr_enable	= 0;
 			prf_pr_value			= 0;
-		end
+		end*/
 
 		if (next_ld_match[ldq_ready_high] & ~ld_cdb_wait)
 		begin
