@@ -73,11 +73,9 @@ module lsq (// Inputs
 						Dcache_ar_idx,
 
 						// For the retired store value
-						Dcache_st_value0,
-						Dcache_st_value1,
+						Dcache_st_value,
 
-						Dcache_st_addr0,
-						Dcache_st_addr1
+						Dcache_st_addr,
 						);
 
 `ifndef LEN_STQ
@@ -151,8 +149,8 @@ output [63:0]	Dcache_addr;
 output	[6:0]	Dcache_pr_idx;
 output	[4:0]	Dcache_ar_idx;
 
-output [63:0]	Dcache_st_value0;
-output [63:0]	Dcache_st_value1;
+output [63:0]	Dcache_st_value;
+output [63:0]	Dcache_st_addr;
 
 reg						cdb_complete;
 reg			[6:0]	cdb_prf_pr_idx;
@@ -240,8 +238,8 @@ assign rs_disp_old0 = st_empty;
 assign rs_disp_age1 = (id_wr_mem0)? st_tail + 1: st_tail;
 assign rs_disp_old1 = (id_wr_mem0)? 0: st_empty;
 
-assign Dcache_st_value0 = st_value[st_head];
-assign Dcache_st_value1 = st_value[st_head+1];
+assign Dcache_st_value 	= st_value[st_head];
+assign Dcache_st_addr		= st_addr[st_head];
 
 prien_4 prien_ldq_avail(.decode(ld_avail),
 												.encode_high(ldq_high_idx),
