@@ -176,6 +176,7 @@ module decoder(// Inputs
               `STQ_INST:
                 begin
                   wr_mem = `TRUE;
+									opa_select = `ALU_OPA_IS_REGA;
                   dest_reg = `DEST_NONE;
                 end // case: `STQ_INST
               `STQ_C_INST:
