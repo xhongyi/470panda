@@ -7,8 +7,6 @@
  * Min clock time: 3.5
  */
 
-`timescale 1ns/100ps
-
 
   // Decode an instruction: given instruction bits IR produce the
   // appropriate datapath control signals.
@@ -176,7 +174,6 @@ module decoder(// Inputs
               `STQ_INST:
                 begin
                   wr_mem = `TRUE;
-									opa_select = `ALU_OPA_IS_REGA;
                   dest_reg = `DEST_NONE;
                 end // case: `STQ_INST
               `STQ_C_INST:
@@ -327,8 +324,8 @@ module id (
 				if_valid_inst1,
 				if_NPC0,
 				if_NPC1,
-				if_bhr0,
-				if_bhr1,
+				bht_bhr0,
+				bht_bhr1,
 				if_branch_taken0,
 				if_branch_taken1,
 				if_pred_addr0,
@@ -383,8 +380,8 @@ module id (
 				rs_halt0,
 				rs_halt1,
 				
-				rob_bhr0,
-				rob_bhr1,
+				rob_bhr0,//new
+				rob_bhr1,//new
 
 				rs_rob_mt_illegal_inst0,
 				rs_rob_mt_illegal_inst1,
@@ -403,8 +400,8 @@ input					if_valid_inst0;
 input					if_valid_inst1;
 input	 [63:0] if_NPC0;
 input	 [63:0]	if_NPC1;
-input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_bhr0;
-input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] if_bhr1;
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] bht_bhr0;
+input [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] bht_bhr1;
 input					if_branch_taken0;
 input 				if_branch_taken1;
 input	 [63:0]	if_pred_addr0;
@@ -489,6 +486,7 @@ reg					uncond_branch0;
 reg					halt0;
 reg					illegal_inst0;
 reg					valid_inst0;
+reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bhr0;//new
 
 reg	 [63:0]	npc1;
 reg	 [31:0]	ir1;
@@ -510,6 +508,7 @@ reg					uncond_branch1;
 reg					halt1;
 reg					illegal_inst1;
 reg					valid_inst1;
+reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bhr1;//new
 
 wire	[4:0]	next_ra_idx0;
 wire	[4:0]	next_rb_idx0;
@@ -604,9 +603,6 @@ assign next_ra_idx1 = if_IR1[25:21];   // inst operand A register index
 assign next_rb_idx1 = if_IR1[20:16];   // inst operand B register index
 assign next_rc_idx1 = if_IR1[4:0];     // inst operand C register index
 
-assign rob_bhr0 = if_bhr0;
-assign rob_bhr1 = if_bhr1;
-
 always @*
 begin
 	case (dest_reg_select0)
@@ -693,6 +689,8 @@ assign rs_cond_branch0		= cond_branch0;
 assign rs_uncond_branch0	= uncond_branch0;
 assign rs_halt0						= halt0;
 
+assign rob_bhr0 = bhr0;//new
+
 assign rs_rob_mt_illegal_inst0 	= illegal_inst0;
 assign rs_rob_mt_valid_inst0		= (dispatch_num[1] | dispatch_num[0]) ? valid_inst0 : 1'b0;
 
@@ -721,6 +719,8 @@ assign rs_stc_mem1				= stc_mem1;
 assign rs_cond_branch1		= cond_branch1;
 assign rs_uncond_branch1	= uncond_branch1;
 assign rs_halt1						= halt1;
+
+assign rob_bhr1 = bhr1;//new
 
 assign rs_rob_mt_illegal_inst1 	= illegal_inst1;
 assign rs_rob_mt_valid_inst1		= (dispatch_num[1]) ? valid_inst1 : 1'b0;
@@ -752,6 +752,7 @@ begin
 		halt0						<= `SD 0;
 		illegal_inst0 	<= `SD 0;
 		valid_inst0			<= `SD 0;
+		bhr0						<= `SD 0;
 
 		npc1						<= `SD 0;
 		ir1							<= `SD `NOOP_INST;
@@ -771,6 +772,7 @@ begin
 		halt1						<= `SD 0;
 		illegal_inst1 	<= `SD 0;
 		valid_inst1			<= `SD 0;
+		bhr1						<= `SD 0;
 	end
 	else if (dispatch_num[1] || (dispatch_num[0] && ~valid_inst1) || (~valid_inst1 && ~valid_inst0)) // Two instructions are dispatched
 	begin
@@ -794,6 +796,7 @@ begin
 		halt0 					<= `SD next_halt0;
 		illegal_inst0 	<= `SD next_illegal_inst0;
 		valid_inst0 		<= `SD next_valid_inst0;
+		bhr0						<= `SD bht_bhr0;
 
 		npc1 						<= `SD if_NPC1;
 		ir1 						<= `SD if_IR1;
@@ -815,6 +818,7 @@ begin
 		halt1 					<= `SD next_halt1;
 		illegal_inst1 	<= `SD next_illegal_inst1;
 		valid_inst1 		<= `SD next_valid_inst1;
+		bhr1						<= `SD bht_bhr1;
 		end
 	else if (dispatch_num[0] && valid_inst1) // One instructions are dispatched
 		begin
@@ -838,6 +842,7 @@ begin
 		halt0 					<= `SD halt1;
 		illegal_inst0 	<= `SD illegal_inst1;
 		valid_inst0 		<= `SD valid_inst1;
+		bhr0						<= `SD bhr1;
 
 		npc1 						<= `SD if_NPC0;
 		ir1 						<= `SD if_IR0;
@@ -859,6 +864,7 @@ begin
 		halt1 					<= `SD next_halt0;
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
+		bhr1						<= `SD bht_bhr0;
 		end
 	else if (dispatch_num == 2'b0 && valid_inst0 && ~valid_inst1)
 	begin
@@ -882,6 +888,7 @@ begin
 		halt1 					<= `SD next_halt0;
 		illegal_inst1 	<= `SD next_illegal_inst0;
 		valid_inst1 		<= `SD next_valid_inst0;
+		bhr1						<= `SD bht_bhr0;
 	end
 end
 
