@@ -38,8 +38,8 @@ module rob(//inputs
 						id_halt1,
 						id_bhr0,//new
 						id_bhr1,//new
-						id_wr_mem0;//new!!
-						id_wr_mem1;//new!!
+						id_wr_mem0,//new!!
+						id_wr_mem1,//new!!
 						//complete
 						cdb_pr_ready,
 						cdb_pr_tag_0,
@@ -85,6 +85,7 @@ module rob(//inputs
 						
 						lsq_retire_wr_mem0,//new!!
 						lsq_retire_wr_mem1,//new!!
+						
 
 						recover_exception,//new
 						retire_halt //new it is true when halt inst is retired
@@ -119,8 +120,8 @@ input														id_halt1;
 input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr0;
 input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr1;
 
-input														id_mem0;//new!!
-input														id_mem1;//new!!
+input														id_wr_mem0;//new!!
+input														id_wr_mem1;//new!!
 
 
 input	[5:0]											cdb_pr_ready;	//Note:	the	bandwidth	is	CDB_WIDTH;
@@ -166,7 +167,7 @@ output	[63:0]									recover_actual_addr1;
 output													recover_uncond_branch1;
 
 output													lsq_retire_wr_mem0;//new!!
-output													lsq_reitre_wr_mem1;//new!!
+output													lsq_retire_wr_mem1;//new!!
 
 output													recover_exception;//new
 output													retire_halt;
@@ -454,7 +455,7 @@ begin
 	//check  if tail and tail_plus_one are ready
 	//if ready, put the tag to retire
 	//if retire is tail, output
-  if (ready[head] & ready[head_plus_one] & ~exception[head]) begin//two
+  if (ready[head] & ready[head_plus_one] & ~exception[head] & ~(wr_mem[head] & wr_mem[head_plus_one])) begin//two
 		next_head											= head_plus_two;
 		next_ready[head]							= 1'b0;
 		next_ready[head_plus_one]			= 1'b0;
@@ -465,7 +466,7 @@ begin
 		next_tag[head]								= 7'd127;
 		next_tag[head]								= 7'd127;
 	end
-	else if (ready[head] & (~ready[head_plus_one] | exception[head])) begin//one
+	else if (ready[head] & (~ready[head_plus_one] | exception[head] | (wr_mem[head] & wr_mem[head_plus_one]))) begin//one
 		next_head											= head_plus_one;
 		next_ready[head]							= 1'b0;
 		lsq_mt_fl_bht_recover_retire_num 	= 2'd1;
