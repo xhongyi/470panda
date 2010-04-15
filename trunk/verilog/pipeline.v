@@ -137,25 +137,59 @@
 	output	[6:0]	rob_retire_tag_b;
 
 	/*
-	 * Input & Output from cache mem
+	 * Input & Output from Icache mem
 	 */
-  wire [63:0] proc2Dmem_addr, proc2Imem_addr;
-  wire [1:0]  proc2Dmem_command, proc2Imem_command;
-  wire [3:0]  Imem2proc_response, Dmem2proc_response;
+  wire [63:0] Icachemem_data;
+  wire        Icachemem_valid;
+
+	/*
+	 * Input & Output from Dcache mem
+	 */
+  wire [63:0] proc2Imem_addr;
+  wire [1:0]  proc2Imem_command;
+  wire [3:0]  Imem2proc_response;
 
 	/*
 	 * Output from icache
 	 */
-  wire [63:0] Icachemem_data;
-  wire        Icachemem_valid;
-  wire  [6:0] Icache_rd_idx;
-  wire [21:0] Icache_rd_tag;
-  wire  [6:0] Icache_wr_idx;
-  wire [21:0] Icache_wr_tag;
-  wire        Icache_wr_en;
-  wire [63:0] Icache_data_out, proc2Icache_addr;
-  wire        Icache_valid_out;
+  wire [63:0] proc2Imem_addr;//
+  wire [1:0]  proc2Imem_command;//
+  wire [3:0]  Imem2proc_response;
 
+  wire  [6:0] Icache_rd_idx;//
+  wire [21:0] Icache_rd_tag;//
+  wire  [6:0] Icache_wr_idx;//
+  wire [21:0] Icache_wr_tag;//
+  wire        Icache_wr_en;//
+  wire [63:0] Icache_data_out;//
+  wire [63:0] proc2Icache_addr;
+  wire        Icache_valid_out;//
+
+	/*
+	 * Outputs from Dcache
+	 */
+	
+	wire  [1:0] 					Dcache_Dmem_command;//store? load? none?
+  wire [63:0] 					Dcache_Dmem_addr;//addr to dmem
+  wire [63:0] 					Dcache_Dmem_data;
+  wire									Dcache_lsq_load_avail;
+  wire [63:0] 					Dcache_prf_data_out;     // value is memory[proc2Dcache_addr]
+  wire        					Dcache_valid_out;
+  wire 									Dcache_load_en;//Dcache_valid_out & Dcache_load_en are intermediate signal. They would be oprands for Decache_cdb_complete.
+	wire	[6:0] 					Dcache_cdb_prf_pr_idx;
+	wire  [4:0] 					Dcache_cdb_ar_idx;
+  wire  [6:0] 					dcache_rd_idx;
+  wire [21:0] 					dcache_rd_tag;
+  wire  [6:0] 					dcache_wr_idx1;
+  wire [21:0] 					dcache_wr_tag1;
+	wire  [6:0] 					dcache_wr_idx0;
+  wire [21:0] 					dcache_wr_tag0;
+  wire        					dcache_wr_en1;
+	wire        					dcache_wr_en0;
+	wire [63:0] 					dcache_wr_data;
+	
+	wire									Dcache_cdb_prf_complete;//additional wire. Determine cdb_complete(Dcache only for load)
+	
 	/*
 	 * Output from IF
 	 */
@@ -539,30 +573,6 @@
 	wire	[63:0]					lsq_Dcache_st_value;
 	wire	[63:0]					lsq_Dcache_st_addr;
 
-	/*
-	 * Outputs from Dcache
-	 */
-	
-	wire  [1:0] 					Dcache_Dmem_command;//store? load? none?
-  wire [63:0] 					Dcache_Dmem_addr;//addr to dmem
-  wire [63:0] 					Dcache_Dmem_data;
-  wire									Dcache_lsq_load_avail;
-  wire [63:0] 					Dcache_prf_data_out;     // value is memory[proc2Dcache_addr]
-  wire        					Dcache_valid_out;
-  wire 									Dcache_load_en;//Dcache_valid_out & Dcache_load_en are intermediate signal. They would be oprands for Decache_cdb_complete.
-	wire	[6:0] 					Dcache_cdb_prf_pr_idx;
-	wire  [4:0] 					Dcache_cdb_ar_idx;
-  wire  [6:0] 					dcache_rd_idx;
-  wire [21:0] 					dcache_rd_tag;
-  wire  [6:0] 					dcache_wr_idx1;
-  wire [21:0] 					dcache_wr_tag1;
-	wire  [6:0] 					dcache_wr_idx0;
-  wire [21:0] 					dcache_wr_tag0;
-  wire        					dcache_wr_en1;
-	wire        					dcache_wr_en0;
-	wire [63:0] 					dcache_wr_data;
-	
-	wire									Dcache_cdb_prf_complete;//additional wire. Determine cdb_complete(Dcache only for load)
 	
 	/*
 	 * Outputs from BHT
@@ -619,15 +629,13 @@
 	wire		prf_reset;
 	wire		alu_sim_reset;
 	wire		alu_mul_reset;
-	wire		alu_mem_reset;
+	wire		lsq_reset;//new
 	wire		cdb_reset;
-	wire		ic_reset;
-	wire		dc_reset;
 	wire		cachemem_reset;
-	wire		icache_reset;
+	wire		cache_reset;
 	wire		bht_reset;
 	wire		btb_reset;
-	wire		lsq_reset;
+
 	
 	
 
@@ -637,10 +645,10 @@
 
 	
   assign proc2mem_command =
-           (proc2Dmem_command==`BUS_NONE)?proc2Imem_command:dcache_Dmem_command;
+           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_command : Dcache_Dmem_command;
   assign proc2mem_addr =
-           (proc2Dmem_command==`BUS_NONE)?proc2Imem_addr:dcache_Dmem_addr;
-	assign proc2mem_data			= (proc2Dmem_command ==  `BUS_NONE)?64'b0:dcache_Dmem_data;
+           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_addr : dcache_Dmem_addr;
+	assign proc2mem_data			= (Dcache_Dmem_command ==  `BUS_NONE)? 64'b0 : dcache_Dmem_data;
 	
 	
 	
@@ -714,8 +722,6 @@
 	assign alu_mul_reset = recover_other_reset;
 	assign alu_mem_reset = recover_other_reset;
 	assign cdb_reset = recover_other_reset;
-	assign ic_reset = recover_other_reset;
-	assign dc_reset = recover_other_reset;
 	assign lsq_reset = recover_other_reset;
 	assign mt_reset = recover_mt_reset;
 	assign fl_reset = recover_fl_reset;
@@ -724,8 +730,7 @@
 	assign btb_reset = recover_btb_reset;
 	
 	assign cachemem_reset = reset;
-	assign icache_reset = reset;
-	assign dcache_reset = reset;
+	assign cache_reset = reset;
 //cdb dcache complete
 	assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
@@ -745,12 +750,32 @@
                               .rd1_data(Icachemem_data),
                               .rd1_valid(Icachemem_valid)
                              );
-	// Dcache??
+	// Dcache
+	cachemem128x64 Dcachememory (// inputs
+                       .clock(clock),
+                       .reset(cachemem_reset), 
+                       .wr1_en,
+                       .wr1_tag,
+                       .wr1_idx,
+                       .wr1_data,
+											 .wr0_en,
+											 .wr0_tag,
+											 .wr0_idx,
+											 .wr0_data,
+                       .rd1_tag,
+                       .rd1_idx,
+
+                       // outputs
+                       .rd1_data,
+                       .rd1_valid,
+                       .wr1_dirty
+                       
+                      );
 
   // Cache controller
   icache icache0(// inputs 
                   .clock(clock),
-                  .reset(icache_reset),
+                  .reset(cache_reset),
 
                   .Imem2proc_response(Imem2proc_response),
                   .Imem2proc_data(mem2proc_data),
@@ -775,7 +800,7 @@
   
   dcache	dcache0(// inputs
               .clock(clock),
-              .reset(dcache_reset),
+              .reset(cache_reset),
               
               .Dmem2proc_response(Dmem2proc_response),
               .Dmem2proc_data(Dmem2proc_data),//no wire
@@ -786,7 +811,7 @@
               .proc2Dcache_st_addr,
               .cachemem_data,
               .cachemem_valid,
-              .dcache_wr_dirty,
+              .dcache_wr_dirty(),
               .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
