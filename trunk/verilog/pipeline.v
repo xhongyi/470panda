@@ -637,10 +637,10 @@
 
 	
   assign proc2mem_command =
-           (proc2Dmem_command==`BUS_NONE)?proc2Imem_command:proc2Dmem_command;
+           (proc2Dmem_command==`BUS_NONE)?proc2Imem_command:dcache_Dmem_command;
   assign proc2mem_addr =
-           (proc2Dmem_command==`BUS_NONE)?proc2Imem_addr:proc2Dmem_addr;
-	assign proc2mem_data			= 64'b0;
+           (proc2Dmem_command==`BUS_NONE)?proc2Imem_addr:dcache_Dmem_addr;
+	assign proc2mem_data			= (proc2Dmem_command ==  `BUS_NONE)?64'b0:dcache_Dmem_data;
 	
 	
 	
@@ -655,9 +655,9 @@
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
 	assign pipeline_commit_NPC			= 64'b0;
-
-	assign proc2Dmem_addr						= 64'b0;
-	assign proc2Dmem_command				= `BUS_NONE;
+	//The following two are actually output signals and are already covered in dcache.
+	//assign proc2Dmem_addr						= 64'b0;
+	//assign proc2Dmem_command				= `BUS_NONE;
 
 
 
@@ -791,7 +791,7 @@
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
               .lsq_ar(lsq_Dcache_ar_idx),
-              .// outputs
+              // outputs
               .proc2Dmem_command(Dcache_Dmem_command),
               .proc2Dmem_addr(Dcache_Dmem_addr),
               .proc2Dmem_data(Dcache_Dmem_data),
