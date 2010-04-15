@@ -444,6 +444,8 @@ module alu_sim(// Inputs
 		end
 		else
 		begin
+			prf_write_enable0 <= `SD next_prf_write_enable0;//new!!
+			prf_write_enable1 <= `SD next_prf_write_enable1;//new!!
 			rs_alu_avail <= `SD next_rs_alu_avail;
 			if(rs_valid_inst0)
 			begin
@@ -452,7 +454,7 @@ module alu_sim(// Inputs
 				cdb_prf_dest_pr_idx0 <= `SD next_cdb_prf_dest_pr_idx0;
 				cdb_exception0 <= `SD next_cdb_exception0;
 				prf_result0 <= `SD next_prf_result0;
-				prf_write_enable0 <= `SD next_prf_write_enable0;
+//				prf_write_enable0 <= `SD next_prf_write_enable0;
 				cdb_actual_addr0 <= `SD next_cdb_actual_addr0;
 				cdb_actual_taken0 <= `SD next_cdb_actual_taken0;
 			end
@@ -463,7 +465,7 @@ module alu_sim(// Inputs
 				cdb_prf_dest_pr_idx1 <= `SD next_cdb_prf_dest_pr_idx1;
 				cdb_exception1 <= `SD next_cdb_exception1;
 				prf_result1 <= `SD next_prf_result1;
-				prf_write_enable1 <= `SD next_prf_write_enable1;
+//				prf_write_enable1 <= `SD next_prf_write_enable1;
 				cdb_actual_addr1 <= `SD next_cdb_actual_addr1;
 				cdb_actual_taken1 <= `SD next_cdb_actual_taken1;
 			end

@@ -146,8 +146,8 @@
 	/*
 	 * Output from icache
 	 */
-  wire [63:0] cachemem_data;
-  wire        cachemem_valid;
+  wire [63:0] Icachemem_data;
+  wire        Icachemem_valid;
   wire  [6:0] Icache_rd_idx;
   wire [21:0] Icache_rd_tag;
   wire  [6:0] Icache_wr_idx;
@@ -202,10 +202,10 @@
 	wire		[4:0]	id_rs_alu_func0;
 	wire		[4:0]	id_rs_alu_func1;
 
-	wire					id_rs_rd_mem0;
-	wire					id_rs_rd_mem1;
-	wire					id_rs_wr_mem0;
-	wire					id_rs_wr_mem1;
+	wire					id_rs_rob_lsq_rd_mem0;
+	wire					id_rs_rob_lsq_rd_mem1;
+	wire					id_rs_rob_lsq_wr_mem0;
+	wire					id_rs_rob_lsq_wr_mem1;
 
 	wire					id_rs_ldl_mem0;
 	wire					id_rs_ldl_mem1;
@@ -259,7 +259,7 @@
 	wire  [4:0]  rob_mt_retire_ar_b;
 	wire	 [6:0] rob_mt_fl_retire_tag_a;
 	wire	 [6:0] rob_mt_fl_retire_tag_b;
-	wire	 [1:0] rob_mt_fl_bht_recover_retire_num;
+	wire	 [1:0] rob_mt_fl_bht_lsq_recover_retire_num;
 
 	wire  			 rob_bht_recover_cond_branch0;
 	wire [`LOG_NUM_BHT_PATTERN_ENTRIES-1:0] rob_bht_recover_retire_bhr0;
@@ -275,9 +275,13 @@
 	wire         rob_recover_uncond_branch1;
 	wire  [63:0] rob_recover_actual_addr1;
 	
+	wire				 rob_lsq_retire_wr_mem0;//new
+	wire				 rob_lsq_retire_wr_mem1;//new
 	
 	wire         rob_recover_exception;
 	wire				 rob_retire_halt;
+	
+	wire					rob_Dcache_wr_mem = rob_lsq_retire_wr_mem0 | rob_lsq_retire_wr_mem1;
 	/*
 	 * Output from RS
 	 */
@@ -416,6 +420,11 @@
 	wire					rs_alu_mem_illegal_inst1;
 	wire					rs_alu_mem_valid_inst0;
 	wire					rs_alu_mem_valid_inst1;
+	
+	wire	[`BIT_STQ-1:0]	rs_alu_mem_issue_age0;
+	wire	[`BIT_STQ-1:0]	rs_alu_mem_issue_age1;
+	wire					rs_alu_mem_issue_old0;
+	wire					rs_alu_mem_issue_old1;
 
 	/*
 	 * Outputs from physical register file
@@ -507,24 +516,54 @@
   wire	 [1:0]	alu_mul_rs_avail;
 
 	/*
-	 * Output from memory ALU
+	 * Output from memory LSQ
 	 */
-  wire	 [63:0] alu_mem_prf_value0 = 64'b0;   // ALU result
-	wire	 				alu_mem_prf_wr_enable0 = 0;
-	wire					alu_mem_cdb_complete0 = 0;
-	wire		[4:0]	alu_mem_cdb_ar_idx0 = 0;
-	wire		[6:0]	alu_mem_cdb_prf_pr_idx0 = 0;
-	wire					alu_mem_cdb_exception0 = 0;
+	wire	[`BIT_STQ-1:0]	lsq_rs_disp_age0;
+	wire	[`BIT_STQ-1:0]	lsq_rs_disp_age1;
+	wire									lsq_rs_disp_old0;
+	wire									lsq_rs_disp_old1;
+	
+	wire	[1:0]						lsq_rs_avail;
+	wire									lsq_cdb_complete;
+	wire	[6:0]						lsq_cdb_prf_pr_idx;
+	wire	[4:0]						lsq_cdb_ar_idx;
+	wire									lsq_prf_pr_wr_enable;
+	wire	[63:0]					lsq_prf_pr_value;
+	
+	wire									lsq_Dcache_rd_mem;
+	wire									lsq_Dcache_wr_mem;
+	wire	[63:0]					lsq_Dcache_addr;
+	wire	[6:0]						lsq_Dcache_pr_idx;
+	wire	[4:0]						lsq_Dcache_ar_idx;
+	
+	wire	[63:0]					lsq_Dcache_st_value;
+	wire	[63:0]					lsq_Dcache_st_addr;
 
-  wire	 [63:0] alu_mem_prf_value1 = 64'b0;   // ALU result
-	wire	 				alu_mem_prf_wr_enable1 = 0;
-	wire					alu_mem_cdb_complete1 = 0;
-	wire		[4:0]	alu_mem_cdb_ar_idx1 = 0;
-	wire		[6:0]	alu_mem_cdb_prf_pr_idx1 = 0;
-	wire					alu_mem_cdb_exception1 = 0;
-
-  wire	 [1:0]	alu_mem_rs_avail;
-  
+	/*
+	 * Outputs from Dcache
+	 */
+	
+	wire  [1:0] 					Dcache_Dmem_command;//store? load? none?
+  wire [63:0] 					Dcache_Dmem_addr;//addr to dmem
+  wire [63:0] 					Dcache_Dmem_data;
+  wire									Dcache_lsq_load_avail;
+  wire [63:0] 					Dcache_prf_data_out;     // value is memory[proc2Dcache_addr]
+  wire        					Dcache_valid_out;
+  wire 									Dcache_load_en;//Dcache_valid_out & Dcache_load_en are intermediate signal. They would be oprands for Decache_cdb_complete.
+	wire	[6:0] 					Dcache_cdb_prf_pr_idx;
+	wire  [4:0] 					Dcache_cdb_ar_idx;
+  wire  [6:0] 					dcache_rd_idx;
+  wire [21:0] 					dcache_rd_tag;
+  wire  [6:0] 					dcache_wr_idx1;
+  wire [21:0] 					dcache_wr_tag1;
+	wire  [6:0] 					dcache_wr_idx0;
+  wire [21:0] 					dcache_wr_tag0;
+  wire        					dcache_wr_en1;
+	wire        					dcache_wr_en0;
+	wire [63:0] 					dcache_wr_data;
+	
+	wire									Dcache_cdb_prf_complete;//additional wire. Determine cdb_complete(Dcache only for load)
+	
 	/*
 	 * Outputs from BHT
 	 */
@@ -588,6 +627,7 @@
 	wire		icache_reset;
 	wire		bht_reset;
 	wire		btb_reset;
+	wire		lsq_reset;
 	
 	
 
@@ -662,7 +702,7 @@
 	assign cdb_pr_tag3					= cdb_rs_rob_mt_pr_tag3;
 	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
 	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
-	assign rob_retire_num				= rob_mt_fl_bht_recover_retire_num;
+	assign rob_retire_num				= rob_mt_fl_bht_lsq_recover_retire_num;
 	assign rob_retire_tag_a			= rob_mt_fl_retire_tag_a;
 	assign rob_retire_tag_b			= rob_mt_fl_retire_tag_b;
 
@@ -676,17 +716,21 @@
 	assign cdb_reset = recover_other_reset;
 	assign ic_reset = recover_other_reset;
 	assign dc_reset = recover_other_reset;
-	assign cachemem_reset = recover_other_reset;
-	assign icache_reset = recover_other_reset;
+	assign lsq_reset = recover_other_reset;
 	assign mt_reset = recover_mt_reset;
 	assign fl_reset = recover_fl_reset;
 	assign if_reset = recover_if_reset;
 	assign bht_reset = recover_bht_reset;
 	assign btb_reset = recover_btb_reset;
-
+	
+	assign cachemem_reset = reset;
+	assign icache_reset = reset;
+	assign dcache_reset = reset;
+//cdb dcache complete
+	assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
   // Actual cache (data and tag RAMs)
-  cachemem128x64 cachememory (// inputs
+  cachemem128x64 Icachememory (// inputs
                               .clock(clock),
                               .reset(cachemem_reset),
                               .wr1_en(Icache_wr_en),
@@ -698,12 +742,13 @@
                               .rd1_tag(Icache_rd_tag),
 
                               // outputs
-                              .rd1_data(cachemem_data),
-                              .rd1_valid(cachemem_valid)
-                             );   
+                              .rd1_data(Icachemem_data),
+                              .rd1_valid(Icachemem_valid)
+                             );
+	// Dcache??
 
   // Cache controller
-  icache icache_0(// inputs 
+  icache icache0(// inputs 
                   .clock(clock),
                   .reset(icache_reset),
 
@@ -712,8 +757,8 @@
                   .Imem2proc_tag(mem2proc_tag),
 
                   .proc2Icache_addr(proc2Icache_addr),
-                  .cachemem_data(cachemem_data),
-                  .cachemem_valid(cachemem_valid),
+                  .Icachemem_data(Icachemem_data),
+                  .Icachemem_valid(Icachemem_valid),
 
                    // outputs
                   .proc2Imem_command(proc2Imem_command),
@@ -727,6 +772,45 @@
                   .last_tag(Icache_wr_tag),
                   .data_write_enable(Icache_wr_en)
                  );
+  
+  dcache	dcache0(// inputs
+              .clock(clock),
+              .reset(dcache_reset),
+              
+              .Dmem2proc_response(Dmem2proc_response),
+              .Dmem2proc_data(Dmem2proc_data),//no wire
+              .Dmem2proc_tag(Dmem2proc_tag),//no wire
+              .rob_halt(rob_retire_halt),
+              .proc2Dcache_addr(),
+              .proc2Dcache_st_data,
+              .proc2Dcache_st_addr,
+              .cachemem_data,
+              .cachemem_valid,
+              .dcache_wr_dirty,
+              .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
+              .lsq_rd_mem(lsq_Dcache_rd_mem),
+              .lsq_pr(lsq_Dcache_pr_idx),
+              .lsq_ar(lsq_Dcache_ar_idx),
+              .// outputs
+              .proc2Dmem_command(Dcache_Dmem_command),
+              .proc2Dmem_addr(Dcache_Dmem_addr),
+              .proc2Dmem_data(Dcache_Dmem_data),
+              .lsq_load_avail(Dcache_lsq_load_avail),
+              .Dcache_data_out(Dcache_prf_data_out),
+              .Dcache_valid_out(Dcache_valid_out),   
+              .cdb_load_en(Dcache_load_en),
+              .cdb_pr(Dcache_cdb_prf_pr_idx),
+              .cdb_ar(Dcache_cdb_ar_idx),
+              .dcache_wr_data(dcache_wr_data),
+              .dcache_rd_idx(dcache_rd_idx),
+              .dcache_rd_tag(dcache_rd_tag),
+              .dcache_wr_idx1(dcache_wr_idx1),
+              .dcache_wr_tag1(dcache_wr_tag1),
+              .dcache_wr_idx0(dcache_wr_idx0),
+              .dcache_wr_tag0(dcache_wr_tag0),
+              .dcache_wr_en1(dcache_wr_en1),
+              .dcache_wr_en0(dcache_wr_en0)
+             );
 
 	// IF module
 	if_mod if_mod0 (// Inputs
@@ -797,8 +881,8 @@
 					.rs_mt_dest_idx0(id_rs_mt_dest_idx0),
 					.rs_alu_func0(id_rs_alu_func0),
 
-					.rs_rd_mem0(id_rs_rd_mem0),
-					.rs_wr_mem0(id_rs_wr_mem0),
+					.rs_rd_mem0(id_rs_rob_lsq_rd_mem0),
+					.rs_wr_mem0(id_rs_rob_lsq_wr_mem0),
 
 					.rs_ldl_mem0(id_rs_ldl_mem0),
 					.rs_stc_mem0(id_rs_stc_mem0),
@@ -826,8 +910,8 @@
 					.rs_mt_dest_idx1(id_rs_mt_dest_idx1),
 					.rs_alu_func1(id_rs_alu_func1),
 
-					.rs_rd_mem1(id_rs_rd_mem1),
-					.rs_wr_mem1(id_rs_wr_mem1),
+					.rs_rd_mem1(id_rs_rob_lsq_rd_mem1),
+					.rs_wr_mem1(id_rs_rob_lsq_wr_mem1),
 
 					.rs_ldl_mem1(id_rs_ldl_mem1),
 					.rs_stc_mem1(id_rs_stc_mem1),
@@ -870,6 +954,9 @@
 					 .id_cond_branch1(id_rs_cond_branch1),
 					 .id_uncond_branch1(id_rs_uncond_branch1),
 					 .id_halt1(id_rs_rob_halt1),
+					 
+ 					 .id_wr_mem0(id_rs_rob_lsq_wr_mem0),//new!!
+					 .id_wr_mem1(id_rs_rob_lsq_wr_mem1),//new!!
 
 					 .id_bhr0(id_rob_bhr0),
 					 .id_bhr1(id_rob_bhr1),
@@ -902,7 +989,7 @@
 					 .mt_fl_retire_tag_a(rob_mt_fl_retire_tag_a),
 					 .mt_fl_retire_tag_b(rob_mt_fl_retire_tag_b),
 
-					 .mt_fl_bht_recover_retire_num(rob_mt_fl_bht_recover_retire_num),
+					 .lsq_mt_fl_bht_recover_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 
 					 .bht_recover_cond_branch0(rob_bht_recover_cond_branch0),
 					 .bht_recover_retire_bhr0(rob_bht_recover_retire_bhr0),
@@ -917,6 +1004,9 @@
 					 .bht_actual_taken1(rob_bht_actual_taken1),
 					 .recover_uncond_branch1(rob_recover_uncond_branch1),
 					 .recover_actual_addr1(rob_recover_actual_addr1),
+					 
+					 .lsq_retire_wr_mem0(rob_lsq_retire_wr_mem0),//new
+					 .lsq_retire_wr_mem1(rob_lsq_retire_wr_mem1),//new
 					 
 					 .recover_exception(rob_recover_exception),
 					 .retire_halt(rob_retire_halt)
@@ -963,7 +1053,7 @@
 				 .cdb_ar_tag5(cdb_mt_ar_tag5),
 				 
 				 .recover(recover_mt_recover),
-				 .rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+				 .rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 				 .rob_retire_ar0(rob_mt_retire_ar_a),
 				 .rob_retire_ar1(rob_mt_retire_ar_b),
 				 .rob_retire_pr0(rob_mt_fl_retire_tag_a),
@@ -990,7 +1080,7 @@
 					.clock(clock),
 					.reset(fl_reset),
 					.id_dispatch_num(id_rs_rob_mt_dispatch_num),
-					.rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+					.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 					.rob_retire_tag_0(rob_mt_fl_retire_tag_a),
 					.rob_retire_tag_1(rob_mt_fl_retire_tag_b),
 					
@@ -1014,8 +1104,8 @@
 					.id_opb_select0(id_rs_mt_opb_select0),
 					.id_dest_idx0(id_rs_mt_dest_idx0),
 					.id_alu_func0(id_rs_alu_func0),
-					.id_rd_mem0(id_rs_rd_mem0),
-					.id_wr_mem0(id_rs_wr_mem0),
+					.id_rd_mem0(id_rs_rob_lsq_rd_mem0),
+					.id_wr_mem0(id_rs_rob_lsq_wr_mem0),
 					.id_cond_branch0(id_rs_cond_branch0),
 					.id_uncond_branch0(id_rs_uncond_branch0),
 					.id_halt0(id_rs_rob_halt0),
@@ -1030,8 +1120,8 @@
 					.id_opb_select1(id_rs_mt_opb_select1),
 					.id_dest_idx1(id_rs_mt_dest_idx1),
 					.id_alu_func1(id_rs_alu_func1),
-					.id_rd_mem1(id_rs_rd_mem1),
-					.id_wr_mem1(id_rs_wr_mem1),
+					.id_rd_mem1(id_rs_rob_lsq_rd_mem1),
+					.id_wr_mem1(id_rs_rob_lsq_wr_mem1),
 					.id_cond_branch1(id_rs_cond_branch1),
 					.id_uncond_branch1(id_rs_uncond_branch1),
 					.id_halt1(id_rs_rob_halt1),
@@ -1054,7 +1144,7 @@
 
 					.alu_sim_avail(alu_sim_rs_avail), 
 					.alu_mul_avail(alu_mul_rs_avail),
-					.alu_mem_avail(alu_mem_rs_avail),
+					.alu_mem_avail(lsq_rs_avail),
 
 					.cdb_broadcast(cdb_rs_rob_mt_broadcast),
 					.cdb_pr_tag0(cdb_rs_rob_mt_pr_tag0),
@@ -1064,7 +1154,11 @@
 					.cdb_pr_tag4(cdb_rs_rob_mt_pr_tag4),
 					.cdb_pr_tag5(cdb_rs_rob_mt_pr_tag5),
 
-
+					.lsq_rs_disp_age0(lsq_rs_disp_age0),//new
+					.lsq_rs_disp_age1(lsq_rs_disp_age1),//new
+					.lsq_rs_disp_old0(lsq_rs_disp_old0),//new
+					.lsq_rs_disp_old1(lsq_rs_disp_old1),//new
+					//Outputs
 					.id_rs_cap(rs_id_cap),
 
 					.alu_sim_NPC0(rs_alu_sim_NPC0),
@@ -1221,7 +1315,12 @@
 					.alu_mem_halt1(rs_alu_mem_halt1),
 
 					.alu_mem_illegal_inst1(rs_alu_mem_illegal_inst1),
-					.alu_mem_valid_inst1(rs_alu_mem_valid_inst1)
+					.alu_mem_valid_inst1(rs_alu_mem_valid_inst1),
+					
+					.alu_mem_issue_age0(rs_alu_mem_issue_age0),
+					.alu_mem_issue_age1(rs_alu_mem_issue_age1),
+					.alu_mem_issue_old0(rs_alu_mem_issue_old0),
+					.alu_mem_issue_old1(rs_alu_mem_issue_old1)
 	);
 
 
@@ -1262,13 +1361,13 @@
 						.alu_mul_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 						.alu_mul_pr_value1(alu_mul_prf_value1),
 
-						.alu_mem_wr_enable0(alu_mem_prf_wr_enable0),
-						.alu_mem_pr_idx0(alu_mem_cdb_prf_pr_idx0),
-						.alu_mem_pr_value0(alu_mem_prf_value0),
+						.alu_mem_wr_enable0(lsq_prf_pr_wr_enable),
+						.alu_mem_pr_idx0(lsq_cdb_prf_pr_idx),
+						.alu_mem_pr_value0(lsq_prf_pr_value),
 
-						.alu_mem_wr_enable1(alu_mem_prf_wr_enable1),
-						.alu_mem_pr_idx1(alu_mem_cdb_prf_pr_idx1),
-						.alu_mem_pr_value1(alu_mem_prf_value1),
+						.alu_mem_wr_enable1(Dcache_cdb_prf_complete),
+						.alu_mem_pr_idx1(Dcache_cdb_prf_pr_idx),
+						.alu_mem_pr_value1(Dcache_prf_data_out),
 
 						// Outputs
 						.alu_sim_pra_value0(prf_alu_sim_pra_value0),
@@ -1322,14 +1421,14 @@
 						.alu_mul_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 						.alu_mul_ar_idx1(alu_mul_cdb_ar_idx1),
 
-						.alu_mem_complete0(alu_mem_cdb_complete0),
-						.alu_mem_pr_idx0(alu_mem_cdb_prf_pr_idx0),
-						.alu_mem_ar_idx0(alu_mem_cdb_ar_idx0),
+						.alu_mem_complete0(lsq_cdb_complete),
+						.alu_mem_pr_idx0(lsq_cdb_prf_pr_idx),
+						.alu_mem_ar_idx0(lsq_cdb_ar_idx),
 						.alu_mem_exception0(alu_mem_cdb_exception0),
 
-						.alu_mem_complete1(alu_mem_cdb_complete1),
-						.alu_mem_pr_idx1(alu_mem_cdb_prf_pr_idx1),
-						.alu_mem_ar_idx1(alu_mem_cdb_ar_idx1),
+						.alu_mem_complete1(Dcache_cdb_prf_complete),
+						.alu_mem_pr_idx1(Dcache_cdb_prf_pr_idx),
+						.alu_mem_ar_idx1(Dcache_cdb_ar_idx),
 						.alu_mem_exception1(alu_mem_cdb_exception1),
 
 						// Outputs
@@ -1416,7 +1515,7 @@
 										.cdb_dest_ar_idx1(alu_sim_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_sim_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_sim_cdb_exception1),
-										.prf_result1(alu_sim_prf_value0),
+										.prf_result1(alu_sim_prf_value1),
 										.prf_write_enable1(alu_sim_prf_wr_enable1),
 										
 										.cdb_actual_addr0(alu_sim_cdb_actual_addr0),
@@ -1469,6 +1568,87 @@
 										.rs_alu_avail(alu_mul_rs_avail)
 								);
 
+  /*
+	 * LSQ
+	 */
+ lsq lsq0(// Inputs
+						.clock(clock),
+						.reset(lsq_reset),
+						// Give the age of each ld
+						.id_rd_mem0(id_rs_rob_lsq_rd_mem0),
+						.id_rd_mem1(id_rs_rob_lsq_rd_mem1),
+
+						// Put the store in the queue at dispatch
+						.id_wr_mem0(id_rs_rob_lsq_wr_mem0),
+						.id_wr_mem1(id_rs_rob_lsq_wr_mem1),
+						
+						// At the issue stage, pass the ready load and store 
+						// from rs to lsq
+						.rs_IR0(rs_alu_mem_IR0),
+						.prf_pra_value0(prf_alu_mem_pra_value0),
+						.prf_prb_value0(prf_alu_mem_prb_value0),
+						.rs_issue_age0(rs_alu_mem_issue_age0),
+						.rs_issue_old0(rs_alu_mem_issue_old0),
+						.rs_dest_ar_idx0(rs_alu_mem_dest_ar_idx0),
+						.rs_dest_pr_idx0(rs_alu_mem_dest_pr_idx0),
+						.rs_rd_mem0(rs_alu_mem_rd_mem0),
+						.rs_wr_mem0(rs_alu_mem_wr_mem0),
+						.rs_valid_inst0(rs_alu_mem_valid_inst0),
+
+						.rs_IR1(rs_alu_mem_IR1),
+						.prf_pra_value1(prf_alu_mem_pra_value1),
+						.prf_prb_value1(prf_alu_mem_prb_value1),
+						.rs_issue_age1(rs_alu_mem_issue_age1),
+						.rs_issue_old1(rs_alu_mem_issue_old1),
+						.rs_dest_ar_idx1(rs_alu_mem_dest_ar_idx1),
+						.rs_dest_pr_idx1(rs_alu_mem_dest_pr_idx1),
+						.rs_rd_mem1(rs_alu_mem_rd_mem1),
+						.rs_wr_mem1(rs_alu_mem_wr_mem1),
+						.rs_valid_inst1(rs_alu_mem_valid_inst1),
+
+						// Retire the stores
+						.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
+						.rob_retire_wr_mem0(rob_lsq_retire_wr_mem0),
+						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem0),
+
+						.Dcache_avail(Dcache_lsq_load_avail),
+
+						// Outputs
+						// Give back the age of ld at dispatch
+						.rs_disp_age0(lsq_rs_disp_age0),
+						.rs_disp_old0(lsq_rs_disp_old0),
+						.rs_disp_age1(lsq_rs_disp_age1),
+						.rs_disp_old1(lsq_rs_disp_old1),
+
+						// How many ld lsq can eat
+						.rs_avail(lsq_rs_avail),//!!problem!
+
+						// If the value of load is found if the previous store
+						// complete the inst and write the value
+						// Also complete the ready store
+						.cdb_complete(lsq_cdb_complete),
+						.cdb_prf_pr_idx(lsq_cdb_prf_pr_idx),
+						.cdb_ar_idx(lsq_cdb_ar_idx),
+						.prf_pr_wr_enable(lsq_prf_pr_wr_enable),
+						.prf_pr_value(lsq_prf_pr_value),
+
+						// The load value of the address is not found,
+						// throw the load to cache
+	
+						// When Dcache commit the ld, it will write the value to 
+						// the second interface for alu_mem of prf
+						.Dcache_rd_mem(lsq_Dcache_rd_mem),
+						.Dcache_wr_mem(lsq_Dcache_wr_mem),
+						.Dcache_addr(lsq_Dcache_addr),
+						.Dcache_pr_idx(lsq_Dcache_pr_idx),
+						.Dcache_ar_idx(lsq_Dcache_ar_idx),
+
+						// For the retired store value
+						.Dcache_st_value(lsq_Dcache_st_value),
+
+						.Dcache_st_addr(lsq_Dcache_st_addr)
+						);
+	 
 
 
   /*
@@ -1530,7 +1710,7 @@
 							.clock(clock),
 							.reset(reset),
 
-							.rob_retire_num(rob_mt_fl_bht_recover_retire_num),
+							.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 							.rob_exception(rob_recover_exception),
 
 							.rob_cond_branch0(rob_bht_recover_cond_branch0),
