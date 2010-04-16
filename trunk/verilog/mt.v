@@ -137,8 +137,7 @@ module mt (// Inputs
 	wire	rob_ar_b1_valid = (id_valid_inst1) & (id_opa_select1 == `ALU_OPA_IS_REGA);
 	wire	rob_ar_b2_valid = (id_valid_inst1) & (id_opb_select1 == `ALU_OPB_IS_REGB);
 	
-	wire	[31:0]	output_ready_bits;
-	
+	reg		[31:0]	output_ready_bits;
 
 	wire	[6:0]	pr_tags_next0 = 
 								(id_dispatch_num == 2'd0 || ~rob_ar_a_valid) ? pr_tags[id_dest_idx0] : 
