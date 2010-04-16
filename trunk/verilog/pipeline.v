@@ -669,7 +669,7 @@
 	assign Dmem2proc_response = mem2proc_response;
 
 	assign pipeline_completed_inst	= 0;
-	assign pipeline_error_status		= rob_retire_halt & ~pipeline_recover? `HALTED_ON_HALT : `NO_ERROR;
+	assign pipeline_error_status		= rob_retire_halt ? `HALTED_ON_HALT : `NO_ERROR;
 	assign pipeline_commit_wr_idx		= 64'b0;
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
@@ -821,7 +821,7 @@
               .Dmem2proc_response(Dmem2proc_response),
               .Dmem2proc_data(mem2proc_data),//no wire
               .Dmem2proc_tag(mem2proc_tag),//no wire
-              .rob_halt(rob_halt),
+              .rob_halt(rob_halt & ~pipeline_recover),
               .proc2Dcache_addr(lsq_Dcache_addr),
               .proc2Dcache_st_data(lsq_Dcache_st_value),
               .proc2Dcache_st_addr(lsq_Dcache_st_addr),
