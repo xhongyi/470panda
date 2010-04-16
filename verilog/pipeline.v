@@ -321,7 +321,7 @@
 	wire         rob_recover_exception;
 	wire				 rob_retire_halt;
 	
-	wire					rob_Dcache_wr_mem = rob_lsq_retire_wr_mem0 | rob_lsq_retire_wr_mem1;
+	wire				rob_Dcache_wr_mem = (rob_mt_fl_bht_lsq_recover_retire_num != 0) & (rob_lsq_retire_wr_mem0 | (rob_mt_fl_bht_lsq_recover_retire_num == 2 & rob_lsq_retire_wr_mem1));
 	/*
 	 * Output from RS
 	 */
