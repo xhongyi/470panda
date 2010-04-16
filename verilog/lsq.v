@@ -224,6 +224,9 @@ wire		 [63:0]	rs_mem_addr1;
 
 wire						ld_cdb_wait;
 
+wire [63:0] mem_disp0 = { {48{rs_IR0[15]}}, rs_IR0[15:0] };
+wire [63:0] mem_disp1 = { {48{rs_IR1[15]}}, rs_IR1[15:0] };
+
 assign rs_mem_addr0 = prf_prb_value0 + {{48{rs_IR0[15]}}, rs_IR0[15:0]};
 assign rs_mem_addr1 = prf_prb_value1 + {{48{rs_IR1[15]}}, rs_IR1[15:0]};
 
@@ -417,13 +420,13 @@ begin
 	if (rs_wr_mem0 & rs_valid_inst0)
 	begin
 		next_st_addr[rs_issue_age0]		= rs_mem_addr0;
-		next_st_value[rs_issue_age0]	= prf_pra_value0;
+		next_st_value[rs_issue_age0]	= prf_pra_value0 + mem_disp0;
 		next_st_ready[rs_issue_age0]	= 1;
 	end
 	if (rs_wr_mem1 & rs_valid_inst1)
 	begin
 		next_st_addr[rs_issue_age1]		= rs_mem_addr1;
-		next_st_value[rs_issue_age1]	= prf_pra_value1;
+		next_st_value[rs_issue_age1]	= prf_pra_value1 + mem_disp1;
 		next_st_ready[rs_issue_age1]	= 1;
 	end
 
