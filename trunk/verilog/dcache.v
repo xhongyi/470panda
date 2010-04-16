@@ -6,13 +6,13 @@ module dcache(// inputs
               clock,
               reset,
               
-              Dmem2proc_response,
-              Dmem2proc_data,
-              Dmem2proc_tag,
+              Dmem2proc_response,//from mem
+              Dmem2proc_data,//from mem
+              Dmem2proc_tag,//from mem
 							rob_halt,
-              proc2Dcache_addr,
-              proc2Dcache_st_data,
-              proc2Dcache_st_addr,
+              proc2Dcache_addr,//from cache
+              proc2Dcache_st_data,//from cache
+              proc2Dcache_st_addr,//from cache
               cachemem_data,
               cachemem_valid,
 							dcache_wr_dirty,
@@ -22,9 +22,9 @@ module dcache(// inputs
 							lsq_pr,
 							lsq_ar,
               // outputs
-              proc2Dmem_command,
-              proc2Dmem_addr,
-              proc2Dmem_data,
+              proc2Dmem_command,//to mem
+              proc2Dmem_addr,//to mem
+              proc2Dmem_data,//to mem
 							lsq_load_avail,
               Dcache_data_out,
               Dcache_valid_out,   
@@ -32,15 +32,15 @@ module dcache(// inputs
 							cdb_pr,
 							cdb_ar,
 							cachemem_halt,
-							dcache_wr_data,
-              dcache_rd_idx,
-              dcache_rd_tag,
-              dcache_wr_idx1,
-              dcache_wr_tag1,
-							dcache_wr_idx0,
-							dcache_wr_tag0,
-              dcache_wr_en1,
-							dcache_wr_en0
+							dcache_wr_data,//to cache
+              dcache_rd_idx,//to cache
+              dcache_rd_tag,//to cache
+              dcache_wr_idx1,//to cache
+              dcache_wr_tag1,//to cache
+							dcache_wr_idx0,//to cache
+							dcache_wr_tag0,//to cache
+              dcache_wr_en1,//to cache
+							dcache_wr_en0//to cache
              );
 
   input         clock;
