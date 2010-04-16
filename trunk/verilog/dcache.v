@@ -167,6 +167,7 @@ module dcache(// inputs
 		end
 		next_head = head;
 		next_tail = tail;
+		cdb_load_en = 0;
 		dcache_wr_en1 = 0;
 		if(Dcache_hit)
 		$display("Dcache hit");
