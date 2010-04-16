@@ -35,7 +35,7 @@ MODULE		= 	pipeline
 TESTBENCH = 	sys_defs.vh	    \
    testbench/$(MODULE)_test.v \
 	 testbench/mem.v						\
-	 testbench/pipe_print.c
+#	 testbench/pipe_print.c
 
 SIMFILES =	verilog/$(MODULE).v	\
 						verilog/prien.v \
@@ -50,9 +50,13 @@ SIMFILES =	verilog/$(MODULE).v	\
 						verilog/prf.v \
 						verilog/cdb.v \
 						verilog/icache.v \
-						verilog/cachemem.v \
+						verilog/dcache.v \
+						verilog/icachemem.v \
+						verilog/dcachemem.v \
 						verilog/btb.v	\
-						verilog/bht.v
+						verilog/bht.v	\
+						verilog/recover.v \
+						verilog/lsq.v
 
 SYNFILES = synth/$(MODULE).vg
 

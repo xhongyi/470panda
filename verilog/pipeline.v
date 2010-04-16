@@ -610,8 +610,8 @@
 	
 	wire					recover_btb_reset;
 	wire					recover_btb_recover;
-	wire					recover_btb_NPC;
-	wire					recover_btb_actual_addr;
+	wire	[63:0]	recover_btb_NPC;
+	wire	[63:0]	recover_btb_actual_addr;
 	
 	wire					recover_fl_reset;
 	wire					recover_fl_recover;
@@ -653,15 +653,15 @@
   assign proc2mem_command =
            (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_command : Dcache_Dmem_command;
   assign proc2mem_addr =
-           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_addr : dcache_Dmem_addr;
-	assign proc2mem_data			= (Dcache_Dmem_command ==  `BUS_NONE)? 64'b0 : dcache_Dmem_data;
+           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_addr : Dcache_Dmem_addr;
+	assign proc2mem_data			= (Dcache_Dmem_command ==  `BUS_NONE)? 64'b0 : Dcache_Dmem_data;
 	
 	
 	
 	assign Dmem2proc_response = 
-      (proc2Dmem_command==`BUS_NONE) ? 0 : mem2proc_response;
+      (Dcache_Dmem_command==`BUS_NONE) ? 0 : mem2proc_response;
   assign Imem2proc_response =
-      (proc2Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
+      (Dcache_Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
@@ -671,7 +671,7 @@
 	assign pipeline_commit_NPC			= 64'b0;
 	//The following two are actually output signals and are already covered in dcache.
 	//assign proc2Dmem_addr						= 64'b0;
-	//assign proc2Dmem_command				= `BUS_NONE;
+	//assign Dcache_Dmem_command				= `BUS_NONE;
 
 
 
@@ -787,9 +787,9 @@
                   .Imem2proc_data(mem2proc_data),
                   .Imem2proc_tag(mem2proc_tag),
 
-                  .if_proc2Icache_addr(if_proc2Icache_addr),
-                  .Icachemem_data(Icachemem_data),
-                  .Icachemem_valid(Icachemem_valid),
+                  .proc2Icache_addr(if_proc2Icache_addr),
+                  .cachemem_data(Icachemem_data),
+                  .cachemem_valid(Icachemem_valid),
 
                    // outputs
                   .proc2Imem_command(proc2Imem_command),
@@ -1692,8 +1692,8 @@
 						.if_NPC0(if_id_bht_NPC0),
 						.if_NPC1(if_id_bht_NPC1),//not implemented yet
 									
-						.if_valid_cond0(if_bht_valid_inst0),
-						.if_valid_cond1(if_bht_valid_inst1),
+						.if_valid_cond0(if_bht_valid_cond0),
+						.if_valid_cond1(if_bht_valid_cond1),
 
 						.recover_cond(rob_recover_exception),
 						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
