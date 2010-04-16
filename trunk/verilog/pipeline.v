@@ -137,32 +137,37 @@
 	output	[6:0]	rob_retire_tag_b;
 
 	/*
-	 * Input & Output from Icache mem
+	 * Output from Icache mem
 	 */
   wire [63:0] Icachemem_data;
   wire        Icachemem_valid;
 
 	/*
-	 * Input & Output from Dcache mem
+	 * Output from Dcache mem
 	 */
-  wire [63:0] proc2Imem_addr;
-  wire [1:0]  proc2Imem_command;
+  wire [63:0] Dcachemem_data;
+  wire        Dcachemem_valid;
+  wire				Dcachemem_dirty;
+  
+  /*
+	 * Intermediate wires for icache and dcache respectively
+	 */
+	 
   wire [3:0]  Imem2proc_response;
+  wire [3:0]  Dmem2proc_response;
 
 	/*
 	 * Output from icache
 	 */
   wire [63:0] proc2Imem_addr;//
   wire [1:0]  proc2Imem_command;//
-  wire [3:0]  Imem2proc_response;
-
   wire  [6:0] Icache_rd_idx;//
   wire [21:0] Icache_rd_tag;//
   wire  [6:0] Icache_wr_idx;//
   wire [21:0] Icache_wr_tag;//
   wire        Icache_wr_en;//
   wire [63:0] Icache_data_out;//
-  wire [63:0] proc2Icache_addr;
+
   wire        Icache_valid_out;//
 
 	/*
@@ -205,6 +210,7 @@
 	wire	 [63:0]	if_id_pred_addr1;
 	wire					if_bht_valid_cond0;
 	wire					if_bht_valid_cond1;
+  wire [63:0]		if_proc2Icache_addr;
 
 	/*
 	 * Output from ID
@@ -735,7 +741,7 @@
 	assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
   // Actual cache (data and tag RAMs)
-  cachemem128x64 Icachememory (// inputs
+  icachemem128x64 Icachememory (// inputs
                               .clock(clock),
                               .reset(cachemem_reset),
                               .wr1_en(Icache_wr_en),
@@ -751,24 +757,24 @@
                               .rd1_valid(Icachemem_valid)
                              );
 	// Dcache
-	cachemem128x64 Dcachememory (// inputs
+	dcachemem128x64 Dcachememory (// inputs
                        .clock(clock),
                        .reset(cachemem_reset), 
-                       .wr1_en,
-                       .wr1_tag,
-                       .wr1_idx,
-                       .wr1_data,
-											 .wr0_en,
-											 .wr0_tag,
-											 .wr0_idx,
-											 .wr0_data,
-                       .rd1_tag,
-                       .rd1_idx,
+                       .wr1_en(dcache_wr_en1),
+                       .wr1_tag(dcache_wr_tag1),
+                       .wr1_idx(dcache_wr_idx1),
+                       .wr1_data(dcache_wr_data),
+											 .wr0_en(dcache_wr_en0),
+											 .wr0_tag(dcache_wr_tag0),
+											 .wr0_idx(dcache_wr_idx0),
+											 .wr0_data(mem2proc_data),
+                       .rd1_tag(dcache_rd_tag),
+                       .rd1_idx(dcache_rd_idx),
 
                        // outputs
-                       .rd1_data,
-                       .rd1_valid,
-                       .wr1_dirty
+                       .rd1_data(Dcachemem_data),
+                       .rd1_valid(Dcachemem_valid),
+                       .wr1_dirty(Dcachemem_dirty)
                        
                       );
 
@@ -781,7 +787,7 @@
                   .Imem2proc_data(mem2proc_data),
                   .Imem2proc_tag(mem2proc_tag),
 
-                  .proc2Icache_addr(proc2Icache_addr),
+                  .if_proc2Icache_addr(if_proc2Icache_addr),
                   .Icachemem_data(Icachemem_data),
                   .Icachemem_valid(Icachemem_valid),
 
@@ -803,15 +809,15 @@
               .reset(cache_reset),
               
               .Dmem2proc_response(Dmem2proc_response),
-              .Dmem2proc_data(Dmem2proc_data),//no wire
-              .Dmem2proc_tag(Dmem2proc_tag),//no wire
+              .Dmem2proc_data(mem2proc_data),//no wire
+              .Dmem2proc_tag(mem2proc_tag),//no wire
               .rob_halt(rob_retire_halt),
-              .proc2Dcache_addr(),
-              .proc2Dcache_st_data,
-              .proc2Dcache_st_addr,
-              .cachemem_data,
-              .cachemem_valid,
-              .dcache_wr_dirty(),
+              .proc2Dcache_addr(lsq_Dcache_addr),
+              .proc2Dcache_st_data(lsq_Dcache_st_value),
+              .proc2Dcache_st_addr(lsq_Dcache_st_addr),
+              .cachemem_data(Dcachemem_data),
+              .cachemem_valid(Dcachemem_valid),
+              .dcache_wr_dirty(Dcachemem_dirty),
               .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
@@ -856,7 +862,7 @@
 								.id_bht_NPC1(if_id_bht_NPC1),
 								.id_IR0(if_id_IR0),
 								.id_IR1(if_id_IR1),
-								.proc2Imem_addr(proc2Icache_addr),
+								.proc2Imem_addr(if_proc2Icache_addr),
 								.id_branch_taken0(if_id_branch_taken0),
 								.id_branch_taken1(if_id_branch_taken1),
 								.id_pred_addr0(if_id_pred_addr0),
