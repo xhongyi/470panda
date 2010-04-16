@@ -148,6 +148,7 @@
   wire [63:0] Dcachemem_data;
   wire        Dcachemem_valid;
   wire				Dcachemem_dirty;
+  wire [63:0] Dcachemem_dirty_data;
   wire [63:0] halt_Dmem_addr;
   wire [63:0] halt_Dmem_data;
   wire [1:0]  halt_Dmem_cmd;
@@ -777,6 +778,7 @@
                        .rd1_data(Dcachemem_data),
                        .rd1_valid(Dcachemem_valid),
                        .wr1_dirty(Dcachemem_dirty),
+                       .wr1_dirty_data(Dcachemem_dirty_data),
                        .rob_halt_complete(rob_retire_halt),
                        .Dmem_cmd(halt_Dmem_cmd),
                        .Dmem_data(halt_Dmem_data),
@@ -823,6 +825,7 @@
               .cachemem_data(Dcachemem_data),
               .cachemem_valid(Dcachemem_valid),
               .dcache_wr_dirty(Dcachemem_dirty),
+              .dcache_wr_dirty_data(Dcachemem_dirty_data),
               .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
