@@ -662,7 +662,7 @@
 	
 	assign Imem2proc_response = 
       (Dcache_Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
-  assign Dmem2proc_response = mem2proc_response;
+  assign Dmem2proc_response = (Dcache_Dmem_command != `BUS_NONE) ? mem2proc_response : 0;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
