@@ -225,7 +225,10 @@ module dcache(// inputs
 			next_occupied[Dmem2proc_response] = 1;
 			next_head = head_plus_one;
 		end
-		
+		if(dcache_wr_dirty)
+		begin
+			
+		end
 
  end
  
