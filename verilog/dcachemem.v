@@ -114,7 +114,7 @@ begin
 			tags[wr1_idx] <= `SD wr1_tag;
 			dirty[wr1_idx] <= `SD 1;
 		end
-		if(wr0_en)
+		if(wr0_en&&~(wr1_en&&wr0_idx==wr1_idx))
 		begin
 			data[wr0_idx] <= `SD wr0_data;
 			tags[wr0_idx] <= `SD wr0_tag;
