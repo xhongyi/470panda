@@ -137,6 +137,8 @@ module mt (// Inputs
 	wire	rob_ar_b1_valid = (id_valid_inst1) & (id_opa_select1 == `ALU_OPA_IS_REGA);
 	wire	rob_ar_b2_valid = (id_valid_inst1) & (id_opb_select1 == `ALU_OPB_IS_REGB);
 	
+	wire	[31:0]	output_ready_bits;
+	
 
 	wire	[6:0]	pr_tags_next0 = 
 								(id_dispatch_num == 2'd0 || ~rob_ar_a_valid) ? pr_tags[id_dest_idx0] : 
@@ -164,6 +166,9 @@ module mt (// Inputs
 			next_ready_bits[cdb_ar_tag4] = 1'b1;
 		if (cdb_broadcast[5] && pr_tags[cdb_ar_tag5] == cdb_pr_tag5)
 			next_ready_bits[cdb_ar_tag5] = 1'b1;
+
+		output_ready_bits = next_ready_bits;
+
 		if (id_dispatch_num > 0 && rob_ar_a_valid)
 			next_ready_bits[id_dest_idx0] = 1'b0;
 		if (id_dispatch_num > 1 && rob_ar_b_valid)
@@ -175,18 +180,18 @@ module mt (// Inputs
 
 	assign rs_pr_a1 = pr_tags[id_ra_idx0];
 	assign rs_pr_a2 = pr_tags[id_rb_idx0];
-	assign rs_pr_a1_ready = ready_bits[id_ra_idx0] | ~rob_ar_a1_valid;
-	assign rs_pr_a2_ready = ready_bits[id_rb_idx0] | ~rob_ar_a2_valid;
+	assign rs_pr_a1_ready = output_ready_bits[id_ra_idx0] | ~rob_ar_a1_valid;
+	assign rs_pr_a2_ready = output_ready_bits[id_rb_idx0] | ~rob_ar_a2_valid;
 
 	assign rs_pr_b1 = (rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? fl_pr0: 
 																															 pr_tags[id_ra_idx1];
 	assign rs_pr_b2 = (rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? fl_pr0: 
 																												  		 pr_tags[id_rb_idx1];
 	assign rs_pr_b1_ready = ((rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? 1'b0: 
-																															 ready_bits[id_ra_idx1]) |
+																															 output_ready_bits[id_ra_idx1]) |
 										~rob_ar_b1_valid;
 	assign rs_pr_b2_ready = ((rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? 1'b0: 
-																															 ready_bits[id_rb_idx1]) |
+																															 output_ready_bits[id_rb_idx1]) |
 										~rob_ar_b2_valid;
 
 /*	genvar i;
