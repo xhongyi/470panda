@@ -1198,6 +1198,8 @@ begin
 		next_halt[ent_avail_high_idx]					= id_halt0;
 		next_illegal_inst[ent_avail_high_idx]	= id_illegal_inst0;
 		next_valid_inst[ent_avail_high_idx]		= id_valid_inst0;
+		next_age[ent_avail_high_idx]					= lsq_rs_disp_age0;
+		next_old[ent_avail_high_idx]					= alu_mem_issue_old0;
 
 		next_ent_avail[ent_avail_high_idx]		= 0;
 		next_ent_taken[ent_avail_high_idx]		= 1;
@@ -1236,6 +1238,8 @@ begin
 		next_halt[ent_avail_low_idx]					= id_halt1;
 		next_illegal_inst[ent_avail_low_idx]	= id_illegal_inst1;
 		next_valid_inst[ent_avail_low_idx]		= id_valid_inst1;
+		next_age[ent_avail_low_idx]						= lsq_rs_disp_age0;
+		next_old[ent_avail_low_idx]						= alu_mem_issue_old0;
 
 		next_ent_avail[ent_avail_low_idx]		= 0;
 		next_ent_taken[ent_avail_low_idx]		= 1;
@@ -1368,6 +1372,8 @@ begin
 			halt[i]					<= `SD 0;
 			illegal_inst[i]	<= `SD 0;
 			valid_inst[i]		<= `SD 0;
+			age[i]					<= `SD 0;
+			old[i]					<= `SD 0;
 		end
 	end
 	else
@@ -1401,6 +1407,8 @@ begin
 			halt[i]					<= `SD next_halt[i];
 			illegal_inst[i]	<= `SD next_illegal_inst[i];
 			valid_inst[i]		<= `SD next_valid_inst[i];
+			age[i]					<= `SD next_age[i];
+			old[i]					<= `SD next_old[i];
 		end
 
 	end
