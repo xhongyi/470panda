@@ -974,7 +974,7 @@ begin
 			alu_mul_valid_inst1 	=	0;//Tell the alu_mult that only instruction0 is valid
 
 			next_mul_ready[ready_mul_high_idx]	= 0;
-			
+
 			next_ent_taken[ready_mul_high_idx] = 0;
 			next_ent_avail[ready_mul_high_idx] = 1'b1;
 		end
@@ -1169,7 +1169,7 @@ begin
 //------------------------------------------------------------------------DISPATCH LOGIC
 	if (id_valid_inst0 & ~id_illegal_inst0) begin
 		case (id_IR0[31:26])
-			`MULQ_INST: 
+			`INTM_GRP: 
 				next_alu_type[ent_avail_high_idx] = `ALU_MUL;
 			`LDQ_INST, `LDQ_L_INST,
 			`STQ_INST, `STQ_C_INST:
@@ -1199,7 +1199,7 @@ begin
 		next_illegal_inst[ent_avail_high_idx]	= id_illegal_inst0;
 		next_valid_inst[ent_avail_high_idx]		= id_valid_inst0;
 		next_age[ent_avail_high_idx]					= lsq_rs_disp_age0;
-		next_old[ent_avail_high_idx]					= alu_mem_issue_old0;
+		next_old[ent_avail_high_idx]					= lsq_rs_disp_old0;
 
 		next_ent_avail[ent_avail_high_idx]		= 0;
 		next_ent_taken[ent_avail_high_idx]		= 1;
@@ -1209,7 +1209,7 @@ begin
 	if (id_valid_inst1 & ~id_illegal_inst1)
 	begin
 		case (id_IR1[31:26])
-			`MULQ_INST: 
+			`INTM_GRP: 
 				next_alu_type[ent_avail_low_idx] = `ALU_MUL;
 			`LDQ_INST, `LDQ_L_INST,
 			`STQ_INST, `STQ_C_INST:
@@ -1238,8 +1238,8 @@ begin
 		next_halt[ent_avail_low_idx]					= id_halt1;
 		next_illegal_inst[ent_avail_low_idx]	= id_illegal_inst1;
 		next_valid_inst[ent_avail_low_idx]		= id_valid_inst1;
-		next_age[ent_avail_low_idx]						= lsq_rs_disp_age0;
-		next_old[ent_avail_low_idx]						= alu_mem_issue_old0;
+		next_age[ent_avail_low_idx]						= lsq_rs_disp_age1;
+		next_old[ent_avail_low_idx]						= lsq_rs_disp_old1;
 
 		next_ent_avail[ent_avail_low_idx]		= 0;
 		next_ent_taken[ent_avail_low_idx]		= 1;
@@ -1386,31 +1386,32 @@ begin
 
 		for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 		begin
-			alu_type[i]			<= `SD next_alu_type[i];
-			npc[i]					<= `SD next_npc[i];
-			ir[i]						<= `SD next_ir[i];
-			branch_taken[i]	<= `SD next_branch_taken[i];
-			pred_addr[i]		<= `SD next_pred_addr[i];
-			opa_select[i]		<= `SD next_opa_select[i];
-			opb_select[i]		<= `SD next_opb_select[i];
-			dest_ar_idx[i]	<= `SD next_dest_ar_idx[i];
-			dest_pr_idx[i]	<= `SD next_dest_pr_idx[i];
-			pra_idx[i]			<= `SD next_pra_idx[i];
-			pra_ready[i]		<= `SD next_pra_ready[i];
-			prb_idx[i]			<= `SD next_prb_idx[i];
-			prb_ready[i]		<= `SD next_prb_ready[i];
-			alu_func[i]			<= `SD next_alu_func[i];
-			rd_mem[i]				<= `SD next_rd_mem[i];
-			wr_mem[i]				<= `SD next_wr_mem[i];
-			cond_branch[i]	<= `SD next_cond_branch[i];
-			uncond_branch[i]<= `SD next_uncond_branch[i];
-			halt[i]					<= `SD next_halt[i];
-			illegal_inst[i]	<= `SD next_illegal_inst[i];
-			valid_inst[i]		<= `SD next_valid_inst[i];
-			age[i]					<= `SD next_age[i];
-			old[i]					<= `SD next_old[i];
+			if (~next_halt[i]) begin
+				alu_type[i]			<= `SD next_alu_type[i];
+				npc[i]					<= `SD next_npc[i];
+				ir[i]						<= `SD next_ir[i];
+				branch_taken[i]	<= `SD next_branch_taken[i];
+				pred_addr[i]		<= `SD next_pred_addr[i];
+				opa_select[i]		<= `SD next_opa_select[i];
+				opb_select[i]		<= `SD next_opb_select[i];
+				dest_ar_idx[i]	<= `SD next_dest_ar_idx[i];
+				dest_pr_idx[i]	<= `SD next_dest_pr_idx[i];
+				pra_idx[i]			<= `SD next_pra_idx[i];
+				pra_ready[i]		<= `SD next_pra_ready[i];
+				prb_idx[i]			<= `SD next_prb_idx[i];
+				prb_ready[i]		<= `SD next_prb_ready[i];
+				alu_func[i]			<= `SD next_alu_func[i];
+				rd_mem[i]				<= `SD next_rd_mem[i];
+				wr_mem[i]				<= `SD next_wr_mem[i];
+				cond_branch[i]	<= `SD next_cond_branch[i];
+				uncond_branch[i]<= `SD next_uncond_branch[i];
+				halt[i]					<= `SD next_halt[i];
+				illegal_inst[i]	<= `SD next_illegal_inst[i];
+				valid_inst[i]		<= `SD next_valid_inst[i];
+				age[i]					<= `SD next_age[i];
+				old[i]					<= `SD next_old[i];
+			end
 		end
-
 	end
 end
 
@@ -1467,8 +1468,12 @@ generate
 		wire					MEM_READY = mem_ready[IDX];
 		wire					ENT_TAKEN = ent_taken[IDX]; // ent means entry
 		wire					ENT_AVAIL = ent_avail[IDX];
- 
+
 end
+		wire	[31:26]	IR0_INST = id_IR0[31:26];
+		wire	[31:26]	IR1_INST = id_IR1[31:26];
+		wire					IR0_ISMULT	=	(id_IR0[31:26] == `INTM_GRP);
+		wire					IR1_ISMULT	=	(id_IR1[31:26] == `INTM_GRP);
 endgenerate
 
 endmodule
