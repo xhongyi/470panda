@@ -110,8 +110,8 @@ module dcache(// inputs
 	
 	reg  [6:0] dcache_wr_idx0;
   reg [21:0] dcache_wr_tag0;
-	reg  [6:0] dcache_wr_idx1;
-  reg [21:0] dcache_wr_tag1;
+	//reg  [6:0] dcache_wr_idx1;
+ // reg [21:0] dcache_wr_tag1;
   
   //Response Queue
   reg   [6:0] index				[15:0];
@@ -152,7 +152,8 @@ module dcache(// inputs
   assign lsq_load_avail = (~rob_wr_mem);
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
-  assign {dcache_rd_tag, dcache_rd_idx} = waiting_addr[head][31:3];  
+  assign {dcache_rd_tag, dcache_rd_idx} = waiting_addr[head][31:3];
+  assign {dcache_wr_tag1, dcache_wr_idx1} = proc2Dcache_st_addr[31:3];	  
   assign dcache_wr_data = proc2Dcache_st_data;
   assign cachemem_halt = dcache_on_halt;
   
@@ -177,10 +178,11 @@ module dcache(// inputs
 		next_tail = tail;
 		cdb_load_en = 0;
 		dcache_wr_en1 = 0;
+		proc2Dmem_command = `BUS_NONE;
 		if(Dcache_hit)
 		$display("Dcache hit");
 		begin//if it is a hit, then initiate data updating
-			proc2Dmem_command = `BUS_NONE;
+			//proc2Dmem_command = `BUS_NONE;
 			if(lsq_rd_mem & lsq_load_avail)//if it is a load, then data will be directed to cdb
 			begin
 				cdb_load_en = ~rob_wr_mem;
@@ -190,7 +192,7 @@ module dcache(// inputs
 			else if (rob_wr_mem)//if it is a store, then set the dirty bits and store data
 			begin
 			  dcache_wr_en1  = 1;
-			  {dcache_wr_tag1, dcache_wr_idx1} = proc2Dcache_st_addr[31:3];			
+			  		
 			end
 		end//if dcache hit
 		if(Dcache_miss_solved)
@@ -199,8 +201,6 @@ module dcache(// inputs
 			//dcache_wr_en0  = 1;
 			dcache_wr_idx0 = index[Dmem2proc_tag];
 			dcache_wr_tag0 = tag[Dmem2proc_tag];
-			//cdb_pr				 = pr [Dmem2proc_tag];
-			//cdb_ar				 = ar [Dmem2proc_tag];
 			next_occupied[Dmem2proc_tag]  = 0;
 			
 			//Data is just the data from Dmem;
@@ -211,7 +211,7 @@ module dcache(// inputs
 			// Eat new command
 			next_tail = tail_plus_one;
 			next_waiting_addr[tail] = rob_wr_mem? proc2Dcache_st_addr : proc2Dcache_addr;
-			next_waiting_cmd[tail] =  rob_wr_mem? 2 : lsq_rd_mem ? 1 : 0;//`BUS_STORE = 2, `BUS_LOAD = 1
+			next_waiting_cmd[tail] =  lsq_rd_mem ? 2'b01 : 0;//`BUS_STORE = 2, `BUS_LOAD = 1
 			next_waiting_data[tail] = proc2Dcache_st_data;
 			next_waiting_pr [tail] = lsq_pr;
 			next_waiting_ar [tail] = lsq_ar;
@@ -227,9 +227,9 @@ module dcache(// inputs
 		begin
 		if(Dcache_miss)
 		begin//If there is a cache miss, update tail
-			proc2Dmem_command = waiting_cmd[head];
-			proc2Dmem_addr    = waiting_addr[head];
-			proc2Dmem_data    = waiting_data[head];
+			proc2Dmem_command = (head == tail)?next_waiting_cmd[head]:waiting_cmd[head];
+			proc2Dmem_addr    = (head == tail)?next_waiting_addr[head]:waiting_addr[head];
+			proc2Dmem_data    = (head == tail)?next_waiting_data[head]:waiting_data[head];
 		end
 		
 		if(Dmem2proc_response != 0&&!occupied[Dmem2proc_response]&&!dcache_wr_dirty)
@@ -267,8 +267,8 @@ module dcache(// inputs
 			dcache_on_halt 	<= `SD 0;
 			for (j = 0; j < 64; j = j + 1)
 			begin
-				waiting_addr[j] 	<= `SD -1;
-				waiting_cmd[j] 		<= `SD -1;
+				waiting_addr[j] 	<= `SD 0;
+				waiting_cmd[j] 		<= `SD 0;
 				waiting_data[j] 	<= `SD 0;
 				waiting_pr[j]  		<= `SD 0;
 				waiting_ar[j]	 		<= `SD 0;
