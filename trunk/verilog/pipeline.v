@@ -148,7 +148,9 @@
   wire [63:0] Dcachemem_data;
   wire        Dcachemem_valid;
   wire				Dcachemem_dirty;
-  
+  wire [63:0] halt_Dmem_addr;
+  wire [63:0] halt_Dmem_data;
+  wire [1:0]  halt_Dmem_cmd;
   /*
 	 * Intermediate wires for icache and dcache respectively
 	 */
@@ -192,7 +194,7 @@
   wire        					dcache_wr_en1;
 	wire        					dcache_wr_en0;
 	wire [63:0] 					dcache_wr_data;
-	
+	wire								  dcache_halt;
 	wire									Dcache_cdb_prf_complete;//additional wire. Determine cdb_complete(Dcache only for load)
 	
 	/*
@@ -320,7 +322,7 @@
 	
 	wire         rob_recover_exception;
 	wire				 rob_retire_halt;
-	
+	wire				 rob_halt;
 	wire				rob_Dcache_wr_mem = (rob_mt_fl_bht_lsq_recover_retire_num != 0) & (rob_lsq_retire_wr_mem0 | (rob_mt_fl_bht_lsq_recover_retire_num == 2 & rob_lsq_retire_wr_mem1));
 	/*
 	 * Output from RS
@@ -651,17 +653,16 @@
 
 	
   assign proc2mem_command =
-           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_command : Dcache_Dmem_command;
+           (dcache_halt)?halt_Dmem_cmd:(Dcache_Dmem_command==`BUS_NONE)? proc2Imem_command : Dcache_Dmem_command;
   assign proc2mem_addr =
-           (Dcache_Dmem_command==`BUS_NONE)? proc2Imem_addr : Dcache_Dmem_addr;
-	assign proc2mem_data			= (Dcache_Dmem_command ==  `BUS_NONE)? 64'b0 : Dcache_Dmem_data;
+           (dcache_halt)?halt_Dmem_addr:(Dcache_Dmem_command==`BUS_NONE)? proc2Imem_addr : Dcache_Dmem_addr;
+	assign proc2mem_data			= (dcache_halt)?halt_Dmem_addr:(Dcache_Dmem_command ==  `BUS_NONE)? 64'b0 : Dcache_Dmem_data;
 	
 	
 	
-	assign Dmem2proc_response = 
-      (Dcache_Dmem_command==`BUS_NONE) ? 0 : mem2proc_response;
-  assign Imem2proc_response =
+	assign Imem2proc_response = 
       (Dcache_Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
+  assign Dmem2proc_response = mem2proc_response;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
@@ -770,12 +771,16 @@
 											 .wr0_data(mem2proc_data),
                        .rd1_tag(dcache_rd_tag),
                        .rd1_idx(dcache_rd_idx),
-
+											 .dcache_halt(dcache_halt),
+											 .Dmem_response(Dmem2proc_response),
                        // outputs
                        .rd1_data(Dcachemem_data),
                        .rd1_valid(Dcachemem_valid),
-                       .wr1_dirty(Dcachemem_dirty)
-                       
+                       .wr1_dirty(Dcachemem_dirty),
+                       .rob_halt_complete(rob_retire_halt),
+                       .Dmem_cmd(halt_Dmem_cmd),
+                       .Dmem_data(halt_Dmem_data),
+                       .Dmem_addr(halt_Dmem_addr)
                       );
 
   // Cache controller
@@ -811,7 +816,7 @@
               .Dmem2proc_response(Dmem2proc_response),
               .Dmem2proc_data(mem2proc_data),//no wire
               .Dmem2proc_tag(mem2proc_tag),//no wire
-              .rob_halt(rob_retire_halt),
+              .rob_halt(rob_halt),
               .proc2Dcache_addr(lsq_Dcache_addr),
               .proc2Dcache_st_data(lsq_Dcache_st_value),
               .proc2Dcache_st_addr(lsq_Dcache_st_addr),
@@ -832,6 +837,7 @@
               .cdb_load_en(Dcache_load_en),
               .cdb_pr(Dcache_cdb_prf_pr_idx),
               .cdb_ar(Dcache_cdb_ar_idx),
+              .cachemem_halt(dcache_halt),
               .dcache_wr_data(dcache_wr_data),
               .dcache_rd_idx(dcache_rd_idx),
               .dcache_rd_tag(dcache_rd_tag),
@@ -1040,7 +1046,7 @@
 					 .lsq_retire_wr_mem1(rob_lsq_retire_wr_mem1),//new
 					 
 					 .recover_exception(rob_recover_exception),
-					 .retire_halt(rob_retire_halt)
+					 .retire_halt(rob_halt)
 	);
 
 	// Map table
@@ -1640,7 +1646,7 @@
 						// Retire the stores
 						.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 						.rob_retire_wr_mem0(rob_lsq_retire_wr_mem0),
-						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem0),
+						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem1),
 
 						.Dcache_avail(Dcache_lsq_load_avail),
 
