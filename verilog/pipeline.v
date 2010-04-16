@@ -1003,8 +1003,8 @@
 					 .cdb_exception1(cdb_rob_exception1),
 					 .cdb_exception2(cdb_rob_exception2),
 					 .cdb_exception3(cdb_rob_exception3),
-					 .cdb_exception4(cdb_rob_exception4),
-					 .cdb_exception5(cdb_rob_exception5),
+					 .cdb_exception4(0),
+					 .cdb_exception5(0),
 					 
 					 .cdb_actual_addr0(cdb_rob_actual_addr0),
 					 .cdb_actual_taken0(cdb_rob_actual_taken0),

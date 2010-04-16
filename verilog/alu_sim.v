@@ -64,7 +64,7 @@ module alu(//Inputs
      // `ALU_MULQ:   result = opa * opb;
       `ALU_CMPULT: result = { 63'd0, (opa < opb) };
       `ALU_CMPEQ:  result = { 63'd0, (opa == opb) };
-      `ALU_CMPULE: result = { 63'd0, (opa <= opb) };
+      `ALU_CMPULE: result = { 63'd0, (opa == opb) };
       `ALU_CMPLT:  result = { 63'd0, signed_lt(opa, opb) };
       `ALU_CMPLE:  result = { 63'd0, (signed_lt(opa, opb) || (opa == opb)) };
       default:     result = 64'hdeadbeefbaadbeef; // here only to force
@@ -103,7 +103,7 @@ module brcond(// Inputs
       2'b00: cond = (opa[0] == 0);  // LBC: (lsb(opa) == 0) ?
       2'b01: cond = (opa == 0);     // EQ: (opa == 0) ?
       2'b10: cond = (opa[63] == 1); // LT: (signed(opa) < 0) : check sign bit
-      2'b11: cond = (opa[63] == 1) || (opa == 0); // LE: (signed(opa) <= 0)
+      2'b11: cond = (opa[63] == 1) || (opa == 0); // LE: (signed(opa) = 0)
     endcase
   
      // negate cond if func[2] is set
@@ -394,83 +394,76 @@ module alu_sim(// Inputs
                           | (rs_cond_branch1 & brcond_result1);
 	
 	//deal with branch exception:												
-	always @*
+always @*
+begin
+next_cdb_exception0 = 1'd0;
+next_cdb_exception1 = 1'd0;
+	if (rs_cond_branch0)
 	begin
-	next_cdb_exception0 = 1'd0;
-	next_cdb_exception1 = 1'd0;
-		if (rs_cond_branch0)
-		begin
-			if (rs_branch_taken0 ^ ex_take_branch_out0)
-				next_cdb_exception0 = 1'd1;
-		end
-		if (rs_cond_branch1)
-		begin
-			if (rs_branch_taken1 ^ ex_take_branch_out1)
-				next_cdb_exception1 = 1'd1;
-		end
-		if (rs_uncond_branch0)
-		begin
-			if (rs_pred_addr0 != alu_result0)
-				next_cdb_exception0 = 1'd1;
-		end
-		if (rs_uncond_branch1)
-		begin
-			if (rs_pred_addr1 != alu_result1)
-				next_cdb_exception1 = 1'd1;
-		end
-	end//end always
-													
-	always @(posedge clock)//Sequential logic
+		if (rs_branch_taken0 ^ ex_take_branch_out0)
+			next_cdb_exception0 = 1'd1;
+	end
+	if (rs_cond_branch1)
 	begin
-		if(reset)
-		begin
-			cdb_complete0 <= `SD 0;
-			cdb_complete1 <= `SD 0;
-			cdb_dest_ar_idx0 <= `SD 0;
-			cdb_dest_ar_idx1 <= `SD 0;
-			cdb_prf_dest_pr_idx0 <= `SD 0;
-			cdb_prf_dest_pr_idx1 <=`SD 0;
-			cdb_exception0 <= `SD 0;
-			cdb_exception1 <= `SD 0;
-			prf_result0 <= `SD 0;
-			prf_result1 <= `SD 0;
-			prf_write_enable0 <= `SD 0;
-			prf_write_enable1 <= `SD 0;
-			rs_alu_avail <= `SD 0;
-			cdb_actual_addr0 <= `SD 0;
-			cdb_actual_addr1 <= `SD 0;
-			cdb_actual_taken0 <= `SD 0;
-			cdb_actual_taken1 <= `SD 0;
-		end
-		else
-		begin
-			prf_write_enable0 <= `SD next_prf_write_enable0;//new!!
-			prf_write_enable1 <= `SD next_prf_write_enable1;//new!!
-			rs_alu_avail <= `SD next_rs_alu_avail;
-			if(rs_valid_inst0)
-			begin
-				cdb_complete0 <= `SD next_cdb_complete0;
-				cdb_dest_ar_idx0 <= `SD next_cdb_dest_ar_idx0;
-				cdb_prf_dest_pr_idx0 <= `SD next_cdb_prf_dest_pr_idx0;
-				cdb_exception0 <= `SD next_cdb_exception0;
-				prf_result0 <= `SD next_prf_result0;
-//				prf_write_enable0 <= `SD next_prf_write_enable0;
-				cdb_actual_addr0 <= `SD next_cdb_actual_addr0;
-				cdb_actual_taken0 <= `SD next_cdb_actual_taken0;
-			end
-			if(rs_valid_inst1)
-			begin
-				cdb_complete1 <= `SD next_cdb_complete1;
-				cdb_dest_ar_idx1 <= `SD next_cdb_dest_ar_idx1;
-				cdb_prf_dest_pr_idx1 <= `SD next_cdb_prf_dest_pr_idx1;
-				cdb_exception1 <= `SD next_cdb_exception1;
-				prf_result1 <= `SD next_prf_result1;
-//				prf_write_enable1 <= `SD next_prf_write_enable1;
-				cdb_actual_addr1 <= `SD next_cdb_actual_addr1;
-				cdb_actual_taken1 <= `SD next_cdb_actual_taken1;
-			end
-		end
-  end
+		if (rs_branch_taken1 ^ ex_take_branch_out1)
+			next_cdb_exception1 = 1'd1;
+	end
+	if (rs_uncond_branch0)
+	begin
+		if (rs_pred_addr0 != alu_result0)
+			next_cdb_exception0 = 1'd1;
+	end
+	if (rs_uncond_branch1)
+	begin
+		if (rs_pred_addr1 != alu_result1)
+			next_cdb_exception1 = 1'd1;
+	end
+end//end always
+												
+always @* //Sequential logic
+begin
+	cdb_complete0 = 0;
+	cdb_complete1 = 0;
+	cdb_dest_ar_idx0 = 0;
+	cdb_dest_ar_idx1 = 0;
+	cdb_prf_dest_pr_idx0 = 0;
+	cdb_prf_dest_pr_idx1 =0;
+	cdb_exception0 = 0;
+	cdb_exception1 = 0;
+	prf_result0 = 0;
+	prf_result1 = 0;
+	prf_write_enable0 = 0;
+	prf_write_enable1 = 0;
+	rs_alu_avail = 0;
+	cdb_actual_addr0 = 0;
+	cdb_actual_addr1 = 0;
+	cdb_actual_taken0 = 0;
+	cdb_actual_taken1 = 0;
+
+	rs_alu_avail = next_rs_alu_avail;
+	if(rs_valid_inst0)
+	begin
+		cdb_complete0 = next_cdb_complete0;
+		cdb_dest_ar_idx0 = next_cdb_dest_ar_idx0;
+		cdb_prf_dest_pr_idx0 = next_cdb_prf_dest_pr_idx0;
+		cdb_exception0 = next_cdb_exception0;
+		prf_result0 = next_prf_result0;
+		prf_write_enable0 = next_prf_write_enable0;
+		cdb_actual_addr0 = next_cdb_actual_addr0;
+		cdb_actual_taken0 = next_cdb_actual_taken0;
+	end
+	if(rs_valid_inst1)
+	begin
+			cdb_complete1 = next_cdb_complete1;
+			cdb_dest_ar_idx1 = next_cdb_dest_ar_idx1;
+			cdb_prf_dest_pr_idx1 = next_cdb_prf_dest_pr_idx1;
+			cdb_exception1 = next_cdb_exception1;
+			prf_result1 = next_prf_result1;
+			prf_write_enable1 = next_prf_write_enable1;
+			cdb_actual_addr1 = next_cdb_actual_addr1;
+			cdb_actual_taken1 = next_cdb_actual_taken1;
+	end
+end
 
 endmodule // module ex_stage
 
