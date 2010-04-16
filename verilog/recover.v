@@ -41,7 +41,8 @@ module recover(//inputs
 							mt_reset,
 							mt_recover,
 							//universal reset: id,rob,rs,alu_sim,alu_mul,cdb
-							other_reset
+							other_reset,
+							pipeline_recover
 							);
 							
 input																			clock;
@@ -78,6 +79,7 @@ output																			fl_recover;
 output																			mt_reset;
 output																			mt_recover;
 output																			other_reset;
+output																			pipeline_recover;
 
 wire																		if_reset;
 wire																		bht_reset;
@@ -117,6 +119,7 @@ assign	btb_reset = (reset)? 1'd1 : 1'd0;
 assign	fl_reset = (reset)? 1'd1 : 1'd0;
 assign	mt_reset = (reset)? 1'd1 : 1'd0;
 assign	other_reset = (reset)? 1'd1 : else_reset;
+assign	pipeline_recover = if_recover;
 
 always @* begin
 	next_if_recover = 1'd0;

@@ -1605,7 +1605,7 @@
 										.cdb_dest_ar_idx1(alu_mul_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_mul_cdb_exception1),
-										.prf_result1(alu_mul_prf_value0),
+										.prf_result1(alu_mul_prf_value1),
 										.prf_write_enable1(alu_mul_prf_write_enable1),
 
 										.rs_alu_avail(alu_mul_rs_avail)
