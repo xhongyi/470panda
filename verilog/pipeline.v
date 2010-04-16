@@ -651,7 +651,7 @@
 	
 
 	// Default assignment
-	//
+	
 	// To be changed in the future
 
 	
@@ -665,8 +665,8 @@
 	
 	assign Imem2proc_response = 
       (Dcache_Dmem_command==`BUS_NONE) ? mem2proc_response : 0;
-  //assign Dmem2proc_response = (Dcache_Dmem_command != `BUS_NONE) ? mem2proc_response : 0;
-	assign Dmem2proc_response = mem2proc_response;
+  assign Dmem2proc_response = (Dcache_Dmem_command != `BUS_NONE) ? mem2proc_response : 0;
+	//assign Dmem2proc_response = mem2proc_response;
 
 	assign pipeline_completed_inst	= 0;
 	assign pipeline_error_status		= rob_retire_halt ? `HALTED_ON_HALT : `NO_ERROR;
@@ -743,7 +743,7 @@
 	assign cachemem_reset = reset;
 	assign cache_reset = reset;
 //cdb dcache complete
-	assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
+	//assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
   // Actual cache (data and tag RAMs)
   icachemem128x64 Icachememory (// inputs
@@ -780,12 +780,9 @@
                        // outputs
                        .rd1_data(Dcachemem_data),
                        .rd1_valid(Dcachemem_valid),
-                       .wr1_dirty(Dcachemem_dirty),
-                       .wr1_dirty_data(Dcachemem_dirty_data),
-                       .rob_halt_complete(rob_retire_halt),
-                       .Dmem_cmd(halt_Dmem_cmd),
-                       .Dmem_data(halt_Dmem_data),
-                       .Dmem_addr(halt_Dmem_addr)
+                       
+                       .rob_halt_complete(rob_retire_halt)
+                       
                       );
 
   // Cache controller
@@ -827,8 +824,7 @@
               .proc2Dcache_st_addr(lsq_Dcache_st_addr),
               .cachemem_data(Dcachemem_data),
               .cachemem_valid(Dcachemem_valid),
-              .dcache_wr_dirty(Dcachemem_dirty),
-              .dcache_wr_dirty_data(Dcachemem_dirty_data),
+           
               .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
@@ -840,7 +836,7 @@
               .lsq_load_avail(Dcache_lsq_load_avail),
               .Dcache_data_out(Dcache_prf_data_out),
               .Dcache_valid_out(Dcache_valid_out),   
-              .cdb_load_en(Dcache_load_en),
+              .cdb_load_en(Dcache_cdb_prf_complete),
               .cdb_pr(Dcache_cdb_prf_pr_idx),
               .cdb_ar(Dcache_cdb_ar_idx),
               .cachemem_halt(dcache_halt),
