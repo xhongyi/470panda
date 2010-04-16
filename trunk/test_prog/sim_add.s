@@ -5,4 +5,6 @@
 	stq   $r3, 600($r3)
 	stq   $r1, 800($r3)
 	ldq   $r4, 800($r3)
+	stq		$r1, 1600($r3)
+	stq		$r4, 1200($r3)
 	call_pal		0x555
