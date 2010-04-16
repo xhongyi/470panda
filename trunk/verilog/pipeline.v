@@ -624,6 +624,8 @@
 	
 	wire					recover_other_reset;
 
+	wire					pipeline_recover;
+
 	/*
 	 * Reset for each module
 	 *
@@ -667,7 +669,7 @@
 	assign Dmem2proc_response = mem2proc_response;
 
 	assign pipeline_completed_inst	= 0;
-	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
+	assign pipeline_error_status		= rob_retire_halt & ~pipeline_recover? `HALTED_ON_HALT : `NO_ERROR;
 	assign pipeline_commit_wr_idx		= 64'b0;
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
@@ -1786,7 +1788,9 @@
 							.mt_reset(recover_mt_reset),
 							.mt_recover(recover_mt_recover),
 							//universal reset: id,rob,rs,alu_sim,alu_mul,cdb
-							.other_reset(recover_other_reset)
+							.other_reset(recover_other_reset),
+
+							.pipeline_recover(pipeline_recover)
 							);
  					
 					
