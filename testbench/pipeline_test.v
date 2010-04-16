@@ -279,7 +279,7 @@ module testbench;
     else
     begin
       clock_count <= `SD (clock_count + 1);
-      instr_count <= `SD (instr_count + pipeline_completed_insts);
+      instr_count <= `SD (instr_count + rob_retire_num);
     end
   end  
 
