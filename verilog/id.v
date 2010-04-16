@@ -208,7 +208,10 @@ module decoder(// Inputs
                 end
   
               default:
+              begin
+              	opa_select = `ALU_OPA_IS_REGA;
                 cond_branch = `TRUE; // all others are conditional
+              end
             endcase // case(inst[31:26])
           end
       endcase // case(inst[31:29] << 3)

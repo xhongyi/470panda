@@ -315,13 +315,25 @@ module alu_sim(// Inputs
   always @*
   begin
     case (rs_opa_select0)
-      `ALU_OPA_IS_REGA:     opa_mux_out0 = prf_pra0;
+      `ALU_OPA_IS_REGA:
+											      begin
+											     		if (rs_cond_branch0)
+											     			opa_mux_out0 = rs_NPC0;
+											     		else
+											     			opa_mux_out0 = prf_pra0;
+											     	end
       `ALU_OPA_IS_MEM_DISP: opa_mux_out0 = mem_disp0;
       `ALU_OPA_IS_NPC:      opa_mux_out0 = rs_NPC0;
       `ALU_OPA_IS_NOT3:     opa_mux_out0 = ~64'h3;
     endcase
 		case (rs_opa_select1)
-      `ALU_OPA_IS_REGA:     opa_mux_out1 = prf_pra1;
+      `ALU_OPA_IS_REGA:
+     									      begin
+											     		if (rs_cond_branch1)
+											     			opa_mux_out1 = rs_NPC1;
+											     		else
+											     			opa_mux_out1 = prf_pra1;
+											     	end
       `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
       `ALU_OPA_IS_NPC:      opa_mux_out1 = rs_NPC1;
       `ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
