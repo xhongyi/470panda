@@ -17,6 +17,7 @@ module dcachemem128x64 (// inputs
                        rd1_data,
                        rd1_valid,
                        wr1_dirty,
+                       wr1_dirty_data,
                        rob_halt_complete,
                        Dmem_data,
                        Dmem_addr,
@@ -29,7 +30,7 @@ input [6:0] wr1_idx, wr0_idx, rd1_idx;
 input [21:0] wr1_tag, wr0_tag, rd1_tag;
 input [63:0] wr1_data, wr0_data; 
 input [3:0] Dmem_response;
-output [63:0] rd1_data,Dmem_data, Dmem_addr;
+output [63:0] rd1_data,Dmem_data, Dmem_addr,wr1_dirty_data;
 output [1:0] Dmem_cmd;
 output rd1_valid, rob_halt_complete;
 output wr1_dirty;
@@ -49,6 +50,7 @@ reg rob_halt_complete;
 assign rd1_data = data[rd1_idx];
 assign rd1_valid = valids[rd1_idx]&&(tags[rd1_idx] == rd1_tag);
 assign wr1_dirty = dirty[wr1_idx];
+assign wr1_data  = data[wr1_idx];
 assign mem_wr_en = dirty[wr1_idx] & valids[wr1_idx] & (wr1_tag != tags[wr1_idx]);
 assign mem_addr =  {tags[wr1_idx], wr1_idx};
 assign mem_data =  data[wr1_idx];
