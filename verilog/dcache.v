@@ -30,6 +30,7 @@ module dcache(// inputs
 							cdb_load_en,
 							cdb_pr,
 							cdb_ar,
+							cachemem_halt,
 							dcache_wr_data,
               dcache_rd_idx,
               dcache_rd_tag,
@@ -67,6 +68,7 @@ module dcache(// inputs
   output 				cdb_load_en;
 	output	[6:0] cdb_pr;
 	output  [4:0] cdb_ar;
+	output				cachemem_halt;
   output  [6:0] dcache_rd_idx;
   output [21:0] dcache_rd_tag;
   output  [6:0] dcache_wr_idx1;
@@ -123,7 +125,7 @@ module dcache(// inputs
 	
 	reg   [6:0] cdb_pr;
 	reg   [4:0] cdb_ar;
-
+ 
  
   reg [1:0] 	proc2Dmem_command;
   reg [63:0]	proc2Dmem_data;
@@ -134,19 +136,23 @@ module dcache(// inputs
 	
   wire [5:0] tail_plus_one = (tail == 6'd63) ? 0 : tail + 1;
   wire [5:0] head_plus_one = (head == 6'd63) ? 0 : head + 1;
-
+	
+	//halt
+	reg dcache_on_halt;
+	
 
 	//Internal combinational logic
   wire [63:0] Dcache_data_out = cachemem_data;
   wire Dcache_hit = (lsq_rd_mem | rob_wr_mem) & cachemem_valid; 
 	wire Dcache_miss = (lsq_rd_mem | rob_wr_mem) & !cachemem_valid;
-	wire Dcache_miss_solved = (Dmem2proc_tag != 0); 
+	wire Dcache_miss_solved = (Dmem2proc_tag != 0 & occupied[Dmem2proc_tag]==1); 
 	//Output combinational logic
   assign lsq_load_avail = (~rob_wr_mem);
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
   assign {dcache_rd_tag, dcache_rd_idx} = waiting_addr[head][31:3];  
   assign dcache_wr_data = proc2Dcache_st_data;
+  assign cachemem_halt = dcache_on_halt;
   
   
 	always @*
@@ -219,7 +225,7 @@ module dcache(// inputs
 			next_occupied[Dmem2proc_response] = 1;
 			next_head = head_plus_one;
 		end
-
+		
 
  end
  
@@ -239,8 +245,9 @@ module dcache(// inputs
 				pr[j]					<= `SD 0;
 				ar[j]					<= `SD 0;
       end
-			head <= `SD 0;
-			tail <= `SD 0;
+			head 						<= `SD 0;
+			tail 						<= `SD 0;
+			dcache_on_halt 	<= `SD 0;
 			for (j = 0; j < 64; j = j + 1)
 			begin
 				waiting_addr[j] 	<= `SD -1;
@@ -263,6 +270,7 @@ module dcache(// inputs
       end
 			head 						<= `SD next_head;
 			tail 						<= `SD next_tail;
+			dcache_on_halt 	<= `SD dcache_on_halt | rob_halt;
 			for (j = 0; j < 64; j = j + 1)
 			begin
 				waiting_addr[j] <= `SD next_waiting_addr[j];
