@@ -442,13 +442,13 @@ begin
 	cdb_prf_dest_pr_idx1 =0;
 	cdb_exception0 = 0;
 	cdb_exception1 = 0;
-	prf_result0 = 0;
-	prf_result1 = 0;
+	prf_result0 = 64'b0;
+	prf_result1 = 64'b0;
 	prf_write_enable0 = 0;
 	prf_write_enable1 = 0;
 	rs_alu_avail = 0;
-	cdb_actual_addr0 = 0;
-	cdb_actual_addr1 = 0;
+	cdb_actual_addr0 = 64'b0;
+	cdb_actual_addr1 = 64'b0;
 	cdb_actual_taken0 = 0;
 	cdb_actual_taken1 = 0;
 
