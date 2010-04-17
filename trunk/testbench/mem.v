@@ -50,6 +50,14 @@ wire valid_address = (proc2mem_addr[2:0]==3'b0) &
 
 integer i;
 
+genvar j;
+generate
+	for (j = 1; j <= `NUM_MEM_TAGS; j = j+1)
+	begin : foo
+		wire [15:0]	CYCLES_LEFT = cycles_left[j];
+	end
+endgenerate
+
 // Implement the Memory function
 always @(negedge clk)
 begin
