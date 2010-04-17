@@ -200,7 +200,7 @@ module alu_mul(
    //
 								
 								
- always @*
+ /*always @*
   begin
     case (opa_select0)
       `ALU_OPA_IS_REGA:     opa_mux_out0 = pra0;
@@ -214,13 +214,39 @@ module alu_mul(
       `ALU_OPA_IS_NPC:      opa_mux_out1 = NPC1;
       `ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
     endcase
-  end
+
+    case (opb_select0)
+      `ALU_OPA_IS_REGA:     opb_mux_out0 = prb0;
+      `ALU_OPA_IS_MEM_DISP: opb_mux_out0 = mem_disp0;
+      `ALU_OPA_IS_NPC:      opb_mux_out0 = NPC0;
+      `ALU_OPA_IS_NOT3:     opb_mux_out0 = ~64'h3;
+    endcase
+	case (opb_select1)
+      `ALU_OPA_IS_REGA:     opb_mux_out1 = prb1;
+      `ALU_OPA_IS_MEM_DISP: opb_mux_out1 = mem_disp1;
+      `ALU_OPA_IS_NPC:      opb_mux_out1 = NPC1;
+      `ALU_OPA_IS_NOT3:     opb_mux_out1 = ~64'h3;
+    endcase
+  end*/
+	always @*
+	begin
+		opa_mux_out0 = pra0;
+		opa_mux_out1 = pra1;
+		case (opb_select0)
+			`ALU_OPB_IS_REGB:			opb_mux_out0 = prb0;
+			`ALU_OPB_IS_ALU_IMM:	opb_mux_out0 = alu_imm0;
+		endcase
+		case (opb_select1)
+			`ALU_OPB_IS_REGB:			opb_mux_out1 = prb1;
+			`ALU_OPB_IS_ALU_IMM:	opb_mux_out1 = alu_imm1;
+		endcase
+	end
 
 	//
    // instantiate the ALU
    //
-  mult mult0(clock, reset, pra0, prb0, valid_inst0, prf_result0, cdb_complete0);
-	mult mult1(clock, reset, pra1, prb1, valid_inst1, prf_result1, cdb_complete1);
+  mult mult0(clock, reset, opa_mux_out0, opb_mux_out0, valid_inst0, prf_result0, cdb_complete0);
+	mult mult1(clock, reset, opa_mux_out1, opb_mux_out1, valid_inst1, prf_result1, cdb_complete1);
   
 	always @(posedge clock)
 	begin
