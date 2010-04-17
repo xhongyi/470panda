@@ -308,7 +308,7 @@ module alu_sim(// Inputs
 		if (rs_dest_ar_idx1 == `ZERO_REG)
 			next_prf_result1 = 64'd0;
 		else if (ex_take_branch_out1)
-			next_prf_result1 = rs_NPC0;
+			next_prf_result1 = rs_NPC1;
 		else
 			next_prf_result1 = alu_result1;
   end
