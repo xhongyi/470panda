@@ -219,7 +219,7 @@ module dcache(// inputs
 			next_pr   [Dmem2proc_response] = waiting_pr [head];
 			next_ar   [Dmem2proc_response] = waiting_ar [head];
 			next_st		[Dmem2proc_response] = waiting_st [head];
-			next_occupied[Dmem2proc_response] = 1;
+			next_occupied[Dmem2proc_response] = waiting_st[head]?0:1;
 			next_head = head_plus_one;
 		end
 		

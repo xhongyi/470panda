@@ -1,4 +1,4 @@
-	addq	$r1, 8, $r1
+	addq	$r1, 16, $r1
 	addq	$r1, $r2, $r3
 	addq	$r3, $r1, $r4
 	stq 	$r3, 400($r3)
@@ -8,6 +8,7 @@
 	stq   $r1, 480($r3)
 	ldq   $r4, 480($r3)
 	stq		$r3, 560($r3)
+	ldq   $r3, 560($r3)
 	stq		$r1, 720($r3)
-	#stq   $r1, 760($r3)
+	stq   $r1, 2024($r0)
 	call_pal		0x555
