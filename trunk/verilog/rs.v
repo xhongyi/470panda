@@ -1378,15 +1378,14 @@ begin
 	end
 	else
 	begin
-		sim_ready					<= `SD next_sim_ready;
-		mul_ready					<= `SD next_mul_ready;
-		mem_ready					<= `SD next_mem_ready;
-		ent_taken					<= `SD next_ent_taken;
-		ent_avail					<= `SD next_ent_avail;
-
 		for (i = 0; i < `NUM_RS_ENTRIES; i = i+1)
 		begin
 			if (~next_halt[i]) begin
+				sim_ready[i]		<= `SD next_sim_ready[i];
+				mul_ready[i]		<= `SD next_mul_ready[i];
+				mem_ready[i]		<= `SD next_mem_ready[i];
+				ent_taken[i]		<= `SD next_ent_taken[i];
+				ent_avail[i]		<= `SD next_ent_avail[i];
 				alu_type[i]			<= `SD next_alu_type[i];
 				npc[i]					<= `SD next_npc[i];
 				ir[i]						<= `SD next_ir[i];

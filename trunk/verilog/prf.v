@@ -176,19 +176,27 @@ always @ (posedge clock)
 begin
 	if(reset) 
 	begin
-	  for ( i = 0; i < 64; i = i + 1)
+	  for ( i = 0; i < 96; i = i + 1)
 		begin
 			register[i] <= `SD 0;
 		end
 	end
 	else
 	begin
-		for ( i = 0; i < 64; i = i + 1)
+		for ( i = 0; i < 96; i = i + 1)
 		begin
 			register[i] <= `SD next_register[i];
 		end
 	end
 end
 
+genvar IDX;
+generate
+	for(IDX=0; IDX<96; IDX=IDX+1)
+	begin : foo
+wire	[63:0]	XREGISTER = register[IDX];
+wire	[63:0]	XNEXT_REGISTER = next_register[IDX];
+	end
+endgenerate
 
 endmodule
