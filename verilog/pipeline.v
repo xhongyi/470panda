@@ -678,7 +678,7 @@
 	//assign proc2Dmem_addr						= 64'b0;
 	//assign Dcache_Dmem_command				= `BUS_NONE;
 
-	assign  rob_Dcache_wr_mem = (rob_mt_fl_bht_lsq_recover_retire_num != 0) & (rob_lsq_retire_wr_mem0 | (rob_mt_fl_bht_lsq_recover_retire_num == 2 & rob_lsq_retire_wr_mem1)) & ~pipeline_recover;
+	assign  rob_Dcache_wr_mem = (rob_mt_fl_bht_lsq_recover_retire_num != 0) & (rob_lsq_retire_wr_mem0 | ((rob_mt_fl_bht_lsq_recover_retire_num == 2'd2) & rob_lsq_retire_wr_mem1)) & ~pipeline_recover;
 
 
 
