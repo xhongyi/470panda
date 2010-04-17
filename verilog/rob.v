@@ -536,19 +536,19 @@ end//of sequential logic
 genvar IDX;
 generate
 	for(IDX=0; IDX<`ROB_WIDTH; IDX=IDX+1)
-	begin : foo
-wire	[`ROB_WIDTH-1:0]	READY = ready[IDX];
-wire	[`ROB_WIDTH-1:0]	EXCEPTION = exception[IDX];
-wire	[`ROB_WIDTH-1:0]	COND_BRANCH = cond_branch[IDX];
-wire	[`ROB_WIDTH-1:0]	UNCOND_BRANCH = uncond_branch[IDX];
-wire	[`ROB_WIDTH-1:0]	ACTUAL_TAKEN = actual_taken[IDX];
+	begin : robfoo
+wire										READY = ready[IDX];
+wire										EXCEPTION = exception[IDX];
+wire										COND_BRANCH = cond_branch[IDX];
+wire										UNCOND_BRANCH = uncond_branch[IDX];
+wire										ACTUAL_TAKEN = actual_taken[IDX];
 wire	[63:0]						FOO_NPC = NPC[IDX];  //64 tags, 64 bits each.
 wire	[63:0]						ACTUAL_ADDR = actual_addr[IDX];  //64 tags, 64 bits each.
 wire	[4:0]							AR = ar[IDX];
 wire	[6:0]							TAG = tag[IDX];  //64 tags, 7 bits each.
 wire	[6:0]							TOLD = told[IDX];  //64 old tags, 7 bits each.
-wire	[`ROB_WIDTH-1:0]	HALT = halt[IDX];
-wire	[`ROB_WIDTH-1:0]	VALID = valid[IDX];
+wire										HALT = halt[IDX];
+wire										VALID = valid[IDX];
 wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR = bhr[IDX];
 	end
 wire special0 = (cdb_pr_tag_0 == tag[0]);
