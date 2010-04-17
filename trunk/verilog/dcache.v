@@ -145,7 +145,7 @@ module dcache(// inputs
 	wire dcache_halt_complete;
 
 	//Internal combinational logic
-  wire [63:0] Dcache_data_out = cachemem_data;
+  reg [63:0] Dcache_data_out;
   wire Dcache_hit = (lsq_rd_mem | rob_wr_mem) & cachemem_valid; 
 	wire Dcache_miss = (lsq_rd_mem | rob_wr_mem) & !cachemem_valid;
 	wire Dcache_miss_solved = (Dmem2proc_tag != 0 & occupied[Dmem2proc_tag]==1); 
@@ -195,6 +195,7 @@ module dcache(// inputs
 				cdb_load_en = 1;
 	      cdb_pr		  = lsq_pr;
 				cdb_ar			= lsq_ar;
+				Dcache_data_out = cachemem_data;
 			end
 		end
 		
@@ -235,6 +236,7 @@ module dcache(// inputs
 				cdb_load_en = 1;
 				cdb_pr      = pr[Dmem2proc_tag];
 				cdb_ar      = ar[Dmem2proc_tag];
+				Dcache_data_out = Dmem2proc_data;
 			end
 			//Data is just the data from Dmem;
 		end
