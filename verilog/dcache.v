@@ -92,13 +92,13 @@ module dcache(// inputs
   reg  [63:0] waiting_data			[63:0];
 	reg  [6:0]  waiting_pr 				[63:0];
 	reg  [4:0]  waiting_ar 				[63:0];
-	reg  				waiting_st				[63:0];
+	reg  [63:0]	waiting_st;
 	reg  [63:0] next_waiting_addr	[63:0];
 	reg  [1:0]  next_waiting_cmd	[63:0];
 	reg  [63:0] next_waiting_data	[63:0];
 	reg  [6:0]  next_waiting_pr	 	[63:0];
 	reg  [4:0]  next_waiting_ar 	[63:0];
-	reg  				next_waiting_st   [63:0];
+	reg  [63:0]		next_waiting_st;
 	// Head and tail
 	
   reg  [5:0] head;
@@ -117,13 +117,13 @@ module dcache(// inputs
   reg  [21:0] tag					[15:0];
 	reg   [6:0] pr					[15:0];
 	reg   [4:0] ar					[15:0];
-	reg					st					[15:0];
+	reg	 [15:0] st;
   reg	 [15:0] occupied;
   reg   [6:0] next_index 	[15:0];
 	reg	 [21:0] next_tag	 	[15:0];
 	reg   [6:0] next_pr     [15:0];
 	reg   [4:0] next_ar     [15:0];
-	reg					next_st			[15:0];
+	reg	 [15:0] next_st;
 	reg  [15:0] next_occupied;
 	
 	reg   [6:0] cdb_pr;
