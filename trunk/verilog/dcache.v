@@ -228,6 +228,7 @@ module dcache(// inputs
 			//dcache_wr_en0  = 1;
 			dcache_wr_idx0 = index[Dmem2proc_tag];
 			dcache_wr_tag0 = tag[Dmem2proc_tag];
+			dcache_wr_data = Dmem2proc_data;
 			next_occupied[Dmem2proc_tag]  = 0;
 			if(!st[Dmem2proc_tag])
 			begin
