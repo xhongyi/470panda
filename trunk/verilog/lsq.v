@@ -335,15 +335,16 @@ begin
 	for (i = 0; i < `LEN_LDQ; i = i+1)
 	begin
 		ld_age_ext[i] = {1'b0, next_ld_age[i]};
+		next_ld_ready[i] = 1;
 		if (next_ld_avail[i])
 			next_ld_ready[i] = 0;
 		else if (next_ld_old[i])
 			next_ld_match[i] = 0;
 		else
 		begin
-			if (next_ld_age[i] == st_head)
-				next_ld_ready[i] = 1;
-			else if (next_ld_age[i] < st_head)
+			//if (next_ld_age[i] == st_head)
+			//	next_ld_ready[i] = 1;
+			if (next_ld_age[i] < st_head)
 				ld_age_ext[i] = {1'b0, next_ld_age[i]} + `LEN_STQ;
 			for (j = 0; j < `LEN_STQ * 2; j = j+1)
 			begin
