@@ -728,7 +728,6 @@
 	assign id_reset = recover_other_reset;
 	assign rob_reset = recover_other_reset;
 	assign rs_reset = recover_other_reset;
-	assign prf_reset = recover_other_reset;
 	assign alu_sim_reset = recover_other_reset;
 	assign alu_mul_reset = recover_other_reset;
 	assign alu_mem_reset = recover_other_reset;
@@ -740,6 +739,7 @@
 	assign bht_reset = recover_bht_reset;
 	assign btb_reset = recover_btb_reset;
 	
+	assign prf_reset = reset;
 	assign cachemem_reset = reset;
 	assign cache_reset = reset;
 //cdb dcache complete
@@ -1595,14 +1595,14 @@
 										.cdb_prf_dest_pr_idx0(alu_mul_cdb_prf_pr_idx0),
 										.cdb_exception0(alu_mul_cdb_exception0),
 										.prf_result0(alu_mul_prf_value0),
-										.prf_write_enable0(alu_mul_prf_write_enable0),
+										.prf_write_enable0(alu_mul_prf_wr_enable0),
 
 										.cdb_complete1(alu_mul_cdb_complete1),
 										.cdb_dest_ar_idx1(alu_mul_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_mul_cdb_exception1),
 										.prf_result1(alu_mul_prf_value1),
-										.prf_write_enable1(alu_mul_prf_write_enable1),
+										.prf_write_enable1(alu_mul_prf_wr_enable1),
 
 										.rs_alu_avail(alu_mul_rs_avail)
 								);

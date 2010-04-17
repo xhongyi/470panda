@@ -41,7 +41,7 @@ reg [3:0] halt_counter;
 assign rd1_data = data[rd1_idx];
 assign rd1_valid = valids[rd1_idx]&&(tags[rd1_idx] == rd1_tag);
 
-assign rob_halt_complete = (halt_counter == 10);
+assign rob_halt_complete = (halt_counter == 2);
 
 
 always @(posedge clock)

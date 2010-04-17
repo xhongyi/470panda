@@ -36,10 +36,10 @@ input recover;
 
 output [6:0] rob_rs_mt_pr0, rob_rs_mt_pr1;
 
-wire [63:0] tail_plus_one;
-wire [63:0] head_plus_one;
-wire [63:0] tail_plus_two;
-wire [63:0] head_plus_two;
+wire [5:0] tail_plus_one;
+wire [5:0] head_plus_one;
+wire [5:0] tail_plus_two;
+wire [5:0] head_plus_two;
 
 reg [5:0] head, tail;
 reg [5:0] next_head, next_tail;
@@ -47,10 +47,10 @@ reg [5:0] next_head, next_tail;
 reg [6:0] next_pr [63:0];
 reg	[6:0]	pr [63:0];
 
-assign tail_plus_one = tail + 1'd1;
-assign head_plus_one = head + 1'd1;
-assign tail_plus_two = tail + 2'd2;
-assign head_plus_two = head + 2'd2;
+assign tail_plus_one = tail + 6'd1;
+assign head_plus_one = head + 6'd1;
+assign tail_plus_two = tail + 6'd2;
+assign head_plus_two = head + 6'd2;
 
 assign rob_rs_mt_pr0 = pr[tail];
 assign rob_rs_mt_pr1 = pr[tail_plus_one];
@@ -100,4 +100,14 @@ always @(posedge clock) begin
     end
   end
 end//end always
+
+genvar IDX;
+generate
+	for(IDX=0; IDX<64; IDX=IDX+1)
+	begin : foo
+wire	[63:0]	PR = pr[IDX];
+wire	[63:0]	NEXT_PR = next_pr[IDX];
+	end
+endgenerate
+
 endmodule
