@@ -179,8 +179,8 @@ module mt (// Inputs
 
 	assign rs_pr_a1 = pr_tags[id_ra_idx0];
 	assign rs_pr_a2 = pr_tags[id_rb_idx0];
-	assign rs_pr_a1_ready = output_ready_bits[id_ra_idx0] | ~rob_ar_a1_valid;
-	assign rs_pr_a2_ready = output_ready_bits[id_rb_idx0] | ~rob_ar_a2_valid;
+	assign rs_pr_a1_ready = output_ready_bits[id_ra_idx0] | ~rob_ar_a1_valid | (id_ra_idx0 == `ZERO_REG);
+	assign rs_pr_a2_ready = output_ready_bits[id_rb_idx0] | ~rob_ar_a2_valid | (id_rb_idx0 == `ZERO_REG);
 
 	assign rs_pr_b1 = (rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? fl_pr0: 
 																															 pr_tags[id_ra_idx1];
@@ -188,10 +188,10 @@ module mt (// Inputs
 																												  		 pr_tags[id_rb_idx1];
 	assign rs_pr_b1_ready = ((rob_ar_a_valid && id_ra_idx1 == id_dest_idx0)? 1'b0: 
 																															 output_ready_bits[id_ra_idx1]) |
-										~rob_ar_b1_valid;
+										~rob_ar_b1_valid | (id_ra_idx1 == `ZERO_REG);
 	assign rs_pr_b2_ready = ((rob_ar_a_valid && id_rb_idx1 == id_dest_idx0)? 1'b0: 
 																															 output_ready_bits[id_rb_idx1]) |
-										~rob_ar_b2_valid;
+										~rob_ar_b2_valid | (id_rb_idx1 == `ZERO_REG);
 
 /*	genvar i;
 	generate
