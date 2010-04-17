@@ -53,8 +53,9 @@ integer i;
 genvar j;
 generate
 	for (j = 1; j <= `NUM_MEM_TAGS; j = j+1)
-	begin : foo
+	begin : MEM
 		wire [15:0]	CYCLES_LEFT = cycles_left[j];
+		wire [15:0] WAITING_BUT	= waiting_for_bus[j];
 	end
 endgenerate
 
