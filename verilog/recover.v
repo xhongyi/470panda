@@ -152,7 +152,7 @@ always @* begin
 			else if (rob_uncond_branch0)
 				next_btb_recover = 1'd1;
 		end
-		else if (rob_retire_num[0]) begin
+		else if (rob_retire_num[1]) begin
 			next_if_recover_addr = rob_actual_addr1;
 			next_bht_bhr = rob_bhr1;
 			next_btb_NPC = rob_NPC1;

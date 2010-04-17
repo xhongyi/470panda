@@ -281,7 +281,7 @@ assign	recover_actual_addr1 = actual_addr[head_plus_one];
 assign	recover_uncond_branch1 = uncond_branch[head_plus_one];
 assign	lsq_retire_wr_mem1 = wr_mem[head_plus_one];//new!!
 
-assign	recover_exception = ready[head] & (exception[head] | (ready[head_plus_one] & exception[head_plus_one]));
+assign	recover_exception = (lsq_mt_fl_bht_recover_retire_num[0] & exception[head]) | (lsq_mt_fl_bht_recover_retire_num[1] & exception[head_plus_one]);
 
 always @*
 begin

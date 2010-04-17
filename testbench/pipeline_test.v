@@ -263,7 +263,7 @@ module testbench;
     reset = 1'b0;
     $display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
 
-   #10000  $finish; 
+   #100000  $finish; 
   end
 
 
