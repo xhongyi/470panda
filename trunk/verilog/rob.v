@@ -65,8 +65,11 @@ module rob(//inputs
 						//retire
 						mt_retire_ar_a,//new
 						mt_retire_ar_b,//new
-						mt_fl_retire_tag_a,//modified
-						mt_fl_retire_tag_b,//modified
+						mt_retire_taga,
+						mt_retire_tagb,
+						fl_retire_tolda,
+						fl_retire_toldb,
+						
 						lsq_mt_fl_bht_recover_retire_num,//modified!!
 						
 						bht_recover_cond_branch0,//new
@@ -148,8 +151,10 @@ output	[1:0]										id_cap;
 
 output	[4:0]										mt_retire_ar_a;
 output	[4:0]										mt_retire_ar_b;
-output	[6:0]										mt_fl_retire_tag_a;
-output	[6:0]										mt_fl_retire_tag_b;
+output	[6:0]										mt_retire_taga;
+output	[6:0]										mt_retire_tagb;
+output	[6:0]										fl_retire_tolda;
+output	[6:0]										fl_retire_toldb;
 output	[1:0]										lsq_mt_fl_bht_recover_retire_num;
 
 output													bht_recover_cond_branch0;
@@ -177,8 +182,10 @@ wire	[1:0]										id_cap;
 
 wire	[4:0]										mt_retire_ar_a;
 wire	[4:0]										mt_retire_ar_b;
-wire	[6:0]										mt_fl_retire_tag_a;
-wire	[6:0]										mt_fl_retire_tag_b;
+wire	[6:0]										mt_retire_taga;
+wire	[6:0]										mt_retire_tagb;
+wire	[6:0]										fl_retire_tolda;
+wire	[6:0]										fl_retire_toldb;
 
 wire													bht_recover_cond_branch0;
 wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bht_recover_retire_bhr0;
@@ -197,7 +204,7 @@ wire													recover_uncond_branch1;
 wire													lsq_retire_wr_mem0;
 wire													lsq_retire_wr_mem1;
 
-wire													revocer_exception;
+wire													recover_exception;
 // parameter-use-wire
 wire	[`ROB_BITS-1:0]	head_plus_one;
 wire	[`ROB_BITS-1:0]	tail_plus_one;
@@ -262,8 +269,10 @@ assign  id_cap = full? 2'd0 : almost_full? 2'd1 :2'd2;
 
 assign	mt_retire_ar_a = ar[head];
 assign	mt_retire_ar_b = ar[head_plus_one];
-assign	mt_fl_retire_tag_a = tag[head];
-assign	mt_fl_retire_tag_b = tag[head_plus_one];
+assign	mt_retire_taga = tag[head];
+assign	mt_retire_tagb = tag[head_plus_one];
+assign	fl_retire_tolda = told[head];
+assign	fl_retire_toldb = told[head_plus_one];
 
 assign	bht_recover_cond_branch0 = cond_branch[head];
 assign	bht_recover_retire_bhr0 = bhr[head];

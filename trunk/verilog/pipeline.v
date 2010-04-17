@@ -300,8 +300,10 @@
 	wire	 [1:0] rob_id_cap;
 	wire  [4:0]  rob_mt_retire_ar_a;
 	wire  [4:0]  rob_mt_retire_ar_b;
-	wire	 [6:0] rob_mt_fl_retire_tag_a;
-	wire	 [6:0] rob_mt_fl_retire_tag_b;
+	wire	 [6:0] rob_mt_retire_taga;
+	wire	 [6:0] rob_mt_retire_tagb;
+	wire	 [6:0] rob_fl_retire_tolda;
+	wire	 [6:0] rob_fl_retire_toldb;
 	wire	 [1:0] rob_mt_fl_bht_lsq_recover_retire_num;
 
 	wire  			 rob_bht_recover_cond_branch0;
@@ -724,8 +726,8 @@
 	assign cdb_pr_tag4					= cdb_rs_rob_mt_pr_tag4;
 	assign cdb_pr_tag5					= cdb_rs_rob_mt_pr_tag5;
 	assign rob_retire_num				= rob_mt_fl_bht_lsq_recover_retire_num;
-	assign rob_retire_tag_a			= rob_mt_fl_retire_tag_a;
-	assign rob_retire_tag_b			= rob_mt_fl_retire_tag_b;
+	assign rob_retire_tag_a			= rob_mt_retire_taga;
+	assign rob_retire_tag_b			= rob_mt_retire_tagb;
 
 	assign id_reset = recover_other_reset;
 	assign rob_reset = recover_other_reset;
@@ -1027,8 +1029,11 @@
 
 					 .mt_retire_ar_a(rob_mt_retire_ar_a),
 					 .mt_retire_ar_b(rob_mt_retire_ar_b),	 
-					 .mt_fl_retire_tag_a(rob_mt_fl_retire_tag_a),
-					 .mt_fl_retire_tag_b(rob_mt_fl_retire_tag_b),
+					 .mt_retire_taga(rob_mt_retire_taga),
+					 .mt_retire_tagb(rob_mt_retire_tagb),
+					 .fl_retire_tolda(rob_fl_retire_tolda),
+					 .fl_retire_toldb(rob_fl_retire_toldb),
+					 
 
 					 .lsq_mt_fl_bht_recover_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 
@@ -1097,8 +1102,8 @@
 				 .rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 				 .rob_retire_ar0(rob_mt_retire_ar_a),
 				 .rob_retire_ar1(rob_mt_retire_ar_b),
-				 .rob_retire_pr0(rob_mt_fl_retire_tag_a),
-				 .rob_retire_pr1(rob_mt_fl_retire_tag_b),
+				 .rob_retire_pr0(rob_mt_retire_taga),
+				 .rob_retire_pr1(rob_mt_retire_tagb),
 
 				// Outputs
 				 .rob_p0told(mt_rob_p0told),
@@ -1122,8 +1127,8 @@
 					.reset(fl_reset),
 					.id_dispatch_num(id_rs_rob_mt_dispatch_num),
 					.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
-					.rob_retire_tag_0(rob_mt_fl_retire_tag_a),
-					.rob_retire_tag_1(rob_mt_fl_retire_tag_b),
+					.rob_retire_tag_0(rob_fl_retire_tolda),
+					.rob_retire_tag_1(rob_fl_retire_tolda),
 					
 					.recover(recover_fl_recover),
 					// Outputs
