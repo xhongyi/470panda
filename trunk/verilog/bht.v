@@ -33,12 +33,12 @@ module bht(//Inputs
 						id_bhr1
 						);
 //parameters
-`ifndef	NUM_BHT_PATTERN_ENTRIES
-`define	NUM_BHT_PATTERN_ENTRIES	64
+`ifndef	LEN_BHT
+`define	LEN_BHT	64
 `endif
 
-`ifndef	LOG_NUM_BHT_PATTERN_ENTRIES
-`define	LOG_NUM_BHT_PATTERN_ENTRIES 6
+`ifndef	BIT_BHT
+`define	BIT_BHT 6
 `endif
 //2bit saturated counter parameters
 `ifndef ST_NOT_TAKEN
@@ -67,36 +67,36 @@ input																	if_valid_cond0;
 input																	if_valid_cond1;
 
 input																	recover_cond;// when this is high, there is an exception.
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	recover_bhr;
+input	[`BIT_BHT-1:0]	recover_bhr;
 input	[1:0]														rob_retire_num;// new & not implemented
 
 input																	rob_retire_cond0;
 input	[63:0]													rob_retire_NPC0;
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_retire_BHR0;
+input	[`BIT_BHT-1:0]	rob_retire_BHR0;
 input																	rob_actual_taken0;
 
 input																	rob_retire_cond1;
 input	[63:0]													rob_retire_NPC1;
-input	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	rob_retire_BHR1;
+input	[`BIT_BHT-1:0]	rob_retire_BHR1;
 input																	rob_actual_taken1;
 
 output																if_branch_taken0;
 output																if_branch_taken1;
-output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr0;
-output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr1;
+output	[`BIT_BHT-1:0]	id_bhr0;
+output	[`BIT_BHT-1:0]	id_bhr1;
 
-reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
-reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	next_BHR;
-reg	[1:0]																pattern				[`NUM_BHT_PATTERN_ENTRIES-1:0];
-reg	[1:0]																next_pattern	[`NUM_BHT_PATTERN_ENTRIES-1:0];
+reg	[`BIT_BHT-1:0]	BHR;
+reg	[`BIT_BHT-1:0]	next_BHR;
+reg	[1:0]																pattern				[`LEN_BHT-1:0];
+reg	[1:0]																next_pattern	[`LEN_BHT-1:0];
 
 reg																			taken0;
 reg																			taken1;
 
-reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr0;
-reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	id_bhr1;
+reg	[`BIT_BHT-1:0]	id_bhr0;
+reg	[`BIT_BHT-1:0]	id_bhr1;
 
-reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	inter_BHR;
+reg	[`BIT_BHT-1:0]	inter_BHR;
 //used only when both are predictions and taken0 is 0.
 
 wire																		if_branch_taken0;
@@ -104,7 +104,7 @@ wire																		if_branch_taken1;
 
 integer i;
 
-//output	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR;
+//output	[`BIT_BHT-1:0]	BHR;
 
 assign if_branch_taken0 = taken0;
 assign if_branch_taken1 = taken1;
@@ -117,7 +117,7 @@ always @* begin
 	taken1 = 1'b0;
 	id_bhr0 = BHR;
 	id_bhr1 = BHR;
-	for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
+	for (i=0; i<`LEN_BHT; i=i+1) begin
 		next_pattern[i] = pattern[i];
 	end
 
@@ -126,21 +126,21 @@ always @* begin
 	//if only if_valid_cond0
 		if (rob_retire_num[1] & ~rob_retire_num[0]) begin//rob_retire_num == 2
 			if (if_valid_cond0 && ~if_valid_cond1) begin
-				taken0 = next_pattern[if_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
+				taken0 = next_pattern[if_NPC0[`BIT_BHT+1:2]^BHR][1];
 				next_BHR = {BHR[4:0], taken0};
 				id_bhr0 = BHR;
 				id_bhr1 = next_BHR;
 			end
 		//if only if_valid_cond1
 			else if (~if_valid_cond0 && if_valid_cond1) begin
-				taken1 = next_pattern[if_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
+				taken1 = next_pattern[if_NPC1[`BIT_BHT+1:2]^BHR][1];
 				next_BHR = {BHR[4:0], taken1};
 				id_bhr0 = BHR;
 				id_bhr1 = BHR;
 			end
 		//if both if_valid_cond0 and if_valid_cond1
 			else if (if_valid_cond0 && if_valid_cond1) begin
-				taken0 = next_pattern[if_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
+				taken0 = next_pattern[if_NPC0[`BIT_BHT+1:2]^BHR][1];
 				if (taken0) begin
 					next_BHR = {BHR[4:0], 1'b1};
 					id_bhr0 = BHR;
@@ -148,7 +148,7 @@ always @* begin
 				end
 				else begin
 					inter_BHR = {BHR[4:0], 1'b0};
-					taken1 = next_pattern[if_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^inter_BHR][1];
+					taken1 = next_pattern[if_NPC1[`BIT_BHT+1:2]^inter_BHR][1];
 					next_BHR = {inter_BHR[4:0], taken1};
 					id_bhr0 = BHR;
 					id_bhr1 = inter_BHR;
@@ -157,7 +157,7 @@ always @* begin
 		end
 		else if (~rob_retire_num[1] & rob_retire_num[0]) begin//rob_retire_num == 1
 			if (if_valid_cond0) begin
-				taken0 = next_pattern[if_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^BHR][1];
+				taken0 = next_pattern[if_NPC0[`BIT_BHT+1:2]^BHR][1];
 				next_BHR = {BHR[4:0], taken0};
 				id_bhr0 = BHR;
 				id_bhr1 = next_BHR;
@@ -174,31 +174,31 @@ always @* begin
 		// rob_0
 		if(rob_retire_cond0) begin
 			if (rob_actual_taken0) begin //the correct outcome is a taken
-				if(~pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][0] | 
-					 ~pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][1])
+				if(~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | 
+					 ~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1])
 					 
-					next_pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] = pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] + 2'b1;
+					next_pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0] = pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0] + 2'b1;
 			end
 			else begin //the correct outcome is a not-taken
-				if(pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][0] | 
-					 pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0][1])
+				if(pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | 
+					 pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1])
 					 
-					next_pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] = pattern[rob_retire_NPC0[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR0] - 2'b1;
+					next_pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0] = pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0] - 2'b1;
 			end
 		end
 	// rob_1
 		if(rob_retire_cond1) begin
 			if (rob_actual_taken1) begin //the correct outcome is a taken
-				if(~pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][0] | 
-					 ~pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][1])
+				if(~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | 
+					 ~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1])
 					 
-					next_pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] = pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] + 2'b1;
+					next_pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1] = pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1] + 2'b1;
 			end
 			else begin //the correct outcome is a not-taken
-				if(pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][0] | 
-					 pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1][1])
+				if(pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | 
+					 pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1])
 					 
-					next_pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] = pattern[rob_retire_NPC1[`LOG_NUM_BHT_PATTERN_ENTRIES+1:2]^rob_retire_BHR1] - 2'b1;
+					next_pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1] = pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1] - 2'b1;
 			end
 		end
 	end
@@ -208,14 +208,14 @@ end
 
 always @(posedge clock) begin
 	if (reset) begin
-		BHR <= `SD `LOG_NUM_BHT_PATTERN_ENTRIES'b0;
-		for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
+		BHR <= `SD `BIT_BHT'b0;
+		for (i=0; i<`LEN_BHT; i=i+1) begin
 			pattern[i] <= `SD	`WK_NOT_TAKEN;
 		end 
 	end
 	else begin
 		BHR <= `SD next_BHR;
-		for (i=0; i<`NUM_BHT_PATTERN_ENTRIES; i=i+1) begin
+		for (i=0; i<`LEN_BHT; i=i+1) begin
 			pattern[i] <= `SD next_pattern[i];
 		end
 	end
@@ -223,7 +223,7 @@ end
 
 genvar IDX;
 generate
-	for(IDX=0; IDX<`NUM_BHT_PATTERN_ENTRIES; IDX=IDX+1)
+	for(IDX=0; IDX<`LEN_BHT; IDX=IDX+1)
 	begin : foo
 		wire	[1:0]	PATTERN = pattern[IDX];
 		wire	[1:0]	NEXT_PATTERN = next_pattern[IDX];
