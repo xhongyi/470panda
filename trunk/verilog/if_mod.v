@@ -79,7 +79,6 @@ wire	[63:0]															PC_plus_4;
 wire	[63:0]															PC_plus_8;
 wire																			PC_enable0;
 wire																			PC_enable1;
-wire																			next_ready_for_valid;
 
 wire																			IR0_jump;
 wire																			IR1_jump;
@@ -88,8 +87,8 @@ wire																			IR1_uncond;
 wire																			IR0_cond;
 wire																			IR1_cond;
 
-wire	[63:0]															branch_pred0;
-wire	[63:0]															branch_pred1;
+wire	[63:0]															branch_pred_addr0;
+wire	[63:0]															branch_pred_addr1;
 
 reg																				valid_jump0;	//new
 reg																				valid_jump1;	//new
@@ -126,21 +125,20 @@ assign	IR1_cond = (((id_IR1[31:29] == 3'd6) | (id_IR1[31:29] == 3'd7)) & ~IR1_un
 assign	IR0_jump = (id_IR0[31:26] == `JSR_GRP);
 assign	IR1_jump = (id_IR1[31:26] == `JSR_GRP);
 
-assign	branch_pred0 = id_bht_NPC0 + {{41{id_IR0[20]}},id_IR0[20:0],2'b00};
-assign	branch_pred1 = id_bht_NPC1 + {{41{id_IR1[20]}},id_IR1[20:0],2'b00};
+assign	branch_pred_addr0 = id_bht_NPC0 + {{41{id_IR0[20]}},id_IR0[20:0],2'b00};
+assign	branch_pred_addr1 = id_bht_NPC1 + {{41{id_IR1[20]}},id_IR1[20:0],2'b00};
 
 assign	id_branch_taken0 = bht_branch_taken0;
 assign	id_branch_taken1 = bht_branch_taken1;
-assign	id_pred_addr0 = (valid_jump0)? btb_pred_addr0 : branch_pred0;
-assign	id_pred_addr1 = (valid_jump1)? btb_pred_addr1 : branch_pred1;
+
+assign	id_pred_addr0 = (IR0_jump)? btb_pred_addr0 : branch_pred_addr0;
+assign	id_pred_addr1 = (IR1_jump)? btb_pred_addr1 : branch_pred_addr1;
 
 always @*
 begin
 //default: ID need none
 	bht_valid_cond0 = 0;//new
 	bht_valid_cond1 = 0;//new
-	valid_jump0 = 0;//new
-	valid_jump1 = 0;//new
 	id_valid_inst0 = 0;
 	id_valid_inst1 = 0;
 	next_PC = PC_reg;
@@ -152,17 +150,16 @@ begin
 				id_valid_inst0 = 1'b1;
 				
 				if (IR0_uncond) begin//IR0 is uncond branch
-					next_PC = branch_pred0;
+					next_PC = branch_pred_addr0;
 				end
 				else if (IR0_cond) begin//IR0 is cond branch
 					bht_valid_cond0 = 1'b1;
 					if (bht_branch_taken0)//branch0 taken
-						next_PC = branch_pred0;
+						next_PC = branch_pred_addr0;
 					else//branch0 not taken
 						next_PC = PC_plus_4;
 				end
 				else if (IR0_jump) begin//IR0 is jump
-					valid_jump0 = 1'b1;
 					next_PC = btb_pred_addr0;
 				end
 				else//IR0 is neither jump nor branch(cond or uncond)
@@ -176,30 +173,29 @@ begin
 				id_valid_inst0 = 1'b1;
 				
 				if(IR0_uncond) begin//IR0 is uncond branch
-					next_PC = branch_pred0;
+					next_PC = branch_pred_addr0;
 				end
 				
 				else if (IR0_cond) begin//IR0 is cond branch
 					bht_valid_cond0 = 1'b1;
 					
 					if (bht_branch_taken0)//branch0 is taken
-						next_PC = branch_pred0;
+						next_PC = branch_pred_addr0;
 					else begin//branch0 is not taken
 						id_valid_inst1 = 1'b1;
 						
 						if (IR1_uncond) begin//IR1 is uncond branch
-							next_PC = branch_pred1;
+							next_PC = branch_pred_addr1;
 						end
 						else if (IR1_cond) begin//IR1 is cond branch
 							bht_valid_cond1 = 1'b1;
 							
 							if (bht_branch_taken1)//branch1 is taken
-								next_PC = branch_pred1;
+								next_PC = branch_pred_addr1;
 							else//branch1 is not taken
 								next_PC = PC_plus_8;
 						end
 						else if (IR1_jump) begin//IR1 is jump
-							valid_jump1 = 1'b1;
 							next_PC = btb_pred_addr1;
 						end
 						else//IR1 is neither jump nor branch(cond or uncond)
@@ -208,7 +204,6 @@ begin
 				end
 				
 				else if (IR0_jump) begin//IR0 is jump
-					valid_jump0 = 1'b1;
 					next_PC = btb_pred_addr0;
 				end
 				
@@ -216,18 +211,17 @@ begin
 					id_valid_inst1 = 1'b1;
 					
 					if (IR1_uncond) begin//IR1 is uncond branch
-						next_PC = branch_pred1;
+						next_PC = branch_pred_addr1;
 					end
 					else if (IR1_cond) begin//IR1 is cond branch
 						bht_valid_cond1 = 1'b1;
 						
 						if(bht_branch_taken1)//branch1 is taken
-							next_PC = branch_pred1;
+							next_PC = branch_pred_addr1;
 						else// branch1 is not taken
 							next_PC = PC_plus_8;
 					end
 					else if (IR1_jump) begin//IR1 is jump
-						valid_jump1 = 1'b1;
 						next_PC = btb_pred_addr1;
 					end
 					else//IR1 is neither branch nor jump
@@ -241,12 +235,11 @@ begin
 					bht_valid_cond0 = 1'b1;
 					
 					if (bht_branch_taken0)
-						next_PC = branch_pred0;
+						next_PC = branch_pred_addr0;
 					else
 						next_PC = PC_plus_4;
 				end
 				else if (IR0_jump) begin
-					valid_jump0 = 1'b1;
 					next_PC = btb_pred_addr0;
 				end
 				else
