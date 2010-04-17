@@ -624,6 +624,8 @@
 	
 	wire					recover_other_reset;
 
+	wire					pipeline_recover;
+
 	/*
 	 * Reset for each module
 	 *
@@ -667,7 +669,7 @@
 	//assign Dmem2proc_response = mem2proc_response;
 
 	assign pipeline_completed_inst	= 0;
-	assign pipeline_error_status		= rob_retire_halt? `HALTED_ON_HALT : `NO_ERROR;
+	assign pipeline_error_status		= rob_retire_halt ? `HALTED_ON_HALT : `NO_ERROR;
 	assign pipeline_commit_wr_idx		= 64'b0;
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
@@ -816,7 +818,7 @@
               .Dmem2proc_response(Dmem2proc_response),
               .Dmem2proc_data(mem2proc_data),//no wire
               .Dmem2proc_tag(mem2proc_tag),//no wire
-              .rob_halt(rob_halt),
+              .rob_halt(rob_halt & ~pipeline_recover),
               .proc2Dcache_addr(lsq_Dcache_addr),
               .proc2Dcache_st_data(lsq_Dcache_st_value),
               .proc2Dcache_st_addr(lsq_Dcache_st_addr),
@@ -1599,7 +1601,7 @@
 										.cdb_dest_ar_idx1(alu_mul_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
 										.cdb_exception1(alu_mul_cdb_exception1),
-										.prf_result1(alu_mul_prf_value0),
+										.prf_result1(alu_mul_prf_value1),
 										.prf_write_enable1(alu_mul_prf_write_enable1),
 
 										.rs_alu_avail(alu_mul_rs_avail)
@@ -1782,7 +1784,9 @@
 							.mt_reset(recover_mt_reset),
 							.mt_recover(recover_mt_recover),
 							//universal reset: id,rob,rs,alu_sim,alu_mul,cdb
-							.other_reset(recover_other_reset)
+							.other_reset(recover_other_reset),
+
+							.pipeline_recover(pipeline_recover)
 							);
  					
 					
