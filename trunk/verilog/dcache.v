@@ -137,8 +137,8 @@ module dcache(// inputs
 	reg dcache_wr_en1;
 	reg [63:0] dcache_wr_data;
 	
-  wire [5:0] tail_plus_one = (tail == 6'd63) ? 0 : tail + 1;
-  wire [5:0] head_plus_one = (head == 6'd63) ? 0 : head + 1;
+  wire [5:0] tail_plus_one = (tail == 6'd63) ? 0 : tail + 6'b1;
+  wire [5:0] head_plus_one = (head == 6'd63) ? 0 : head + 6'b1;
 	
 	//halt
 	reg dcache_on_halt;
@@ -175,6 +175,9 @@ module dcache(// inputs
 			next_occupied[i] 	= occupied[i];
 			next_index[i] 		= index[i];
 			next_tag[i] 			= tag[i];
+			next_pr[i]				= pr[i];
+			next_ar[i]				= ar[i];
+			next_st[i]				=	st[i];
 		end
 		next_head = head;
 		next_tail = tail;
@@ -213,7 +216,7 @@ module dcache(// inputs
 		end
 		//End of output logic
 		//Drain command queue and fill index queue
-		if((Dmem2proc_response != 0&&!occupied[Dmem2proc_response]))
+		if((Dmem2proc_response != 0)&(~occupied[Dmem2proc_response]))
 		begin//If there is a response, put the reading information into the waiting bench
 			next_index[Dmem2proc_response] = dcache_rd_idx;
 			next_tag  [Dmem2proc_response] = dcache_rd_tag;
@@ -221,7 +224,7 @@ module dcache(// inputs
 			next_ar   [Dmem2proc_response] = waiting_ar [head];
 			next_st		[Dmem2proc_response] = waiting_st [head];
 			next_occupied[Dmem2proc_response] = waiting_st[head]?0:1;
-			next_head = head_plus_one;
+			//next_head = head_plus_one;
 		end
 		
 		if(Dcache_miss_solved)
@@ -284,7 +287,7 @@ module dcache(// inputs
 				occupied [j]  <= `SD next_occupied[j];
 				st[j]					<= `SD next_st[j];
       end
-			head 						<= `SD next_head;
+			head 						<= `SD ((Dmem2proc_response != 0)&(~occupied[Dmem2proc_response]))? head_plus_one : head;
 			tail 						<= `SD next_tail;
 			dcache_on_halt 	<= `SD dcache_on_halt | rob_halt;
 			for (j = 0; j < 64; j = j + 1)
