@@ -336,7 +336,7 @@ begin
 	begin
 		ld_age_ext[i] = {1'b0, next_ld_age[i]};
 		next_ld_ready[i] = 1;
-		if (~next_ld_avail[i])
+		if (next_ld_avail[i])
 			next_ld_ready[i] = 0;
 		else if (next_ld_old[i])
 			next_ld_match[i] = 0;
@@ -510,7 +510,7 @@ begin
 
 				next_ld_avail[ldq_ready_low]	= 1;
 				next_ld_taken[ldq_ready_low] = 0;
-			end if (Dcache_avail)
+			end if (Dcache_avail & ~(next_ld_ready[ldq_ready_high] & ~next_ld_match[ldq_ready_high]))
 			begin
 				Dcache_rd_mem		= 1;
 				Dcache_wr_mem		= 0;
