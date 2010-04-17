@@ -88,6 +88,9 @@ wire																			IR1_uncond;
 wire																			IR0_cond;
 wire																			IR1_cond;
 
+wire	[63:0]															branch_pred0;
+wire	[63:0]															branch_pred1;
+
 reg																				valid_jump0;	//new
 reg																				valid_jump1;	//new
 
@@ -123,8 +126,8 @@ assign	IR1_cond = (((id_IR1[31:29] == 3'd6) | (id_IR1[31:29] == 3'd7)) & ~IR1_un
 assign	IR0_jump = (id_IR0[31:26] == `JSR_GRP);
 assign	IR1_jump = (id_IR1[31:26] == `JSR_GRP);
 
-assign	branch_pred0 = PC_reg + id_IR0[20:0];
-assign	branch_pred1 = PC_plus_4 + id_IR1[20:0];
+assign	branch_pred0 = id_bht_NPC0 + {{41{id_IR0[20]}},id_IR0[20:0],2'b00};
+assign	branch_pred1 = id_bht_NPC1 + {{41{id_IR1[20]}},id_IR1[20:0],2'b00};
 
 assign	id_branch_taken0 = bht_branch_taken0;
 assign	id_branch_taken1 = bht_branch_taken1;
@@ -185,13 +188,13 @@ begin
 						id_valid_inst1 = 1'b1;
 						
 						if (IR1_uncond) begin//IR1 is uncond branch
-							next_PC = branch_pred0;
+							next_PC = branch_pred1;
 						end
 						else if (IR1_cond) begin//IR1 is cond branch
 							bht_valid_cond1 = 1'b1;
 							
 							if (bht_branch_taken1)//branch1 is taken
-								next_PC = branch_pred0;
+								next_PC = branch_pred1;
 							else//branch1 is not taken
 								next_PC = PC_plus_8;
 						end
@@ -213,13 +216,13 @@ begin
 					id_valid_inst1 = 1'b1;
 					
 					if (IR1_uncond) begin//IR1 is uncond branch
-						next_PC = branch_pred0;
+						next_PC = branch_pred1;
 					end
 					else if (IR1_cond) begin//IR1 is cond branch
 						bht_valid_cond1 = 1'b1;
 						
 						if(bht_branch_taken1)//branch1 is taken
-							next_PC = branch_pred0;
+							next_PC = branch_pred1;
 						else// branch1 is not taken
 							next_PC = PC_plus_8;
 					end
