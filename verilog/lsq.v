@@ -75,7 +75,7 @@ module lsq (// Inputs
 						// For the retired store value
 						Dcache_st_value,
 
-						Dcache_st_addr,
+						Dcache_st_addr
 						);
 
 `ifndef LEN_STQ

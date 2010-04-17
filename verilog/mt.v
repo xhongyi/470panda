@@ -279,6 +279,7 @@ generate
 wire		READY = ready_bits[IDX];
 wire		NEXT_READY = next_ready_bits[IDX];
 wire	[6:0]	PR_TAGS = pr_tags[IDX];
+wire	[6:0]	PR_RETIRED = pr_tags_retired[IDX];
 	end
 endgenerate
 
