@@ -35,19 +35,22 @@ reg [127:0] valids;
 integer i;
 reg [63:0] Dmem_addr,Dmem_data;
 reg [1:0] Dmem_cmd;
-//reg rob_halt_complete;
+reg [3:0] halt_counter;
 
 
 assign rd1_data = data[rd1_idx];
 assign rd1_valid = valids[rd1_idx]&&(tags[rd1_idx] == rd1_tag);
 
-assign rob_halt_complete = dcache_halt;
+assign rob_halt_complete = (halt_counter == 10);
 
 
 always @(posedge clock)
 begin
   if(reset) 
-	valids <= `SD 128'b0;
+  begin
+  	valids <= `SD 128'b0;
+		halt_counter <= `SD 0;
+	end
   else 
 	begin
 		if(wr1_en) 
@@ -69,6 +72,11 @@ begin
 			data[wr0_idx] <= `SD wr0_data;
 			tags[wr0_idx] <= `SD wr0_tag;
 		end
+		if(dcache_halt)
+		begin
+			halt_counter <= `SD halt_counter + 1;
+		end
+			
 
 end
 

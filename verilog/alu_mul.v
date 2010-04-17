@@ -177,7 +177,8 @@ module alu_mul(
 		assign cdb_prf_dest_pr_idx0 = dest_pr_idx0;
 		assign cdb_prf_dest_pr_idx1 = dest_pr_idx1;
 		assign rs_alu_avail = 2'b11;
-		
+		assign  prf_write_enable0 = cdb_complete0;
+		assign  prf_write_enable1 = cdb_complete1;
 
 			
  reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
