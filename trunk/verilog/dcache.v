@@ -156,7 +156,8 @@ module dcache(// inputs
   assign dcache_wr_en0 = Dcache_miss_solved;
   assign {dcache_rd_tag, dcache_rd_idx} = proc2Dcache_addr[31:3];
   assign {dcache_wr_tag1, dcache_wr_idx1} = waiting_addr[head][31:3];
-  assign dcache_wr_data =	Dcache_miss_solved? Dmem2proc_data: waiting_data[head];
+  //assign dcache_wr_data =	Dcache_miss_solved? Dmem2proc_data: waiting_data[head];
+	assign dcache_wr_data = waiting_data[head];
   assign dcache_wr_en1 =waiting_st[head];	  
 	assign dcache_halt_complete  = dcache_on_halt ;//&(occupied == 16'b0);
   assign cachemem_halt = dcache_halt_complete;
