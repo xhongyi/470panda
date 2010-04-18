@@ -62,6 +62,14 @@ begin
 	end
 end
 
+genvar j;
+generate
+	for (j = 0; j < 128; j=j+1)
+	begin : dmem
+		wire	[63:0]	DATA = data[j];
+	end
+endgenerate
+
 always @(posedge clock)
 begin
 		if(wr1_en)
