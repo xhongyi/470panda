@@ -146,8 +146,8 @@ module dcache(// inputs
 
 	//Internal combinational logic
   reg [63:0] Dcache_data_out;
-  wire Dcache_hit = (lsq_rd_mem | rob_wr_mem) & cachemem_valid; 
-	wire Dcache_miss = (lsq_rd_mem | rob_wr_mem) & !cachemem_valid;
+  wire Dcache_hit = (lsq_rd_mem ) & cachemem_valid; 
+	wire Dcache_miss = (lsq_rd_mem) & !cachemem_valid;
 	wire Dcache_miss_solved = (Dmem2proc_tag != 0 & occupied[Dmem2proc_tag]==1); 
 	//Output combinational logic
   assign lsq_load_avail = (~rob_wr_mem);
@@ -221,13 +221,12 @@ module dcache(// inputs
 		//Drain command queue and fill index queue
 		if((Dmem2proc_response != 0)&(~occupied[Dmem2proc_response]))
 		begin//If there is a response, put the reading information into the waiting bench
-			next_index[Dmem2proc_response] = dcache_rd_idx;
-			next_tag  [Dmem2proc_response] = dcache_rd_tag;
+			{next_tag  [Dmem2proc_response],next_index[Dmem2proc_response]} = waiting_addr[head][31:3]; 
 			next_pr   [Dmem2proc_response] = waiting_pr [head];
 			next_ar   [Dmem2proc_response] = waiting_ar [head];
 			next_st		[Dmem2proc_response] = waiting_st [head];
 			next_occupied[Dmem2proc_response] = waiting_st[head]?0:1;
-			//next_head = head_plus_one;
+			
 		end
 		
 		if(Dcache_miss_solved)
@@ -235,7 +234,6 @@ module dcache(// inputs
 			//dcache_wr_en0  = 1;
 			dcache_wr_idx0 = index[Dmem2proc_tag];
 			dcache_wr_tag0 = tag[Dmem2proc_tag];
-		
 			next_occupied[Dmem2proc_tag]  = 0;
 			if(!st[Dmem2proc_tag])
 			begin
