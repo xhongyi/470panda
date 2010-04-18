@@ -153,7 +153,7 @@ module dcache(// inputs
   assign lsq_load_avail = (~rob_wr_mem);
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
-  assign {dcache_rd_tag, dcache_rd_idx} = waiting_addr[head][31:3];
+  assign {dcache_rd_tag, dcache_rd_idx} = proc2Dcache_addr[31:3];
   assign {dcache_wr_tag1, dcache_wr_idx1} = waiting_addr[head][31:3];
   assign dcache_wr_data =	Dcache_miss_solved? Dmem2proc_data: waiting_data[head];
   assign dcache_wr_en1 =waiting_st[head];	  
