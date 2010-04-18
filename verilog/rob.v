@@ -26,6 +26,8 @@ module rob(//inputs
 						mt_p1told,
 						id_NPC0,//new
 						id_NPC1,//new
+						id_IR0,
+						id_IR1,
 						id_dest_idx0,//new
 						id_dest_idx1,//new
 						id_valid_inst0,
@@ -88,6 +90,9 @@ module rob(//inputs
 						
 						lsq_retire_wr_mem0,//new!!
 						lsq_retire_wr_mem1,//new!!
+
+						rob_retire_IR0,
+						rob_retire_IR1,
 						
 
 						recover_exception,//new
@@ -109,6 +114,8 @@ input	[6:0]											mt_p0told;
 input	[6:0]											mt_p1told;
 input	[63:0]										id_NPC0;
 input	[63:0]										id_NPC1;
+input	[31:0]										id_IR0;
+input	[31:0]										id_IR1;
 input	[4:0]											id_dest_idx0;//new
 input	[4:0]											id_dest_idx1;//new
 input	[1:0]											id_dispatch_num;
@@ -174,6 +181,9 @@ output													recover_uncond_branch1;
 output													lsq_retire_wr_mem0;//new!!
 output													lsq_retire_wr_mem1;//new!!
 
+output	[31:0]									rob_retire_IR0;
+output	[31:0]									rob_retire_IR1;
+
 output													recover_exception;//new
 output													retire_halt;
 
@@ -228,6 +238,7 @@ reg	[6:0]							tag					[`ROB_WIDTH-1:0];  //64 tags, 7 bits each.
 reg	[6:0]							told				[`ROB_WIDTH-1:0];  //64 old tags, 7 bits each.
 reg	[`ROB_WIDTH-1:0]	halt;
 reg	[`ROB_WIDTH-1:0]	valid;
+reg	[31:0]						ir					[`ROB_WIDTH-1:0];
 reg	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	bhr	[`ROB_WIDTH-1:0];
 //reg inputs
 
@@ -292,6 +303,9 @@ assign	lsq_retire_wr_mem1 = wr_mem[head_plus_one];//new!!
 
 assign	recover_exception = (lsq_mt_fl_bht_recover_retire_num[0] & exception[head]) | (lsq_mt_fl_bht_recover_retire_num[1] & exception[head_plus_one]);
 
+assign rob_retire_IR0 = ir[head];
+assign rob_retire_IR1 = ir[head+1];
+
 always @*
 begin
 //Default:
@@ -321,7 +335,7 @@ begin
 	//checklist:
 	//check rs_avail:
 	//update tag with fl , told with mt at tail
-  
+ 
 
 	case (id_dispatch_num) 
 		2'b00:
@@ -503,6 +517,7 @@ begin //of sequential logic
 			valid[i]					<= `SD 1'd0;
 			bhr[i]						<= `SD 6'd0;
 			wr_mem[i]					<= `SD 1'd0;//new!!
+			ir[i]								<= `SD 32'b0;
 		end
 		head <= `SD 1'd0;
 		tail <= `SD 1'd0;
@@ -530,6 +545,10 @@ begin //of sequential logic
 		end
 		head <= `SD next_head;
 		tail <= `SD next_tail;
+		if (id_dispatch_num[0] | id_dispatch_num[1])
+			ir[tail]			<= `SD id_IR0;
+		if (id_dispatch_num[1])
+			ir[tail+1]		<= `SD id_IR1;
 	end
 end//of sequential logic
 
