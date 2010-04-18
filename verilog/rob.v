@@ -569,6 +569,8 @@ wire	[6:0]							TOLD = told[IDX];  //64 old tags, 7 bits each.
 wire										HALT = halt[IDX];
 wire										VALID = valid[IDX];
 wire	[`LOG_NUM_BHT_PATTERN_ENTRIES-1:0]	BHR = bhr[IDX];
+wire	[31:0]						IRRR = ir[IDX];
+wire	[63:0]						NNPC = NPC[IDX];
 	end
 wire special0 = (cdb_pr_tag_0 == tag[0]);
 wire special1 = (cdb_pr_tag_1 == tag[1]);

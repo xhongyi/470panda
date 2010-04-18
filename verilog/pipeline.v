@@ -481,6 +481,9 @@
 	wire	[`BIT_STQ-1:0]	rs_alu_mem_issue_age1;
 	wire					rs_alu_mem_issue_old0;
 	wire					rs_alu_mem_issue_old1;
+	
+	wire					rs_lsq_wr_mem0_peer;
+	wire					rs_lsq_wr_mem1_peer;
 
 	/*
 	 * Outputs from physical register file
@@ -1387,7 +1390,10 @@
 					.alu_mem_issue_age0(rs_alu_mem_issue_age0),
 					.alu_mem_issue_age1(rs_alu_mem_issue_age1),
 					.alu_mem_issue_old0(rs_alu_mem_issue_old0),
-					.alu_mem_issue_old1(rs_alu_mem_issue_old1)
+					.alu_mem_issue_old1(rs_alu_mem_issue_old1),
+					
+					.lsq_wr_mem0_peer(rs_lsq_wr_mem0_peer),
+					.lsq_wr_mem1_peer(rs_lsq_wr_mem1_peer)
 	);
 
 
@@ -1679,6 +1685,9 @@
 						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem1),
 
 						.Dcache_avail(Dcache_lsq_load_avail),
+						
+						.rs_wr_mem0_peer(rs_lsq_wr_mem0_peer),
+						.rs_wr_mem1_peer(rs_lsq_wr_mem1_peer),
 
 						// Outputs
 						// Give back the age of ld at dispatch
