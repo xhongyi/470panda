@@ -842,7 +842,7 @@
               .cachemem_data(Dcachemem_data),
               .cachemem_valid(Dcachemem_valid),
            
-              .rob_wr_mem(rob_Dcache_wr_mem),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
+              .rob_wr_mem(rob_Dcache_wr_mem & ~pipeline_recover),//I think this is from lsq, see lsq signal: "lsq_Dcache_rd_mem"
               .lsq_rd_mem(lsq_Dcache_rd_mem),
               .lsq_pr(lsq_Dcache_pr_idx),
               .lsq_ar(lsq_Dcache_ar_idx),
