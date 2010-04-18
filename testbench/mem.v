@@ -59,7 +59,7 @@ generate
 	end
 	for (j = 0; j < `MEM_64BIT_LINES; j = j+1)
 	begin : MEM_DATA
-		wire 				MEMORY		= unified_memory[j];
+		wire [63:0]	MEMORY		= unified_memory[j];
 	end
 endgenerate
 
