@@ -1146,7 +1146,7 @@
 					.id_dispatch_num(id_rs_rob_mt_dispatch_num),
 					.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 					.rob_retire_tag_0(rob_fl_retire_tolda),
-					.rob_retire_tag_1(rob_fl_retire_tolda),
+					.rob_retire_tag_1(rob_fl_retire_toldb),
 					
 					.recover(recover_fl_recover),
 					// Outputs
