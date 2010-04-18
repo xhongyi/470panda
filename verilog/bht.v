@@ -172,7 +172,7 @@ always @* begin
 // change pattern when recover or retire.
 	if(~recover_cond) begin//if recover, then ignore retire
 		// rob_0
-		if(rob_retire_cond0) begin
+		if(rob_retire_cond0 & (rob_retire_num[0] | rob_retire_num[1])) begin
 			if (rob_actual_taken0) begin //the correct outcome is a taken
 				if(~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | 
 					 ~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1])
@@ -187,7 +187,7 @@ always @* begin
 			end
 		end
 	// rob_1
-		if(rob_retire_cond1) begin
+		if(rob_retire_cond1 & rob_retire_num[1]) begin
 			if (rob_actual_taken1) begin //the correct outcome is a taken
 				if(~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | 
 					 ~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1])

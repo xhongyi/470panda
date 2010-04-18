@@ -656,7 +656,8 @@
 	wire		lsq_reset;//new
 	wire		cdb_reset;
 	wire		cachemem_reset;
-	wire		cache_reset;
+	wire		icache_reset;
+	wire		dcache_reset;
 	wire		bht_reset;
 	wire		btb_reset;
 
@@ -750,6 +751,7 @@
 	assign alu_mem_reset = recover_other_reset;
 	assign cdb_reset = recover_other_reset;
 	assign lsq_reset = recover_other_reset;
+	assign dcache_reset = recover_other_reset;
 	assign mt_reset = recover_mt_reset;
 	assign fl_reset = recover_fl_reset;
 	assign if_reset = recover_if_reset;
@@ -758,7 +760,8 @@
 	
 	assign prf_reset = reset;
 	assign cachemem_reset = reset;
-	assign cache_reset = reset;
+	assign icache_reset = reset;
+
 //cdb dcache complete
 	//assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
@@ -805,7 +808,7 @@
   // Cache controller
   icache icache0(// inputs 
                   .clock(clock),
-                  .reset(cache_reset),
+                  .reset(icache_reset),
 
                   .Imem2proc_response(Imem2proc_response),
                   .Imem2proc_data(mem2proc_data),
@@ -830,7 +833,7 @@
   
   dcache	dcache0(// inputs
               .clock(clock),
-              .reset(cache_reset),
+              .reset(dcache_reset),
               
               .Dmem2proc_response(Dmem2proc_response),
               .Dmem2proc_data(mem2proc_data),//no wire
