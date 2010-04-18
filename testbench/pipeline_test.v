@@ -90,6 +90,8 @@ module testbench;
 	wire  [1:0] rob_retire_num;
 	wire  [6:0] rob_retire_tag_a;
 	wire	[6:0] rob_retire_tag_b;
+
+	wire				pipeline_recover;
 	
 	
   // Strings to hold instruction opcode
@@ -176,8 +178,9 @@ module testbench;
 								 cdb_pr_tag5,
 								 rob_retire_num,
 								 rob_retire_tag_a,
-								 rob_retire_tag_b
+								 rob_retire_tag_b,
 
+								 pipeline_recover
                 );
 
 
@@ -287,7 +290,7 @@ module testbench;
     else
     begin
       clock_count <= `SD (clock_count + 1);
-      instr_count <= `SD (instr_count + rob_retire_num);
+      instr_count <= `SD (instr_count + ((~pipeline_recover)?rob_retire_num:0));
     end
   end  
 

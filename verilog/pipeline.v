@@ -73,7 +73,9 @@
 								 cdb_pr_tag5,
 								 rob_retire_num,
 								 rob_retire_tag_a,
-								 rob_retire_tag_b
+								 rob_retire_tag_b,
+
+								 pipeline_recover
 
                 );
 
@@ -139,6 +141,8 @@
 	output	[1:0]	rob_retire_num;
 	output	[6:0]	rob_retire_tag_a;
 	output	[6:0]	rob_retire_tag_b;
+
+	output				pipeline_recover;
 
 	/*
 	 * Output from Icache mem
