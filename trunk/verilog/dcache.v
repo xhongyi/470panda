@@ -128,7 +128,8 @@ module dcache(// inputs
 	
 	reg   [6:0] cdb_pr;
 	reg   [4:0] cdb_ar;
- 
+	
+	 
  
   reg [1:0] 	proc2Dmem_command;
   reg [63:0]	proc2Dmem_data;
@@ -150,7 +151,7 @@ module dcache(// inputs
 	wire Dcache_miss = (lsq_rd_mem) & !cachemem_valid;
 	wire Dcache_miss_solved = (Dmem2proc_tag != 0 & occupied[Dmem2proc_tag]==1); 
 	//Output combinational logic
-  assign lsq_load_avail = (~rob_wr_mem);
+  assign lsq_load_avail = (~rob_wr_mem)&(~cdb_load_en);
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
   assign {dcache_rd_tag, dcache_rd_idx} = proc2Dcache_addr[31:3];
