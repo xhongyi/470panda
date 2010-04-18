@@ -31,10 +31,6 @@ module btb(//inputs
 `define	LOG_NUM_BTB_ENTRIES	10
 `endif
 
-`ifndef	LOG_ENTRIES_VALUE
-`define	LOG_ENTRIES_VALUE	30
-`endif
-
 input	clock;
 input	reset;
 
@@ -58,21 +54,21 @@ output	[63:0]				if_pred_addr1;
 reg	[`TAG_LENGTH-1:0]	tag							[`NUM_BTB_ENTRIES-1:0];
 reg	[`TAG_LENGTH-1:0]	next_tag				[`NUM_BTB_ENTRIES-1:0];
 */
-reg	[18:0]						br_displ				[`LOG_ENTRIES_VALUE-1:0];//branch displacement (I ignored the fact that branch ins may branch to a unaliased address)
-reg	[18:0]						next_br_displ		[`LOG_ENTRIES_VALUE-1:0];
+reg	[63:0]						br				[`NUM_BTB_ENTRIES-1:0];//branch displacement (I ignored the fact that branch ins may branch to a unaliased address)
+reg	[63:0]						next_br		[`NUM_BTB_ENTRIES-1:0];
 
 wire	[63:0]					if_pred_addr0;
 wire	[63:0]					if_pred_addr1;
 
 integer i;
 
-assign if_pred_addr0 = {32'b0, next_br_displ[if_NPC0[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
-assign if_pred_addr1 = {32'b0, next_br_displ[if_NPC1[`LOG_NUM_BTB_ENTRIES+1:2]], 2'b0};
+assign if_pred_addr0 = br[if_NPC0[`LOG_NUM_BTB_ENTRIES+1:2]];
+assign if_pred_addr1 = br[if_NPC1[`LOG_NUM_BTB_ENTRIES+1:2]];
 
 always @* begin
 	for(i=0; i<`NUM_BTB_ENTRIES; i=i+1) begin
 //		next_tag[i] = tag[i];
-		next_br_displ[i] = br_displ[i];
+		next_br[i] = br[i];
 	end
 
 //correct the BTB if there is a mispredicted branch.	
@@ -82,7 +78,7 @@ always @* begin
 			 recover_NPC[`TAG_LENGTH+`LOG_NUM_BTB_ENTRIES+1:`LOG_NUM_BTB_ENTRIES+2]))
 */
 	if (recover_uncond)
-		next_br_displ[recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2]] = recover_actual_addr[`LOG_ENTRIES_VALUE+1:2];
+		next_br[recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2]] = recover_actual_addr;
 /*
 	if (rob_retire_jump1 && 
 			(tag[rob_retire_pc1[`LOG_NUM_BTB_ENTRIES+1:2]] == 
@@ -105,15 +101,13 @@ end
 always @(posedge clock) begin
 	if (reset) begin
 		for (i=0; i<`NUM_BTB_ENTRIES; i=i+1) begin
-//		tag[i] <= 0;
-			br_displ[i] <= `SD 0;
+			br[i] <= `SD 64'b0;
 		end
 	end
 
 	else begin
 		for (i=0; i<`NUM_BTB_ENTRIES; i=i+1) begin
-//		tag[i] <= next_tag[i];
-			br_displ[i] <= `SD next_br_displ[i];
+			br[i] <= `SD next_br[i];
 		end
 	end
 end
@@ -122,8 +116,8 @@ genvar IDX;
 generate
 	for(IDX=0; IDX<`NUM_BTB_ENTRIES; IDX=IDX+1)
 	begin : foo
-		wire [29:0] BR_DISPL = br_displ[IDX];  //64 tags, 7 bits each.
-		wire [29:0] NEXT_BR_DISPL = next_br_displ[IDX];
+		wire [63:0] BR = br[IDX];  //64 tags, 7 bits each.
+		wire [63:0] NEXT_BR = next_br[IDX];
 	end
 	wire [`LOG_NUM_BTB_ENTRIES-1:0] RETIRE_ENTRY0 = recover_NPC[`LOG_NUM_BTB_ENTRIES+1:2];
 endgenerate
