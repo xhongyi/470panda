@@ -218,7 +218,10 @@ module rs(// Inputs
 						alu_mem_issue_age0,//new
 						alu_mem_issue_age1,//new
 						alu_mem_issue_old0,//new
-						alu_mem_issue_old1//new
+						alu_mem_issue_old1,//new
+
+						lsq_wr_mem0_peer,
+						lsq_wr_mem1_peer
 						);
 
 `ifndef NUM_RS_ENTRIES
@@ -439,6 +442,9 @@ output	[`BIT_STQ-1:0]	alu_mem_issue_age0;//new
 output	[`BIT_STQ-1:0]	alu_mem_issue_age1;//new
 output									alu_mem_issue_old0;//new
 output									alu_mem_issue_old1;//new
+
+output				lsq_wr_mem0_peer;
+output				lsq_wr_mem1_peer;
 
 reg	 [63:0]	alu_sim_NPC0;
 reg	 [63:0]	alu_sim_NPC1;
@@ -667,6 +673,9 @@ integer i;
 
 assign id_rs_cap = (~ent_avail_valid) ? 2'b00 :
 									 (ent_avail_high_idx == ent_avail_low_idx) ? 2'b01 : 2'b10;
+
+assign lsq_wr_mem0_peer = wr_mem[ready_mem_high_idx];
+assign lsq_wr_mem1_peer = wr_mem[ready_mem_low_idx];
 
 // Issue instructions
 
