@@ -1,0 +1,108 @@
+	bsr	$r26, itab																					//0
+	mov	$r0, $r20	# r20 has tag of class i									//4
+	stq	$r1, 0($r0)	# return 1 if r2>r1.value, 0 otherwise (including no value)			//8
+	stq	$r2, 8($r0)	# return 1 if has a value								//12
+	stq     $r3, 16($r0)	# r1=r1.next											//16
+	stq     $r4, 24($r0)	# r0=r1.value											//20
+	stq	$r5, 32($r0)	# link r1.next=r2											//24
+ 	bsr     $r26, htab																			//28
+	mov	$r0, $r21	# r21 has tag of class h									//32
+        stq     $r1, 0($r0)																//36
+	stq     $r1, 8($r0)																			//40
+	lda	$r22, 2048	# r22 has address of "heap"							//44
+	bsr	$r26, makeh																					//48
+	mov	$r0, $r14	# r14 holds current head of linked list		//52
+	lda	$r15, 1024	# r15 holds current address in original list //56
+	ldq	$r2, 0($r15)																				//60
+	blt	$r2, print																					//64
+oloop:	addq	$r15, 8, $r15																//68
+	ldq     $r6, 0($r14)																		//72
+	ldq	$r5, 0($r6)																					//76
+	mov	$r14, $r1																						//80
+	jsr     $r26, ($r5)	# call to greaterthan function			//84
+	bne	$r0, sloop																					//88
+	bsr     $r26, makei																			//92
+	mov     $r0, $r14																				//96
+	ldq     $r2, 0($r15)																		//100
+        bge     $r2, oloop																//104
+	br	print																								//108
+sloop:	mov	$r1, $r16	# r16 holds object to link to this one		//112
+	ldq     $r5, 16($r6)																					//116
+	jsr     $r26, ($r5)	# call to next function										//120
+	ldq	$r6, 0($r1)																								//124
+	ldq	$r5, 0($r6)																								//128
+	jsr	$r26, ($r5)	# call to greaterthan function								//132
+	bne	$r0, sloop																								//136
+	bsr	$r26, makei																								//140
+	mov	$r0, $r2																									//144
+	mov     $r16, $r1																							//148
+	ldq     $r6, 0($r1)																						//152
+        ldq     $r5, 32($r6)																		//156
+	jsr     $r26, ($r5)     # call to link function								//160
+	ldq     $r2, 0($r15)																					//164
+	bge	$r2, oloop																								//168
+print:	mov	$r14, $r1																						//172
+	lda	$r15, 4096																								//176
+prloop:	ldq     $r6, 0($r1)																			//180
+        ldq     $r5, 8($r6)																			//184
+	jsr     $r26, ($r5)     # call to cont function								//188
+	beq	$r0, stop																									//192
+	ldq     $r5, 24($r6)																					//196
+	jsr     $r26, ($r5)	# call to value function									//200
+	stq	$r0, 0($r15)																							//204
+	ldq     $r5, 16($r6)																					//208
+	jsr     $r26, ($r5)     # call to next function								//212
+	addq	$r15, 8, $r15																						//216
+	br	prloop																										//220
+stop:	call_pal 0x555																						//224
+makeh:	mov	$r22, $r0																						//228
+	stq	$r21, 0($r22)																							//232
+	addq	$r22, 8, $r22																						//236
+	ret																														//240
+makei:	mov	$r22, $r0																						//244
+	stq	$r20, 0($r22)																							//248
+	stq	$r1, 16($r22)																							//252
+	stq	$r2, 8($r22)																							//256
+	addq	$r22, 24, $r22																					//260
+	ret																														//264
+igth:	ret	$r1																										//268
+	lda	$r0, 0																										//272
+	ret																														//276
+conti:	br	$r2, nexti																					//280
+	addq	$r31, 1, $r0																						//284
+	ret																														//288
+inti:	br	$r4, linki																						//292
+	ldq	$r0, 8($r1)																								//296
+	ret																														//300
+nexti:	br	$r3, inti																						//304
+	ldq	$r1, 16($r1)																							//308
+	ret																														//312
+linki:	br      $r5, igti																				//316
+	stq	$r2, 16($r1)																							//320
+	ret																														//324
+igti:	ret	$r1																										//328
+	ldq	$r3,8($r1)																								//332
+	cmplt	$r3,$r2,$r0																							//336
+	ret																														//340
+	.align 3
+	lda	$r0, 0		# filler																				//344
+htab:	br 	$r0, igth																							//348
+	.quad	0																												//352
+	.quad	0																												//356
+        lda     $r0, 0          # filler												//360
+itab:   br	$r0, conti																					//364
+        .quad   0
+	.quad	0
+	.quad 	0
+
+
+	.align 10
+	.quad	  2,   8,  23,   1,  17,   6,   7,  25
+        .quad	 26,  29,   6,  30,  23,  39,   3,   3 
+	.quad	 10,  11,  36,  40,  63,  34,  36, 187
+        .quad	  5,  96,  0,  34,  58,  86,  99,  65
+	.quad	 36,  74,  34,  88,  63,  48,  59,   5
+	.quad	 83,  91, 202, 143, 126, 175, 153,   0
+	.quad	137, 159, 137,   9,  17,  30,  20,  19
+        .quad    44,  12,  78, 148, 284, 163, 149, 145	
+	.quad	-1
