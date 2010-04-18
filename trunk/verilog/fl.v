@@ -86,15 +86,15 @@ end//end always
 
 always @(posedge clock) begin
   if (reset) begin
-    head <= 6'd0;
-    tail <= 6'd0;
+    head <= `SD 6'd0;
+    tail <= `SD 6'd0;
    	for (i=0; i<64; i=i+1) begin
    		pr[i] = (i+7'd32);
    	end
   end
   else begin
-    head <= next_head;
-    tail <= next_tail;
+    head <= `SD next_head;
+    tail <= `SD next_tail;
     for (i=0; i<64; i=i+1) begin
     	pr[i] = next_pr[i];
     end
