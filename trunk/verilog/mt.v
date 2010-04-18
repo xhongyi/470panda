@@ -260,8 +260,10 @@ module mt (// Inputs
 		else
 		begin
 			ready_bits <= `SD next_ready_bits;
-			pr_tags[id_dest_idx0] <= `SD pr_tags_next0;
-			pr_tags[id_dest_idx1] <= `SD pr_tags_next1;
+			if (id_valid_inst0)
+				pr_tags[id_dest_idx0] <= `SD pr_tags_next0;
+			if (id_valid_inst1)
+				pr_tags[id_dest_idx1] <= `SD pr_tags_next1;
 
 			if (rob_retire_num[1] || rob_retire_num[0])
 				pr_tags_retired[rob_retire_ar0] <= `SD rob_retire_pr0;
