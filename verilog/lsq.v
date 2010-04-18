@@ -35,6 +35,9 @@ module lsq (// Inputs
 						rs_wr_mem1,
 						rs_valid_inst1,
 
+						rs_wr_mem0_peer,
+						rs_wr_mem1_peer,
+
 						// Retire the stores
 						rob_retire_num,
 						rob_retire_wr_mem0,
