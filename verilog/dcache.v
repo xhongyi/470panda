@@ -151,7 +151,7 @@ module dcache(// inputs
 	wire Dcache_miss = (lsq_rd_mem) & !cachemem_valid;
 	wire Dcache_miss_solved = (Dmem2proc_tag != 0 & occupied[Dmem2proc_tag]==1); 
 	//Output combinational logic
-  assign lsq_load_avail = (~rob_wr_mem)&(~cdb_load_en);
+  assign lsq_load_avail = (~rob_wr_mem)&(~Dcache_miss_solved);
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
   assign {dcache_rd_tag, dcache_rd_idx} = proc2Dcache_addr[31:3];
@@ -196,7 +196,7 @@ module dcache(// inputs
 		if(Dcache_hit)
 		begin//if it is a hit, then initiate data updating
 			//proc2Dmem_command = `BUS_NONE;
-			if(lsq_rd_mem & lsq_load_avail)//if it is a load, then data will be directed to cdb
+			if(lsq_rd_mem & (lsq_load_avail|Dcache_miss_solved))//if it is a load, then data will be directed to cdb
 			begin
 				cdb_load_en = 1;
 	      cdb_pr		  = lsq_pr;
