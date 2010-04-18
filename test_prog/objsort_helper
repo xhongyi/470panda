@@ -1,5 +1,5 @@
-	bsr	$r26, itab																					//0
-	mov	$r0, $r20	# r20 has tag of class i									//4
+	bsr	$r26, itab																					//0	r26 -> 4
+	mov	$r0, $r20	# r20 has tag of class i									//4	r0 -> 0
 	stq	$r1, 0($r0)	# return 1 if r2>r1.value, 0 otherwise (including no value)			//8
 	stq	$r2, 8($r0)	# return 1 if has a value								//12
 	stq     $r3, 16($r0)	# r1=r1.next											//16
@@ -56,7 +56,7 @@ prloop:	ldq     $r6, 0($r1)																			//180
 	br	prloop																										//220
 stop:	call_pal 0x555																						//224
 makeh:	mov	$r22, $r0																						//228
-	stq	$r21, 0($r22)																							//232
+	stq	$r21, 0($r22)																							//232broken!
 	addq	$r22, 8, $r22																						//236
 	ret																														//240
 makei:	mov	$r22, $r0																						//244
@@ -68,19 +68,19 @@ makei:	mov	$r22, $r0																						//244
 igth:	ret	$r1																										//268
 	lda	$r0, 0																										//272
 	ret																														//276
-conti:	br	$r2, nexti																					//280
+conti:	br	$r2, nexti																					//280	r2-> 284
 	addq	$r31, 1, $r0																						//284
 	ret																														//288
-inti:	br	$r4, linki																						//292
+inti:	br	$r4, linki																						//292 r4 -> 296
 	ldq	$r0, 8($r1)																								//296
 	ret																														//300
-nexti:	br	$r3, inti																						//304
+nexti:	br	$r3, inti																						//304	r3 -> 308
 	ldq	$r1, 16($r1)																							//308
 	ret																														//312
-linki:	br      $r5, igti																				//316
+linki:	br      $r5, igti																				//316 r5 -> 320
 	stq	$r2, 16($r1)																							//320
 	ret																														//324
-igti:	ret	$r1																										//328
+igti:	ret	$r1																										//328 r1 -> 332
 	ldq	$r3,8($r1)																								//332
 	cmplt	$r3,$r2,$r0																							//336
 	ret																														//340
@@ -88,9 +88,9 @@ igti:	ret	$r1																										//328
 	lda	$r0, 0		# filler																				//344
 htab:	br 	$r0, igth																							//348
 	.quad	0																												//352
-	.quad	0																												//356
-        lda     $r0, 0          # filler												//360
-itab:   br	$r0, conti																					//364
+	.quad	0																												//360
+        lda     $r0, 0          # filler												//368
+itab:   br	$r0, conti																					//372 r0 -> 376
         .quad   0
 	.quad	0
 	.quad 	0
