@@ -134,8 +134,8 @@ module dcache(// inputs
   reg [63:0]	proc2Dmem_data;
   reg [63:0]	proc2Dmem_addr;
 	reg cdb_load_en;
-	reg dcache_wr_en1;
-	reg [63:0] dcache_wr_data;
+	// dcache_wr_en1;
+	//reg [63:0] dcache_wr_data;
 	
   wire [5:0] tail_plus_one = (tail == 6'd63) ? 0 : tail + 6'b1;
   wire [5:0] head_plus_one = (head == 6'd63) ? 0 : head + 6'b1;
@@ -154,7 +154,9 @@ module dcache(// inputs
   assign Dcache_valid_out = cachemem_valid;
   assign dcache_wr_en0 = Dcache_miss_solved;
   assign {dcache_rd_tag, dcache_rd_idx} = waiting_addr[head][31:3];
-  assign {dcache_wr_tag1, dcache_wr_idx1} = waiting_addr[head][31:3];	  
+  assign {dcache_wr_tag1, dcache_wr_idx1} = waiting_addr[head][31:3];
+  assign dcache_wr_data =	Dcache_miss_solved? Dmem2proc_data: waiting_data[head];
+  assign dcache_wr_en1 =waiting_st[head];	  
 	assign dcache_halt_complete  = dcache_on_halt ;//&(occupied == 16'b0);
   assign cachemem_halt = dcache_halt_complete;
   
@@ -184,8 +186,8 @@ module dcache(// inputs
 		cdb_load_en = 0;
 		cdb_pr     = 0;
 		cdb_ar		=0;
-		dcache_wr_en1 = 0;
-		dcache_wr_data = 0;
+		
+		
 		proc2Dmem_command = next_waiting_cmd[head];
 		proc2Dmem_addr    = next_waiting_addr[head];
 		proc2Dmem_data    = next_waiting_data[head];
@@ -213,6 +215,7 @@ module dcache(// inputs
 			next_waiting_ar [tail] = lsq_ar;
 			next_waiting_st [tail] = rob_wr_mem;
 			
+			
 		end
 		//End of output logic
 		//Drain command queue and fill index queue
@@ -232,7 +235,7 @@ module dcache(// inputs
 			//dcache_wr_en0  = 1;
 			dcache_wr_idx0 = index[Dmem2proc_tag];
 			dcache_wr_tag0 = tag[Dmem2proc_tag];
-			dcache_wr_data = Dmem2proc_data;
+		
 			next_occupied[Dmem2proc_tag]  = 0;
 			if(!st[Dmem2proc_tag])
 			begin
