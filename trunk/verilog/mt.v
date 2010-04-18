@@ -254,7 +254,7 @@ module mt (// Inputs
 		else if (recover)
 		begin
 			for (i = 0; i < 32; i=i+1)
-				pr_tags[i] = pr_tags_retired[i];
+				pr_tags[i] <= `SD pr_tags_retired[i];
 			ready_bits <= `SD 32'hffffffff;
 		end
 		else
