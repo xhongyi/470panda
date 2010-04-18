@@ -25,6 +25,8 @@
                  pipeline_commit_wr_idx,
                  pipeline_commit_wr_en,
                  pipeline_commit_NPC,
+								 pipeline_commit_inst0,
+								 pipeline_commit_inst1,
 
 
                  // testing hooks (these must be exported so we can test
@@ -92,6 +94,8 @@
   output [63:0] pipeline_commit_wr_data;
   output        pipeline_commit_wr_en;
   output [63:0] pipeline_commit_NPC;
+	output [31:0]	pipeline_commit_inst0;
+	output [31:0]	pipeline_commit_inst1;
 
   output [63:0] if_NPC0; //proc2Imem_addr
   output [31:0] if_IR0;
@@ -322,6 +326,9 @@
 	
 	wire				 rob_lsq_retire_wr_mem0;//new
 	wire				 rob_lsq_retire_wr_mem1;//new
+
+	wire	[31:0] rob_retire_IR0;
+	wire	[31:0] rob_retire_IR1;
 	
 	wire         rob_recover_exception;
 	wire				 rob_retire_halt;
@@ -676,6 +683,8 @@
 	assign pipeline_commit_wr_data	= 64'b0;
 	assign pipeline_commit_wr_en		= 0;
 	assign pipeline_commit_NPC			= 64'b0;
+	assign pipeline_commit_inst0		= ((rob_retire_num[0] | rob_retire_num[1]) & ~pipeline_recover)? rob_retire_IR0 : 32'bx;
+	assign pipeline_commit_inst1		= (rob_retire_num[1] & ~pipeline_recover)? rob_retire_IR1 : 32'bx;
 	//The following two are actually output signals and are already covered in dcache.
 	//assign proc2Dmem_addr						= 64'b0;
 	//assign Dcache_Dmem_command				= `BUS_NONE;
@@ -983,6 +992,7 @@
 					 .fl_pr0(fl_rob_rs_mt_pr0),
 					 .mt_p0told(mt_rob_p0told),
 					 .id_NPC0(id_rs_NPC0),
+					 .id_IR0(id_rs_IR0),
 					 .id_dest_idx0(id_rs_mt_dest_idx0),
 					 .id_valid_inst0(id_rs_rob_mt_valid_inst0),
 					 .id_cond_branch0(id_rs_cond_branch0),
@@ -992,6 +1002,7 @@
 					 .fl_pr1(fl_rob_rs_mt_pr1),
 					 .mt_p1told(mt_rob_p1told),
 					 .id_NPC1(id_rs_NPC1),
+					 .id_IR1(id_rs_IR1),
 					 .id_dest_idx1(id_rs_mt_dest_idx1),
 					 .id_valid_inst1(id_rs_rob_mt_valid_inst1),
 					 .id_cond_branch1(id_rs_cond_branch1),
@@ -1053,6 +1064,9 @@
 					 
 					 .lsq_retire_wr_mem0(rob_lsq_retire_wr_mem0),//new
 					 .lsq_retire_wr_mem1(rob_lsq_retire_wr_mem1),//new
+
+					 .rob_retire_IR0(rob_retire_IR0),
+					 .rob_retire_IR1(rob_retire_IR1),
 					 
 					 .recover_exception(rob_recover_exception),
 					 .retire_halt(rob_halt)

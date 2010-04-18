@@ -45,6 +45,8 @@ module testbench;
   wire [63:0] pipeline_commit_wr_data;
   wire        pipeline_commit_wr_en;
   wire [63:0] pipeline_commit_NPC;
+	wire [31:0]	pipeline_commit_inst0;
+	wire [31:0]	pipeline_commit_inst1;
 
 
   wire [63:0] if_NPC0;
@@ -102,6 +104,8 @@ module testbench;
 	reg	 [8*7:0] rs_mul_instr1_str;
 	reg  [8*7:0] rs_mem_instr0_str;
 	reg	 [8*7:0] rs_mem_instr1_str;
+	reg	 [8*7:0] commit_inst_str0;
+	reg	 [8*7:0] commit_inst_str1;
   
 
 
@@ -124,6 +128,8 @@ module testbench;
                  pipeline_commit_wr_idx,
                  pipeline_commit_wr_en,
                  pipeline_commit_NPC,
+								 pipeline_commit_inst0,
+								 pipeline_commit_inst1,
 
 
                  // testing hooks (these must be exported so we can test
@@ -360,6 +366,9 @@ module testbench;
 		rs_mul_instr1_str  = get_instr_string(rs_mul_IR1, rs_mul_valid_inst0);
 		rs_mem_instr0_str  = get_instr_string(rs_mem_IR0, rs_mem_valid_inst0);
 		rs_mem_instr1_str  = get_instr_string(rs_mem_IR1, rs_mem_valid_inst0);
+
+		commit_inst_str0	 = get_instr_string(pipeline_commit_inst0, rob_retire_num[0] | rob_retire_num[1]);
+		commit_inst_str1	 = get_instr_string(pipeline_commit_inst1, rob_retire_num[1]);
    
   end
 
