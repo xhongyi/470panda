@@ -29,6 +29,26 @@ module prf (// Inputs
 						rs_alu_mem_prb_idx0,
 						rs_alu_mem_prb_idx1,
 
+						rs_alu_sim_ara_idx0,
+						rs_alu_sim_ara_idx1,
+						
+						rs_alu_mul_ara_idx0,
+						rs_alu_mul_ara_idx1,
+
+						rs_alu_mem_ara_idx0,
+						rs_alu_mem_ara_idx1,
+
+						rs_alu_sim_arb_idx0, // New
+						rs_alu_sim_arb_idx1,
+						
+						rs_alu_mul_arb_idx0,
+						rs_alu_mul_arb_idx1,
+
+						rs_alu_mem_arb_idx0,
+						rs_alu_mem_arb_idx1,
+
+
+
 						alu_sim_wr_enable0,
 						alu_sim_pr_idx0,
 						alu_sim_pr_value0,
