@@ -393,11 +393,11 @@ begin
 	//checklist:
 	//check each bit of cdb_pr_ready
 	//if any bit of cdb_pr_ready == 1, search the hold file for ready bit.
-	if(cdb_pr_ready[0] ==1)
+	if(cdb_pr_ready[0])
 	begin			
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_0 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_0 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception0;
 				next_actual_addr[i]		= cdb_actual_addr0;
@@ -406,11 +406,11 @@ begin
 		end
 	end
 	
-	if(cdb_pr_ready[1] ==1)
+	if(cdb_pr_ready[1])
 	begin
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin 				//Note: the two tags COULD be the same
-			if(cdb_pr_tag_1 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_1 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception1;
 				next_actual_addr[i]		= cdb_actual_addr1;
@@ -419,11 +419,11 @@ begin
 		end
 	end
 	
-	if(cdb_pr_ready[2] ==1)
+	if(cdb_pr_ready[2])
 	begin	
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_2 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_2 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception2;
 				next_actual_addr[i]		= 1'b0;
@@ -432,11 +432,11 @@ begin
 		end				
 	end
 	
-	if(cdb_pr_ready[3] ==1)
+	if(cdb_pr_ready[3])
 	begin	
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_3 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_3 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception3;
 				next_actual_addr[i]		= 1'b0;
@@ -445,11 +445,11 @@ begin
 		end				
 	end
 
-	if(cdb_pr_ready[4] ==1)
+	if(cdb_pr_ready[4])
 	begin				
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_4 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_4 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception4;
 				next_actual_addr[i]		= 1'b0;
@@ -458,11 +458,11 @@ begin
 		end				
 	end
 	
-	if(cdb_pr_ready[5] ==1)
+	if(cdb_pr_ready[5])
 	begin
 		for (i = 0; i < `ROB_WIDTH; i = i + 1)
 		begin					//Note: the two tags COULD be the same
-			if(cdb_pr_tag_5 == tag[i] & valid[i]) begin
+			if((cdb_pr_tag_5 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
 				next_exception[i]			= cdb_exception5;
 				next_actual_addr[i]		= 1'b0;
