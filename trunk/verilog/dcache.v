@@ -103,10 +103,10 @@ module dcache(// inputs
 	
   reg  [5:0] head;
   reg  [5:0] tail;
-	
+	reg [63:0] valid;
   reg [5:0] next_head;
   reg [5:0] next_tail;
-	
+	reg [63:0] next_valid;
 	reg  [6:0] dcache_wr_idx0;
   reg [21:0] dcache_wr_tag0;
 	//reg  [6:0] dcache_wr_idx1;
@@ -173,7 +173,9 @@ module dcache(// inputs
 			next_waiting_pr [i] 	= waiting_pr [i];
 			next_waiting_ar [i] 	= waiting_ar [i];
 			next_waiting_st [i]   = waiting_st [i];
+			next_valid[i]					= valid[i];
 		end
+		
 		for (i = 0; i < 16; i = i + 1)
 		begin
 			next_occupied[i] 	= occupied[i];
@@ -183,6 +185,7 @@ module dcache(// inputs
 			next_ar[i]				= ar[i];
 			next_st[i]				=	st[i];
 		end
+		
 		next_head = head;
 		next_tail = tail;
 		cdb_load_en = 0;
@@ -190,7 +193,7 @@ module dcache(// inputs
 		cdb_ar		=0;
 		
 		
-		proc2Dmem_command = next_waiting_cmd[head];
+		proc2Dmem_command = valid[head]?next_waiting_cmd[head]:`BUS_NONE;
 		proc2Dmem_addr    = next_waiting_addr[head];
 		proc2Dmem_data    = next_waiting_data[head];
 			
@@ -210,6 +213,7 @@ module dcache(// inputs
 		begin
 			// Fill command queue
 			next_tail = tail_plus_one;
+			next_valid[tail] = 1;
 			next_waiting_addr[tail] = rob_wr_mem ? proc2Dcache_st_addr : proc2Dcache_addr;
 			next_waiting_cmd[tail] =  rob_wr_mem ?2'd2:lsq_rd_mem ? 2'b01 : 0;//`BUS_STORE = 2, `BUS_LOAD = 1
 			next_waiting_data[tail] = proc2Dcache_st_data;
@@ -228,7 +232,7 @@ module dcache(// inputs
 			next_ar   [Dmem2proc_response] = waiting_ar [head];
 			next_st		[Dmem2proc_response] = waiting_st [head];
 			next_occupied[Dmem2proc_response] = waiting_st[head]?0:1;
-			
+			next_valid [head]							=  0;
 		end
 		
 		if(Dcache_miss_solved)
@@ -267,6 +271,7 @@ module dcache(// inputs
       end
 			head 						<= `SD 0;
 			tail 						<= `SD 0;
+			valid						<= `SD 0;
 			dcache_on_halt 	<= `SD 0;
 			for (j = 0; j < 64; j = j + 1)
 			begin
@@ -276,6 +281,7 @@ module dcache(// inputs
 				waiting_pr[j]  		<= `SD 0;
 				waiting_ar[j]	 		<= `SD 0;
 				waiting_st[j]     <= `SD 0;
+			
     end
 		
 	end
@@ -292,6 +298,7 @@ module dcache(// inputs
       end
 			head 						<= `SD ((Dmem2proc_response != 0)&(~occupied[Dmem2proc_response]))? head_plus_one : head;
 			tail 						<= `SD next_tail;
+			valid						<= `SD next_valid;
 			dcache_on_halt 	<= `SD dcache_on_halt | rob_halt;
 			for (j = 0; j < 64; j = j + 1)
 			begin
@@ -301,6 +308,7 @@ module dcache(// inputs
 				waiting_pr[j]  	<= `SD next_waiting_pr[j];
 				waiting_ar[j]  	<= `SD next_waiting_ar[j];
 				waiting_st[j]   <= `SD next_waiting_st[j];
+			
       end
 			
     end
