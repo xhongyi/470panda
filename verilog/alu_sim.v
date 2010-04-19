@@ -263,6 +263,10 @@ module alu_sim(// Inputs
 	wire [63:0] alu_result1;//new
 	
 	
+	wire				ar_a_zero0;
+	wire				ar_b_zero0;
+	wire				ar_a_zero1;
+	wire				ar_b_zero1;
 	
 
   reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
@@ -282,6 +286,12 @@ module alu_sim(// Inputs
    //
    // ALU opA mux
    //
+
+	assign ar_a_zero0 = (rs_IR0[25:21] == `ZERO_REG);
+	assign ar_b_zero0 = (rs_IR0[20:16] == `ZERO_REG);
+	assign ar_a_zero1 = (rs_IR1[25:21] == `ZERO_REG);
+	assign ar_b_zero1 = (rs_IR1[20:16] == `ZERO_REG);
+
 	always @*
 	begin
 		next_cdb_complete0 = 1;
@@ -319,7 +329,9 @@ module alu_sim(// Inputs
 											      begin
 											     		if (rs_cond_branch0)
 											     			opa_mux_out0 = rs_NPC0;
-											     		else
+											     		else if (ar_a_zero0)
+																opa_mux_out0 = 64'b0;
+															else
 											     			opa_mux_out0 = prf_pra0;
 											     	end
       `ALU_OPA_IS_MEM_DISP: opa_mux_out0 = mem_disp0;
@@ -331,7 +343,9 @@ module alu_sim(// Inputs
      									      begin
 											     		if (rs_cond_branch1)
 											     			opa_mux_out1 = rs_NPC1;
-											     		else
+											     		else if (ar_a_zero1)
+																opa_mux_out1 = 64'b0;
+															else
 											     			opa_mux_out1 = prf_pra1;
 											     	end
       `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
@@ -350,12 +364,12 @@ module alu_sim(// Inputs
     opb_mux_out0 = 64'hbaadbeefdeadbeef;
 		opb_mux_out1 = 64'hbaadbeefdeadbeef;
     case (rs_opb_select0)
-      `ALU_OPB_IS_REGB:    opb_mux_out0 = prf_prb0;
+      `ALU_OPB_IS_REGB:    opb_mux_out0 = (ar_b_zero0)? 64'b0 : prf_prb0;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out0 = alu_imm0;
       `ALU_OPB_IS_BR_DISP: opb_mux_out0 = br_disp0;
     endcase 
 	case (rs_opb_select1)
-      `ALU_OPB_IS_REGB:    opb_mux_out1 = prf_prb1;
+      `ALU_OPB_IS_REGB:    opb_mux_out1 = (ar_b_zero1)? 64'b0 : prf_prb1;
       `ALU_OPB_IS_ALU_IMM: opb_mux_out1 = alu_imm1;
       `ALU_OPB_IS_BR_DISP: opb_mux_out1 = br_disp1;
     endcase

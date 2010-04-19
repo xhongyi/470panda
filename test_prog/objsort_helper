@@ -1,13 +1,13 @@
-	bsr	$r26, itab																					//0	r26 -> 4
-	mov	$r0, $r20	# r20 has tag of class i									//4	r0 -> 0
-	stq	$r1, 0($r0)	# return 1 if r2>r1.value, 0 otherwise (including no value)			//8
-	stq	$r2, 8($r0)	# return 1 if has a value								//12
-	stq     $r3, 16($r0)	# r1=r1.next											//16
-	stq     $r4, 24($r0)	# r0=r1.value											//20
-	stq	$r5, 32($r0)	# link r1.next=r2											//24
- 	bsr     $r26, htab																			//28
-	mov	$r0, $r21	# r21 has tag of class h									//32
-        stq     $r1, 0($r0)																//36
+	bsr	$r26, itab																					//0													r26 -> 4
+	mov	$r0, $r20	# r20 has tag of class i									//4													r20 -> 376
+	stq	$r1, 0($r0)	# return 1 if r2>r1.value, 0 otherwise (including no value)			//8 st 332
+	stq	$r2, 8($r0)	# return 1 if has a value								//12												st 284
+	stq     $r3, 16($r0)	# r1=r1.next											//16												st 308
+	stq     $r4, 24($r0)	# r0=r1.value											//20												st 296
+	stq	$r5, 32($r0)	# link r1.next=r2											//24												st 320
+ 	bsr     $r26, htab																			//28												*r26-> 32
+	mov	$r0, $r21	# r21 has tag of class h									//32												st 352
+        stq     $r1, 0($r0)																//36												st 352
 	stq     $r1, 8($r0)																			//40
 	lda	$r22, 2048	# r22 has address of "heap"							//44
 	bsr	$r26, makeh																					//48
@@ -65,7 +65,7 @@ makei:	mov	$r22, $r0																						//244
 	stq	$r2, 8($r22)																							//256
 	addq	$r22, 24, $r22																					//260
 	ret																														//264
-igth:	ret	$r1																										//268
+igth:	ret	$r1																										//268									*ri -> 272
 	lda	$r0, 0																										//272
 	ret																														//276
 conti:	br	$r2, nexti																					//280	r2-> 284
@@ -86,11 +86,11 @@ igti:	ret	$r1																										//328 r1 -> 332
 	ret																														//340
 	.align 3
 	lda	$r0, 0		# filler																				//344
-htab:	br 	$r0, igth																							//348
+htab:	br 	$r0, igth																							//348										*r0 -> 352
 	.quad	0																												//352
 	.quad	0																												//360
         lda     $r0, 0          # filler												//368
-itab:   br	$r0, conti																					//372 r0 -> 376
+itab:   br	$r0, conti																					//372 									r0 -> 376
         .quad   0
 	.quad	0
 	.quad 	0
