@@ -82,20 +82,20 @@ module lsq (// Inputs
 						);
 
 `ifndef LEN_STQ
-`define LEN_STQ 8
+`define LEN_STQ 64
 `endif
 
 `ifndef BIT_STQ
-`define BIT_STQ 3
+`define BIT_STQ 6
 `endif
 
 // LEN_LDQ must be larger than 1
 `ifndef	LEN_LDQ
-`define	LEN_LDQ 64
+`define	LEN_LDQ 4
 `endif
 
 `ifndef	BIT_LDQ
-`define	BIT_LDQ 6
+`define	BIT_LDQ 2
 `endif
 
 input					clock;

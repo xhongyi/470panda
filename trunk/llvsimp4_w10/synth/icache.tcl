@@ -18,7 +18,7 @@ suppress_message {"VER-130"}
 #/* new design                                              */
 #/***********************************************************/
 read_file -f verilog [list "../sys_defs.vh" "../verilog/cachemem.v"]
-set design_name cachemem128x64
+set design_name icachemem128x64
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 20
