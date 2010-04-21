@@ -82,11 +82,11 @@ module lsq (// Inputs
 						);
 
 `ifndef LEN_STQ
-`define LEN_STQ 64
+`define LEN_STQ 8
 `endif
 
 `ifndef BIT_STQ
-`define BIT_STQ 6
+`define BIT_STQ 3
 `endif
 
 // LEN_LDQ must be larger than 1

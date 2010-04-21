@@ -64,12 +64,15 @@ SYNFILES = synth/$(MODULE).vg
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 		testbench/visual_c_hooks.c
 
-synth/$(MODULE).vg:        $(SIMFILES) synth/pipeline.tcl synth/cachemem128x64.vg  
+synth/$(MODULE).vg:        $(SIMFILES) synth/pipeline.tcl synth/icacheme.vg synth/dcachemem.vg
 	cd synth && dc_shell-t -f ./pipeline.tcl | tee pipeline_synth.out 
 
-synth/cachemem128x64.vg:  verilog/cachemem.v
-	cd synth && dc_shell-t -f ./icache.tcl | tee cachemem128x64_synth.out
+synth/icachemem.vg:  verilog/cachemem.v
+	cd synth && dc_shell-t -f ./icache.tcl | tee icachemem_synth.out
  
+synth/dcachemem.vg:  verilog/dcachemem.v
+	cd synth && dc_shell-t -f ./dcache.tcl | tee dcachemem_synth.out
+
 #####
 # Should be no need to modify after here
 #####
