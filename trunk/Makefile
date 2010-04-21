@@ -28,16 +28,12 @@ all:    simv
 #####
 
 
-
-MODULE		= 	pipeline
-
-
 TESTBENCH = 	sys_defs.vh	    \
-   testbench/$(MODULE)_test.v \
+   testbench/pipeline_test.v \
 	 testbench/mem.v						\
 	 testbench/pipe_print.c
 
-SIMFILES =	verilog/$(MODULE).v	\
+SIMFILES =	verilog/pipeline.v	\
 						verilog/prien.v \
 						verilog/if_mod.v \
 						verilog/id.v \
@@ -58,13 +54,13 @@ SIMFILES =	verilog/$(MODULE).v	\
 						verilog/recover.v \
 						verilog/lsq.v
 
-SYNFILES = synth/$(MODULE).vg
+SYNFILES = synth/pipeline.vg
 
 # For visual debugger
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 		testbench/visual_c_hooks.c
 
-synth/$(MODULE).vg:        $(SIMFILES) synth/pipeline.tcl synth/icacheme.vg synth/dcachemem.vg
+synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl synth/icacheme.vg synth/dcachemem.vg
 	cd synth && dc_shell-t -f ./pipeline.tcl | tee pipeline_synth.out 
 
 synth/icachemem.vg:  verilog/cachemem.v
@@ -101,7 +97,7 @@ clean:
 	rm -rf vis_simv vis_simv.daidir
 	rm -rf syn_simv syn_simv.daidir syn_program.out
 	rm -rf int_simv int_simv.daidir syn_int_simv syn_int_simv.daidir
-	rm -rf synsimv synsimv.daidir csrc vcdplus.vpd vcs.key synprog.out $(MODULE).out writeback.out vc_hdrs.h
+	rm -rf synsimv synsimv.daidir csrc vcdplus.vpd vcs.key synprog.out pipeline.out writeback.out vc_hdrs.h
 
 nuke:	clean
 	rm -f synth/*.vg synth/*.rep synth/*.db synth/*.chk synth/command.log
