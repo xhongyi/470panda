@@ -1,4 +1,4 @@
-module dcachemem128x64 (// inputs
+module dcachemem(// inputs
                        clock,
                        reset, 
                        wr1_en,
