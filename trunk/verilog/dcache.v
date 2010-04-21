@@ -287,7 +287,7 @@ module dcache(// inputs
 	end
     else
     begin
-    	 for(j = 0; j<16; j = j + 1)
+    	for(j = 0; j<16; j = j + 1)
       begin
       	index[j] 			<= `SD next_index[j];
       	tag[j] 				<= `SD next_tag[j];
