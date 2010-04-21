@@ -171,6 +171,17 @@ module alu_mul(
  	reg 				valid_inst0;
 	reg					valid_inst1;
 
+	wire				ar_a_zero0;
+	wire				ar_b_zero0;
+	wire				ar_a_zero1;
+	wire				ar_b_zero1;
+	
+	assign ar_a_zero0 = (rs_IR0[25:21] == `ZERO_REG);
+	assign ar_b_zero0 = (rs_IR0[20:16] == `ZERO_REG);
+	assign ar_a_zero1 = (rs_IR1[25:21] == `ZERO_REG);
+	assign ar_b_zero1 = (rs_IR1[20:16] == `ZERO_REG);
+
+
 		
 		assign cdb_dest_ar_idx0 = dest_ar_idx0;
 		assign cdb_dest_ar_idx1 = dest_ar_idx1;
@@ -233,11 +244,11 @@ module alu_mul(
 		opa_mux_out0 = pra0;
 		opa_mux_out1 = pra1;
 		case (opb_select0)
-			`ALU_OPB_IS_REGB:			opb_mux_out0 = prb0;
+			`ALU_OPB_IS_REGB:			opb_mux_out0 = (ar_b_zero0) ? 64'b0 : prb0;
 			`ALU_OPB_IS_ALU_IMM:	opb_mux_out0 = alu_imm0;
 		endcase
 		case (opb_select1)
-			`ALU_OPB_IS_REGB:			opb_mux_out1 = prb1;
+			`ALU_OPB_IS_REGB:			opb_mux_out1 = (ar_b_zero1) ? 64'b0 : prb1;
 			`ALU_OPB_IS_ALU_IMM:	opb_mux_out1 = alu_imm1;
 		endcase
 	end

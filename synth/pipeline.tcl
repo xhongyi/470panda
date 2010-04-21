@@ -19,11 +19,13 @@ suppress_message {"VER-130"}
 #/***********************************************************/
 read_file -f ddc [list "./cachemem128x64.ddc"]
 set_dont_touch cachemem128x64
-read_file -f verilog [list "../sys_defs.vh" "../verilog/pipeline.v" "../verilog/if_mod.v" "../verilog/id.v" "../verilog/alu_sim.v" "../verilog/alu_mul.v" "../verilog/cdb.v" "../verilog/prf.v" "../verilog/icache.v" "../verilog/prien.v" "../verilog/rs.v" "../verilog/fl.v" "../verilog/mt.v" "../verilog/rob.v"]
+read_file -f ddc [list "./dcache.ddc"]
+set_dont_touch dcachemem
+read_file -f verilog [list "../sys_defs.vh" "../verilog/pipeline.v" "../verilog/if_mod.v" "../verilog/id.v" "../verilog/alu_sim.v" "../verilog/alu_mul.v" "../verilog/cdb.v" "../verilog/prf.v" "../verilog/icache.v" "../verilog/prien.v" "../verilog/rs.v" "../verilog/fl.v" "../verilog/mt.v" "../verilog/rob.v" "../verilog/btb.v" "../verilog/bht.v" "../verilog/lsq.v" "../verilog/recover.v" "../verilog/dcache.v"]
 set design_name pipeline
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 8
+set CLK_PERIOD 15
 
 
 #/***********************************************************/
