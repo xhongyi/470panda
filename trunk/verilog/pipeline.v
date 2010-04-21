@@ -523,10 +523,10 @@
 	wire		[4:0]	cdb_mt_ar_tag5;
 	wire					cdb_rob_exception0;
 	wire					cdb_rob_exception1;
-	wire					cdb_rob_exception2;
-	wire					cdb_rob_exception3;
-	wire					cdb_rob_exception4;
-	wire					cdb_rob_exception5;
+//	wire					cdb_rob_exception2;
+//	wire					cdb_rob_exception3;
+//	wire					cdb_rob_exception4;
+//	wire					cdb_rob_exception5;
 
 	wire  [63:0]	cdb_rob_actual_addr0;
 	wire  				cdb_rob_actual_taken0;
@@ -570,8 +570,8 @@
 	wire		[4:0]	alu_mul_cdb_ar_idx1;
 	wire		[6:0]	alu_mul_cdb_prf_pr_idx0;
 	wire		[6:0]	alu_mul_cdb_prf_pr_idx1;
-	wire					alu_mul_cdb_exception0;
-	wire				  alu_mul_cdb_exception1;
+//	wire					alu_mul_cdb_exception0;
+//	wire				  alu_mul_cdb_exception1;
   wire	 [1:0]	alu_mul_rs_avail;
 
 	/*
@@ -1034,10 +1034,10 @@
 					 .cdb_pr_tag_5(cdb_rs_rob_mt_pr_tag5),
 					 .cdb_exception0(cdb_rob_exception0),
 					 .cdb_exception1(cdb_rob_exception1),
-					 .cdb_exception2(cdb_rob_exception2),
-					 .cdb_exception3(cdb_rob_exception3),
-					 .cdb_exception4(0),
-					 .cdb_exception5(0),
+//					 .cdb_exception2(cdb_rob_exception2),
+//					 .cdb_exception3(cdb_rob_exception3),
+//					 .cdb_exception4(0),
+//					 .cdb_exception5(0),
 					 
 					 .cdb_actual_addr0(cdb_rob_actual_addr0),
 					 .cdb_actual_taken0(cdb_rob_actual_taken0),
@@ -1497,12 +1497,12 @@
 						.alu_mem_complete0(lsq_cdb_complete),
 						.alu_mem_pr_idx0(lsq_cdb_prf_pr_idx),
 						.alu_mem_ar_idx0(lsq_cdb_ar_idx),
-						.alu_mem_exception0(alu_mem_cdb_exception0),
+//						.alu_mem_exception0(alu_mem_cdb_exception0),
 
 						.alu_mem_complete1(Dcache_cdb_prf_complete),
 						.alu_mem_pr_idx1(Dcache_cdb_prf_pr_idx),
 						.alu_mem_ar_idx1(Dcache_cdb_ar_idx),
-						.alu_mem_exception1(alu_mem_cdb_exception1),
+//						.alu_mem_exception1(alu_mem_cdb_exception1),
 
 						// Outputs
 						.rs_rob_mt_broadcast(cdb_rs_rob_mt_broadcast),
@@ -1522,10 +1522,10 @@
 
 						.rob_exception0(cdb_rob_exception0),
 						.rob_exception1(cdb_rob_exception1),
-						.rob_exception2(cdb_rob_exception2),
-						.rob_exception3(cdb_rob_exception3),
-						.rob_exception4(cdb_rob_exception4),
-						.rob_exception5(cdb_rob_exception5),
+//						.rob_exception2(cdb_rob_exception2),
+//						.rob_exception3(cdb_rob_exception3),
+//						.rob_exception4(cdb_rob_exception4),
+//						.rob_exception5(cdb_rob_exception5),
 						
 						.rob_actual_addr0(cdb_rob_actual_addr0),
 						.rob_actual_taken0(cdb_rob_actual_taken0),
@@ -1627,14 +1627,14 @@
 										.cdb_complete0(alu_mul_cdb_complete0),
 										.cdb_dest_ar_idx0(alu_mul_cdb_ar_idx0),
 										.cdb_prf_dest_pr_idx0(alu_mul_cdb_prf_pr_idx0),
-										.cdb_exception0(alu_mul_cdb_exception0),
+//										.cdb_exception0(alu_mul_cdb_exception0),
 										.prf_result0(alu_mul_prf_value0),
 										.prf_write_enable0(alu_mul_prf_wr_enable0),
 
 										.cdb_complete1(alu_mul_cdb_complete1),
 										.cdb_dest_ar_idx1(alu_mul_cdb_ar_idx1),
 										.cdb_prf_dest_pr_idx1(alu_mul_cdb_prf_pr_idx1),
-										.cdb_exception1(alu_mul_cdb_exception1),
+//										.cdb_exception1(alu_mul_cdb_exception1),
 										.prf_result1(alu_mul_prf_value1),
 										.prf_write_enable1(alu_mul_prf_wr_enable1),
 

@@ -52,10 +52,10 @@ module rob(//inputs
 						cdb_pr_tag_5,
 						cdb_exception0,
 						cdb_exception1,
-						cdb_exception2,
-						cdb_exception3,
-						cdb_exception4,
-						cdb_exception5,
+//						cdb_exception2,
+//						cdb_exception3,
+//						cdb_exception4,
+//						cdb_exception5,
 
 						cdb_actual_addr0,//new
 						cdb_actual_taken0,//new
@@ -143,10 +143,10 @@ input	[6:0]											cdb_pr_tag_4;
 input	[6:0]											cdb_pr_tag_5; //Note: the bandwidth is CDB_WIDTH;
 input														cdb_exception0;
 input														cdb_exception1;
-input														cdb_exception2;
-input														cdb_exception3;
-input														cdb_exception4;
-input														cdb_exception5;
+//input														cdb_exception2;
+//input														cdb_exception3;
+//input														cdb_exception4;
+//input														cdb_exception5;
 
 input	[63:0]										cdb_actual_addr0;//new
 input														cdb_actual_taken0;//new
@@ -425,7 +425,7 @@ begin
 		begin					//Note: the two tags COULD be the same
 			if((cdb_pr_tag_2 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
-				next_exception[i]			= cdb_exception2;
+				next_exception[i]			= 1'b0;
 				next_actual_addr[i]		= 1'b0;
 				next_actual_taken[i]	= 1'b0;
 			end
@@ -438,7 +438,7 @@ begin
 		begin					//Note: the two tags COULD be the same
 			if((cdb_pr_tag_3 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
-				next_exception[i]			= cdb_exception3;
+				next_exception[i]			= 1'b0;
 				next_actual_addr[i]		= 1'b0;
 				next_actual_taken[i]	= 1'b0;
 			end
@@ -451,7 +451,7 @@ begin
 		begin					//Note: the two tags COULD be the same
 			if((cdb_pr_tag_4 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
-				next_exception[i]			= cdb_exception4;
+				next_exception[i]			= 1'b0;
 				next_actual_addr[i]		= 1'b0;
 				next_actual_taken[i]	= 1'b0;
 			end
@@ -464,7 +464,7 @@ begin
 		begin					//Note: the two tags COULD be the same
 			if((cdb_pr_tag_5 == tag[i]) & valid[i]) begin
 				next_ready[i]					= 1'b1;
-				next_exception[i]			= cdb_exception5;
+				next_exception[i]			= 1'b0;
 				next_actual_addr[i]		= 1'b0;
 				next_actual_taken[i]	= 1'b0;
 			end
