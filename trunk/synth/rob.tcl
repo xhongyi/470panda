@@ -19,11 +19,11 @@ suppress_message {"VER-130"}
 #/***********************************************************/
 #read_file -f ddc [list "./cachemem128x64.ddc"]
 #set_dont_touch cachemem128x64
-read_file -f verilog [list "./sys_defs.vh" "./rob.v"] 
+read_file -f verilog [list "../sys_defs.vh" "../verilog/rob.v"] 
 set design_name rob
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 3.2
+set CLK_PERIOD 6
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */
