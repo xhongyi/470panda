@@ -318,13 +318,13 @@ begin
 		next_ld_pr[i]		= ld_pr[i];
 		next_ld_ar[i]		= ld_ar[i];
 		next_ld_age[i]	= ld_age[i];
+		next_ld_match_idx[i] = 0;
 	end
 	next_ld_avail	= ld_avail;
 	next_ld_taken = ld_taken;
 	next_ld_ready = ld_ready;
 	next_ld_match	= ld_match;
 	next_ld_old		= 0;
-	next_ld_match_idx = 0;
 
 	// Put the new loads into the load waiting queue
 	if (ldq_avail)
