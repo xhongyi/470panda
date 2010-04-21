@@ -91,11 +91,11 @@ module lsq (// Inputs
 
 // LEN_LDQ must be larger than 1
 `ifndef	LEN_LDQ
-`define	LEN_LDQ 4
+`define	LEN_LDQ 64
 `endif
 
 `ifndef	BIT_LDQ
-`define	BIT_LDQ 2
+`define	BIT_LDQ 6
 `endif
 
 input					clock;

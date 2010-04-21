@@ -60,7 +60,7 @@ SYNFILES = synth/pipeline.vg
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 		testbench/visual_c_hooks.c
 
-synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl synth/icacheme.vg synth/dcachemem.vg
+synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl synth/icachemem.vg synth/dcachemem.vg
 	cd synth && dc_shell-t -f ./pipeline.tcl | tee pipeline_synth.out 
 
 synth/icachemem.vg:  verilog/cachemem.v
