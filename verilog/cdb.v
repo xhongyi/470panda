@@ -65,10 +65,10 @@ module cdb (// Inputs
 						mt_ar_tag5,
 						rob_exception0,
 						rob_exception1,
-						rob_exception2,
-						rob_exception3,
-						rob_exception4,
-						rob_exception5,
+//						rob_exception2,
+//						rob_exception3,
+//						rob_exception4,
+//						rob_exception5,
 
 						rob_actual_addr0,
 						rob_actual_taken0,
@@ -137,10 +137,10 @@ output [4:0]	mt_ar_tag4;
 output [4:0]	mt_ar_tag5;
 output				rob_exception0;
 output				rob_exception1;
-output				rob_exception2;
-output				rob_exception3;
-output				rob_exception4;
-output				rob_exception5;
+//output				rob_exception2;
+//output				rob_exception3;
+//output				rob_exception4;
+//output				rob_exception5;
 
 output	[63:0]	rob_actual_addr0;
 output					rob_actual_taken0;
@@ -168,10 +168,10 @@ reg [4:0]	mt_ar_tag4;
 reg [4:0]	mt_ar_tag5;
 reg				rob_exception0;
 reg				rob_exception1;
-reg				rob_exception2;
-reg				rob_exception3;
-reg				rob_exception4;
-reg				rob_exception5;
+//reg				rob_exception2;
+//reg				rob_exception3;
+//reg				rob_exception4;
+//reg				rob_exception5;
 
 reg	[63:0]	rob_actual_addr0;
 reg					rob_actual_taken0;
@@ -202,10 +202,10 @@ begin
 			mt_ar_tag5 <= `SD 0;
 			rob_exception0 <= `SD 0;
 			rob_exception1 <= `SD 0;
-			rob_exception2 <= `SD 0;
-			rob_exception3 <= `SD 0;
-			rob_exception4 <= `SD 0;
-			rob_exception5 <= `SD 0;
+//			rob_exception2 <= `SD 0;
+//			rob_exception3 <= `SD 0;
+//			rob_exception4 <= `SD 0;
+//			rob_exception5 <= `SD 0;
 
 			rob_actual_addr0	<= `SD 0;
 			rob_actual_taken0	<= `SD 0;
@@ -239,10 +239,10 @@ begin
 			mt_ar_tag5 <= `SD alu_mem_ar_idx1;
 			rob_exception0 <= `SD alu_sim_exception0;
 			rob_exception1 <= `SD alu_sim_exception1;
-			rob_exception2 <= `SD 0;
-			rob_exception3 <= `SD 0;
-			rob_exception4 <= `SD alu_mem_exception0;
-			rob_exception5 <= `SD alu_mem_exception1;
+//			rob_exception2 <= `SD 0;
+//			rob_exception3 <= `SD 0;
+//			rob_exception4 <= `SD alu_mem_exception0;
+//			rob_exception5 <= `SD alu_mem_exception1;
 
 			rob_actual_addr0	<= `SD alu_sim_actual_addr0;
 			rob_actual_taken0	<= `SD alu_sim_actual_taken0;

@@ -101,8 +101,8 @@ module alu_mul(
 								cdb_dest_ar_idx1,
 								cdb_prf_dest_pr_idx0,
 								cdb_prf_dest_pr_idx1,
-								cdb_exception0,
-								cdb_exception1,
+//								cdb_exception0,
+//								cdb_exception1,
 								prf_result0,
 								prf_result1,
 								prf_write_enable0,
@@ -145,8 +145,8 @@ module alu_mul(
 	output	[4:0]	cdb_dest_ar_idx1;
 	output	[6:0]	cdb_prf_dest_pr_idx0;
 	output	[6:0]	cdb_prf_dest_pr_idx1;
-	output				cdb_exception0;
-	output			  cdb_exception1;
+//	output				cdb_exception0;
+//	output			  cdb_exception1;
   output [1:0]	rs_alu_avail;
 	//Internal State
 	reg  [63:0] NPC0;           // incoming instruction PC+4
