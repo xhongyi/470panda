@@ -257,12 +257,12 @@ assign rs_disp_old1 = (id_wr_mem0)? 0: st_empty;
 assign Dcache_st_value 	= st_value[st_head];
 assign Dcache_st_addr		= st_addr[st_head];
 
-prien_2 prien_ldq_avail(.decode(ld_avail),
+prien_4 prien_ldq_avail(.decode(ld_avail),
 												.encode_high(ldq_high_idx),
 												.encode_low(ldq_low_idx),
 												.valid(ldq_avail));
 
-prien_2 prien_ldq_ready(.decode(next_ld_ready),
+prien_4 prien_ldq_ready(.decode(next_ld_ready),
 												.encode_high(ldq_ready_high),
 												.encode_low(ldq_ready_low),
 												.valid(ldq_ready));

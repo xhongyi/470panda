@@ -305,8 +305,8 @@
  ****************************************/
 `define LEN_STQ			8
 `define BIT_STQ			3
-`define LEN_LDQ			2
-`define	BIT_LDQ		 	1
+`define LEN_LDQ			4
+`define	BIT_LDQ		 	2
 `define	ZERO_VAL		64'b0 // zero values'
 
 /****************************************
