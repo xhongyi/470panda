@@ -55,9 +55,6 @@ module lsq (// Inputs
 						// How many ld lsq can eat
 						rs_avail,
 
-						// How many st lsq can eat
-						id_avail,
-
 						// If the value of load is found if the previous store
 						// complete the inst and write the value
 						// Also complete the ready store
@@ -85,20 +82,20 @@ module lsq (// Inputs
 						);
 
 `ifndef LEN_STQ
-//`define LEN_STQ 64
+//`define LEN_STQ 8
 `endif
 
 `ifndef BIT_STQ
-//`define BIT_STQ 6
+//`define BIT_STQ 3
 `endif
 
 // LEN_LDQ must be larger than 1
 `ifndef	LEN_LDQ
-//`define	LEN_LDQ 4
+`define	LEN_LDQ 4
 `endif
 
 `ifndef	BIT_LDQ
-//`define	BIT_LDQ 2
+`define	BIT_LDQ 2
 `endif
 
 input					clock;
@@ -145,7 +142,6 @@ output									rs_disp_old0;
 output									rs_disp_old1;
 
 output	[1:0]	rs_avail;
-output	[1:0] id_avail;
 
 output				cdb_complete;
 output	[6:0]	cdb_prf_pr_idx;
@@ -175,7 +171,6 @@ reg			[6:0]	Dcache_pr_idx;
 reg			[4:0]	Dcache_ar_idx;
 
 reg			[1:0]	rs_avail;
-reg			[1:0] id_avail;
 
 reg		 				 [63:0]	st_addr	[`LEN_STQ-1:0];
 reg						 [63:0]	st_value[`LEN_STQ-1:0];
@@ -262,12 +257,12 @@ assign rs_disp_old1 = (id_wr_mem0)? 0: st_empty;
 assign Dcache_st_value 	= st_value[st_head];
 assign Dcache_st_addr		= st_addr[st_head];
 
-prien_2 prien_ldq_avail(.decode(ld_avail),
+prien_4 prien_ldq_avail(.decode(ld_avail),
 												.encode_high(ldq_high_idx),
 												.encode_low(ldq_low_idx),
 												.valid(ldq_avail));
 
-prien_2 prien_ldq_ready(.decode(next_ld_ready),
+prien_4 prien_ldq_ready(.decode(next_ld_ready),
 												.encode_high(ldq_ready_high),
 												.encode_low(ldq_ready_low),
 												.valid(ldq_ready));
@@ -290,24 +285,6 @@ generate
 		wire	[`BIT_STQ:0]		LD_AGE_EXT		= ld_age_ext[idx];
 	end
 endgenerate
-
-
-always @*
-begin
-	st_head_ext = {1'b0, st_head};
-	st_tail_ext = {1'b0, st_tail};
-	if (st_tail < st_head | (~st_empty && st_tail == st_head))
-		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
-
-	if (st_tail_ext - st_head_ext < `LEN_STQ - 2)
-		id_avail = 2'b10;
-	else if (st_tail_ext - st_head_ext < `LEN_STQ - 1)
-		id_avail = 2'b01;
-	else
-		id_avail = 2'b00;
-end
-
-
 
 always @*
 begin
@@ -417,6 +394,11 @@ begin
 
 	// Store part
 	
+	st_head_ext = {1'b0, st_head};
+	st_tail_ext = {1'b0, st_tail};
+	if (st_tail < st_head | (~st_empty && st_tail == st_head))
+		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
+
 	for (i = 0; i < `LEN_STQ; i = i + 1)
 	begin
 		next_st_addr[i]		= st_addr[i];

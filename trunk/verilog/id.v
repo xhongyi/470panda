@@ -338,7 +338,6 @@ module id (
 
 				rob_cap, // rob capacity
 				rs_cap, // rs capacity
-				lsq_cap,
 
 				//Outputs
 
@@ -415,7 +414,6 @@ input	 [63:0]	if_pred_addr1;
 
 input		[1:0]	rob_cap; // rob capacity
 input		[1:0]	rs_cap; // rs capacity
-input		[1:0]	lsq_cap;
 
 output [63:0]	rs_NPC0;
 output [63:0]	rs_NPC1;
@@ -635,9 +633,9 @@ reg		[1:0] inst_need_num;
 
 always @*
 begin
-	if (rob_cap == 2'b10 && rs_cap == 2'b10 && lsq_cap == 2'b10 && valid_inst0 && valid_inst1)
+	if (rob_cap == 2'b10 && rs_cap == 2'b10 && valid_inst0 && valid_inst1)
 		dispatch_num = 2'b10;
-	else if (rob_cap == 2'b0 || rs_cap == 2'b0 || lsq_cap == 2'b0)
+	else if (rob_cap == 2'b0 || rs_cap == 2'b0)
 		dispatch_num = 2'b00;
 	else if (valid_inst0)
 		dispatch_num = 2'b01;
@@ -647,9 +645,9 @@ end
 
 always @*
 begin
-	if (rob_cap == 2'b10 && rs_cap == 2'b10 && lsq_cap == 2'b10)
+	if (rob_cap == 2'b10 && rs_cap == 2'b10)
 		inst_need_num = 2'b10;
-	else if (rob_cap == 2'b0 || rs_cap == 2'b0 || lsq_cap == 2'b0)
+	else if (rob_cap == 2'b0 || rs_cap == 2'b0)
 	begin
 		if (~valid_inst0)
 			inst_need_num = 2'b10;

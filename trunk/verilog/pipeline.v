@@ -583,7 +583,6 @@
 	wire									lsq_rs_disp_old1;
 	
 	wire	[1:0]						lsq_rs_avail;
-	wire	[1:0]						lsq_id_avail;
 	wire									lsq_cdb_complete;
 	wire	[6:0]						lsq_cdb_prf_pr_idx;
 	wire	[4:0]						lsq_cdb_ar_idx;
@@ -881,9 +880,6 @@
 								.reset(if_reset),
 								.bht_branch_taken0(bht_if_branch_taken0),
 								.bht_branch_taken1(bht_if_branch_taken1),
-//								.bht_branch_taken0(1'b1),//delete
-//								.bht_branch_taken1(1'b1),//delete
-								
 								.btb_pred_addr0(btb_if_pred_addr0),
 								.btb_pred_addr1(btb_if_pred_addr1),
 								.Imem2proc_data(Icache_data_out),
@@ -929,7 +925,6 @@
 
 					.rob_cap(rob_id_cap),
 					.rs_cap(rs_id_cap),
-					.lsq_cap(lsq_id_avail),
 
 					// Outputs
 					.rs_NPC0(id_rs_NPC0),
@@ -1690,7 +1685,6 @@
 						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem1),
 
 						.Dcache_avail(Dcache_lsq_load_avail),
-						.id_avail(lsq_id_avail),
 						
 						.rs_wr_mem0_peer(rs_lsq_wr_mem0_peer),
 						.rs_wr_mem1_peer(rs_lsq_wr_mem1_peer),
@@ -1740,17 +1734,17 @@
 						.clock(clock),
 						.reset(bht_reset),///bht_reset later, tho I dont kno why.....
 						
+						.if_dispatch_num(id_if_inst_need_num),
+						
 						.if_NPC0(if_id_bht_NPC0),
 						.if_NPC1(if_id_bht_NPC1),//not implemented yet
-						
-						.if_dispatch_num(id_if_inst_need_num),
 									
 						.if_valid_cond0(if_bht_valid_cond0),
 						.if_valid_cond1(if_bht_valid_cond1),
 
 						.recover_cond(recover_bht_recover),
 						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
-
+						
 						.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 						
 						.rob_retire_cond0(rob_bht_recover_cond_branch0),
@@ -1792,7 +1786,7 @@
 	/*
 	 * Branch Target Buffer
 	 */					
- recover recover0(//inputs
+ recover recover(//inputs
 							.clock(clock),
 							.reset(reset),
 
