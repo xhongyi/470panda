@@ -1736,12 +1736,16 @@
 						
 						.if_NPC0(if_id_bht_NPC0),
 						.if_NPC1(if_id_bht_NPC1),//not implemented yet
+						
+						.if_dispatch_num(id_if_inst_need_num),
 									
 						.if_valid_cond0(if_bht_valid_cond0),
 						.if_valid_cond1(if_bht_valid_cond1),
 
-						.recover_cond(rob_recover_exception),
+						.recover_cond(recover_bht_recover),
 						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
+
+						.rob_retire_num(rob_mt_fl_bht_lsq_recover_retire_num),
 						
 						.rob_retire_cond0(rob_bht_recover_cond_branch0),
 						.rob_retire_NPC0(rob_bht_recover_NPC0),
@@ -1782,7 +1786,7 @@
 	/*
 	 * Branch Target Buffer
 	 */					
- recover recover(//inputs
+ recover recover0(//inputs
 							.clock(clock),
 							.reset(reset),
 
