@@ -286,6 +286,25 @@ generate
 	end
 endgenerate
 
+/*
+always @*
+begin
+	st_head_ext = {1'b0, st_head};
+	st_tail_ext = {1'b0, st_tail};
+	if (st_tail < st_head | (~st_empty && st_tail == st_head))
+		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
+
+	if (st_tail_ext - st_head_ext < `LEN_STQ - 2)
+		id_avail = 2'b10;
+	else if (st_tail_ext - st_head_ext < `LEN_STQ - 1)
+		id_avail = 2'b01;
+	else
+		id_avail = 2'b00;
+	//id_avail = 2'b10;
+end
+*/
+
+
 always @*
 begin
 	if (~ldq_avail)
