@@ -191,7 +191,9 @@ module dcache(// inputs
 		cdb_load_en = 0;
 		cdb_pr     = 0;
 		cdb_ar		=0;
-		
+		Dcache_data_out = 0;
+		dcache_wr_idx0 = 0;
+		dcache_wr_tag0 = 0;
 		
 		proc2Dmem_command = valid[head]?next_waiting_cmd[head]:`BUS_NONE;
 		proc2Dmem_addr    = next_waiting_addr[head];
