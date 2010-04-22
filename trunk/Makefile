@@ -54,7 +54,7 @@ SIMFILES =	verilog/pipeline.v	\
 						verilog/recover.v \
 						verilog/lsq.v
 
-SYNFILES = synth/pipeline.vg
+SYNFILES = synth/dcachemem.vg
 
 # For visual debugger
 VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \

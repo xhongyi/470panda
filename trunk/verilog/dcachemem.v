@@ -60,6 +60,10 @@ begin
 		if(wr0_en)
 		valids[wr0_idx] <= `SD 1;
 	end
+	if(dcache_halt)
+		begin
+			halt_counter <= `SD  1;
+		end
 end
 
 genvar j;
@@ -82,10 +86,7 @@ begin
 			data[wr0_idx] <= `SD wr0_data;
 			tags[wr0_idx] <= `SD wr0_tag;
 		end
-		if(dcache_halt)
-		begin
-			halt_counter <= `SD halt_counter + 1;
-		end
+		
 			
 
 end
