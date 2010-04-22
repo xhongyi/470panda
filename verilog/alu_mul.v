@@ -73,17 +73,15 @@ module mult(clock, reset, mplier, mcand, start, dest_pr_in, dest_ar_in, product,
 
   wire [63:0] mcand_out, mplier_out;
   wire [(3*64)-1:0] internal_products, internal_mcands, internal_mpliers;
-	wire	[(7*3)-1:0] internal_pr_in;
-	wire		[(7*3)-1:0] internal_pr_out;
-	wire	[(5*3)-1:0] internal_ar_in;
-	wire		[(5*3)-1:0] internal_ar_out;
+	wire	[(7*3)-1:0] internal_pr;
+	wire	[(5*3)-1:0] internal_ar;
   wire [2:0] internal_dones;
   
   mult_stage mstage [3:0] 
     (.clock(clock),
      .reset(reset),
-		 .dest_pr_idx_in({internal_pr_in, dest_pr_in}),
-		 .dest_ar_idx_in({internal_ar_in, dest_ar_in}),
+		 .dest_pr_idx_in({internal_pr, dest_pr_in}),
+		 .dest_ar_idx_in({internal_ar, dest_ar_in}),
      .product_in({internal_products,64'h0}),
      .mplier_in({internal_mpliers,mplier}),
      .mcand_in({internal_mcands,mcand}),
@@ -91,8 +89,8 @@ module mult(clock, reset, mplier, mcand, start, dest_pr_in, dest_ar_in, product,
      .product_out({product,internal_products}),
      .mplier_out({mplier_out,internal_mpliers}),
      .mcand_out({mcand_out,internal_mcands}),
-		 .dest_pr_idx_out({dest_pr_out, internal_pr_out}),
-		 .dest_ar_idx_out({dest_ar_out, internal_ar_out}),
+		 .dest_pr_idx_out({dest_pr_out, internal_pr}),
+		 .dest_ar_idx_out({dest_ar_out, internal_ar}),
      .done({done,internal_dones})
     );
 
