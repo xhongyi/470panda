@@ -10,8 +10,6 @@ module bht(//Inputs
 									
 						if_valid_cond0,
 						if_valid_cond1,
-						
-						if_dispatch_num,
 
 						recover_cond,
 						recover_bhr,//stored by ROB to use in recover_cond.
@@ -67,8 +65,6 @@ input	[63:0]													if_NPC1;
 
 input																	if_valid_cond0;
 input																	if_valid_cond1;
-
-input	[1:0]														if_dispatch_num;
 
 input																	recover_cond;// when this is high, there is an exception.
 input	[`BIT_BHT-1:0]	recover_bhr;
@@ -128,7 +124,7 @@ always @* begin
 //if not during recovery, which means normal.
 	if(~recover_cond) begin
 	//if only if_valid_cond0
-		if (if_dispatch_num[1] & ~if_dispatch_num[0]) begin//rob_retire_num == 2
+		if (rob_retire_num[1] & ~rob_retire_num[0]) begin//rob_retire_num == 2
 			if (if_valid_cond0 && ~if_valid_cond1) begin
 				taken0 = next_pattern[if_NPC0[`BIT_BHT+1:2]^BHR][1];
 				next_BHR = {BHR[4:0], taken0};
@@ -159,7 +155,7 @@ always @* begin
 				end
 			end
 		end
-		else if (~if_dispatch_num[1] & if_dispatch_num[0]) begin//rob_retire_num == 1
+		else if (~rob_retire_num[1] & rob_retire_num[0]) begin//rob_retire_num == 1
 			if (if_valid_cond0) begin
 				taken0 = next_pattern[if_NPC0[`BIT_BHT+1:2]^BHR][1];
 				next_BHR = {BHR[4:0], taken0};
@@ -167,8 +163,16 @@ always @* begin
 				id_bhr1 = next_BHR;
 			end
 		end
-		//retire change pattern
-		if(rob_retire_cond0 & (rob_retire_num[0] | rob_retire_num[1])) begin//retire 2 instructions
+	end
+
+// During recovery, recover bht only. Ignore anything else.
+	else
+		next_BHR = recover_bhr;
+		
+// change pattern when recover or retire.
+	if(~recover_cond) begin//if recover, then ignore retire
+		// rob_0
+		if(rob_retire_cond0 & (rob_retire_num[0] | rob_retire_num[1])) begin
 			if (rob_actual_taken0) begin //the correct outcome is a taken
 				if(~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | 
 					 ~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1])
@@ -183,7 +187,7 @@ always @* begin
 			end
 		end
 	// rob_1
-		if(rob_retire_cond1 & rob_retire_num[1]) begin//retire 1 instructions
+		if(rob_retire_cond1 & rob_retire_num[1]) begin
 			if (rob_actual_taken1) begin //the correct outcome is a taken
 				if(~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | 
 					 ~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1])
@@ -198,11 +202,6 @@ always @* begin
 			end
 		end
 	end
-
-// During recovery, recover bht only. Ignore anything else.
-	else
-		next_BHR = recover_bhr;
-
 end
 //end always
 
@@ -229,18 +228,6 @@ generate
 		wire	[1:0]	PATTERN = pattern[IDX];
 		wire	[1:0]	NEXT_PATTERN = next_pattern[IDX];
 	end
-	wire	[5:0]	ENTRY_IDX0 = rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0;
-	wire	[5:0]	ENTRY_IDX1 = rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1;
-	wire	[1:0]	PATTERN0 = pattern[ENTRY_IDX0];
-	wire	[1:0]	PATTERN1 = pattern[ENTRY_IDX1];
-	wire	[1:0]	NEXT_PATTERN0 = next_pattern[ENTRY_IDX0];
-	wire	[1:0]	NEXT_PATTERN1 = next_pattern[ENTRY_IDX1];
-	
-	wire				PAT_NOT_TWO0 = ~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | ~pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1];
-	wire				PAT_NOT_ZERO0 = pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][0] | pattern[rob_retire_NPC0[`BIT_BHT+1:2]^rob_retire_BHR0][1];
-	
-	wire				PAT_NOT_TWO1 = ~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | ~pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1];
-	wire				PAT_NOT_ZERO1 = pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][0] | pattern[rob_retire_NPC1[`BIT_BHT+1:2]^rob_retire_BHR1][1];
 endgenerate
 
 endmodule

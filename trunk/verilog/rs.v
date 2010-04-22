@@ -739,8 +739,6 @@ begin
 	next_ent_taken = ent_taken; // ent means entry
 	next_ent_avail = ent_avail;
 	next_old			 = old;
-
-
 //--------------------------------------------------------------ISSUE LOGIC
 //////////////////////////////////////////////////////////////////////////////////////////////////Here is the simple alu
 	if (ready_sim_valid) begin
@@ -880,42 +878,7 @@ begin
 		end
 	end
 	else begin
-		alu_sim_NPC0					= 64'b0;
-		alu_sim_IR0 					= 0;
-		alu_sim_branch_taken0 = 0;
-		alu_sim_pred_addr0 		= 64'b0;
-		alu_sim_prf_pra_idx0 	= 0;
-		alu_sim_prf_prb_idx0 	= 0;
-		alu_sim_opa_select0		= 0;
-		alu_sim_opb_select0		= 0;
-		alu_sim_dest_ar_idx0	= 0;
-		alu_sim_dest_pr_idx0	= 0;
-		alu_sim_func0					= 0;
-		alu_sim_rd_mem0				= 0;
-		alu_sim_wr_mem0				= 0;
-		alu_sim_cond_branch0	= 0;
-		alu_sim_uncond_branch0	= 0;
-		alu_sim_halt0					= 0;
-		alu_sim_illegal_inst0	= 0;
 		alu_sim_valid_inst0		= 0;
-
-		alu_sim_NPC1					= 64'b0;
-		alu_sim_IR1 					= 0;
-		alu_sim_branch_taken1 = 0;
-		alu_sim_pred_addr1 		= 64'b0;
-		alu_sim_prf_pra_idx1 	= 0;
-		alu_sim_prf_prb_idx1 	= 0;
-		alu_sim_opa_select1		= 0;
-		alu_sim_opb_select1		= 0;
-		alu_sim_dest_ar_idx1	= 0;
-		alu_sim_dest_pr_idx1	= 0;
-		alu_sim_func1					= 0;
-		alu_sim_rd_mem1				= 0;
-		alu_sim_wr_mem1				= 0;
-		alu_sim_cond_branch1	= 0;
-		alu_sim_uncond_branch1	= 0;
-		alu_sim_halt1					= 0;
-		alu_sim_illegal_inst1	= 0;
 		alu_sim_valid_inst1		= 0;
 	end
 
@@ -1057,42 +1020,7 @@ begin
 		end
 	end
 	else begin
-		alu_mul_NPC0					= 64'b0;
-		alu_mul_IR0 					= 0;
-		alu_mul_branch_taken0 = 0;
-		alu_mul_pred_addr0 		= 64'b0;
-		alu_mul_prf_pra_idx0 	= 0;
-		alu_mul_prf_prb_idx0 	= 0;
-		alu_mul_opa_select0		= 0;
-		alu_mul_opb_select0		= 0;
-		alu_mul_dest_ar_idx0	= 0;
-		alu_mul_dest_pr_idx0	= 0;
-		alu_mul_func0					= 0;
-		alu_mul_rd_mem0				= 0;
-		alu_mul_wr_mem0				= 0;
-		alu_mul_cond_branch0	= 0;
-		alu_mul_uncond_branch0	= 0;
-		alu_mul_halt0					= 0;
-		alu_mul_illegal_inst0	= 0;
 		alu_mul_valid_inst0		= 0;
-
-		alu_mul_NPC1					= 64'b0;
-		alu_mul_IR1 					= 0;
-		alu_mul_branch_taken1 = 0;
-		alu_mul_pred_addr1 		= 64'b0;
-		alu_mul_prf_pra_idx1 	= 0;
-		alu_mul_prf_prb_idx1 	= 0;
-		alu_mul_opa_select1		= 0;
-		alu_mul_opb_select1		= 0;
-		alu_mul_dest_ar_idx1	= 0;
-		alu_mul_dest_pr_idx1	= 0;
-		alu_mul_func1					= 0;
-		alu_mul_rd_mem1				= 0;
-		alu_mul_wr_mem1				= 0;
-		alu_mul_cond_branch1	= 0;
-		alu_mul_uncond_branch1	= 0;
-		alu_mul_halt1					= 0;
-		alu_mul_illegal_inst1	= 0;
 		alu_mul_valid_inst1		= 0;
 	end
 //////////////////////////////////////////////////////////////////////////////Here is the LSQ
@@ -1243,43 +1171,8 @@ begin
 		end
 	end
 	else begin
-	alu_mem_NPC0					= 64'b0;
-	alu_mem_IR0 					= 0;
-	alu_mem_branch_taken0 = 0;
-	alu_mem_pred_addr0 		= 64'b0;
-	alu_mem_prf_pra_idx0 	= 0;
-	alu_mem_prf_prb_idx0 	= 0;
-	alu_mem_opa_select0		= 0;
-	alu_mem_opb_select0		= 0;
-	alu_mem_dest_ar_idx0	= 0;
-	alu_mem_dest_pr_idx0	= 0;
-	alu_mem_func0					= 0;
-	alu_mem_rd_mem0				= 0;
-	alu_mem_wr_mem0				= 0;
-	alu_mem_cond_branch0	= 0;
-	alu_mem_uncond_branch0	= 0;
-	alu_mem_halt0					= 0;
-	alu_mem_illegal_inst0	= 0;
-	alu_mem_valid_inst0		= 0;
-
-	alu_mem_NPC1					= 64'b0;
-	alu_mem_IR1 					= 0;
-	alu_mem_branch_taken1 = 0;
-	alu_mem_pred_addr1 		= 64'b0;
-	alu_mem_prf_pra_idx1 	= 0;
-	alu_mem_prf_prb_idx1 	= 0;
-	alu_mem_opa_select1		= 0;
-	alu_mem_opb_select1		= 0;
-	alu_mem_dest_ar_idx1	= 0;
-	alu_mem_dest_pr_idx1	= 0;
-	alu_mem_func1					= 0;
-	alu_mem_rd_mem1				= 0;
-	alu_mem_wr_mem1				= 0;
-	alu_mem_cond_branch1	= 0;
-	alu_mem_uncond_branch1	= 0;
-	alu_mem_halt1					= 0;
-	alu_mem_illegal_inst1	= 0;
-	alu_mem_valid_inst1		= 0;
+		alu_mem_valid_inst0		= 0;
+		alu_mem_valid_inst1		= 0;
 	end
 
 //------------------------------------------------------------------------DISPATCH LOGIC
