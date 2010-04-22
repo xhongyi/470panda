@@ -583,6 +583,7 @@
 	wire									lsq_rs_disp_old1;
 	
 	wire	[1:0]						lsq_rs_avail;
+	wire	[1:0]						lsq_id_avail;
 	wire									lsq_cdb_complete;
 	wire	[6:0]						lsq_cdb_prf_pr_idx;
 	wire	[4:0]						lsq_cdb_ar_idx;
@@ -928,6 +929,7 @@
 
 					.rob_cap(rob_id_cap),
 					.rs_cap(rs_id_cap),
+					.lsq_cap(lsq_id_avail),
 
 					// Outputs
 					.rs_NPC0(id_rs_NPC0),
@@ -1688,6 +1690,7 @@
 						.rob_retire_wr_mem1(rob_lsq_retire_wr_mem1),
 
 						.Dcache_avail(Dcache_lsq_load_avail),
+						.id_avail(lsq_id_avail),
 						
 						.rs_wr_mem0_peer(rs_lsq_wr_mem0_peer),
 						.rs_wr_mem1_peer(rs_lsq_wr_mem1_peer),
