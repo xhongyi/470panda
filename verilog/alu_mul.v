@@ -192,7 +192,7 @@ module alu_mul(
 		assign  prf_write_enable1 = cdb_complete1;
 
 			
- reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
+  reg    [63:0] opa_mux_out0, opa_mux_out1, opb_mux_out0, opb_mux_out1;
   wire          brcond_result0, brcond_result1;
   wire					ex_mem_branch_taken0, ex_mem_branch_taken1; 
    // set up possible immediates:
@@ -211,34 +211,6 @@ module alu_mul(
    //
 								
 								
- /*always @*
-  begin
-    case (opa_select0)
-      `ALU_OPA_IS_REGA:     opa_mux_out0 = pra0;
-      `ALU_OPA_IS_MEM_DISP: opa_mux_out0 = mem_disp0;
-      `ALU_OPA_IS_NPC:      opa_mux_out0 = NPC0;
-      `ALU_OPA_IS_NOT3:     opa_mux_out0 = ~64'h3;
-    endcase
-	case (opa_select1)
-      `ALU_OPA_IS_REGA:     opa_mux_out1 = pra1;
-      `ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
-      `ALU_OPA_IS_NPC:      opa_mux_out1 = NPC1;
-      `ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
-    endcase
-
-    case (opb_select0)
-      `ALU_OPA_IS_REGA:     opb_mux_out0 = prb0;
-      `ALU_OPA_IS_MEM_DISP: opb_mux_out0 = mem_disp0;
-      `ALU_OPA_IS_NPC:      opb_mux_out0 = NPC0;
-      `ALU_OPA_IS_NOT3:     opb_mux_out0 = ~64'h3;
-    endcase
-	case (opb_select1)
-      `ALU_OPA_IS_REGA:     opb_mux_out1 = prb1;
-      `ALU_OPA_IS_MEM_DISP: opb_mux_out1 = mem_disp1;
-      `ALU_OPA_IS_NPC:      opb_mux_out1 = NPC1;
-      `ALU_OPA_IS_NOT3:     opb_mux_out1 = ~64'h3;
-    endcase
-  end*/
 	always @*
 	begin
 		opa_mux_out0 = pra0;
@@ -246,10 +218,12 @@ module alu_mul(
 		case (opb_select0)
 			`ALU_OPB_IS_REGB:			opb_mux_out0 = (ar_b_zero0) ? 64'b0 : prb0;
 			`ALU_OPB_IS_ALU_IMM:	opb_mux_out0 = alu_imm0;
+			default:							opb_mux_out0 = 64'b0;
 		endcase
 		case (opb_select1)
 			`ALU_OPB_IS_REGB:			opb_mux_out1 = (ar_b_zero1) ? 64'b0 : prb1;
 			`ALU_OPB_IS_ALU_IMM:	opb_mux_out1 = alu_imm1;
+			default:							opb_mux_out1 = 64'b0;
 		endcase
 	end
 
