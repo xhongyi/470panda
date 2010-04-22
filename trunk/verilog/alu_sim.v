@@ -303,8 +303,6 @@ module alu_sim(// Inputs
 		next_rs_alu_avail = 2'b11;
 		next_cdb_complete0 = rs_valid_inst0;
 		next_cdb_complete1 = rs_valid_inst1;
-		next_cdb_actual_addr0 = alu_result0;
-		next_cdb_actual_addr1 = alu_result1;
 		next_cdb_actual_taken0 = ex_take_branch_out0;
 		next_cdb_actual_taken1 = ex_take_branch_out1;
 		next_prf_write_enable0 = rs_valid_inst0;
@@ -424,6 +422,8 @@ always @*
 begin
 next_cdb_exception0 = 1'd0;
 next_cdb_exception1 = 1'd0;
+next_cdb_actual_addr0 = alu_result0;
+next_cdb_actual_addr1 = alu_result1;
 	if (rs_cond_branch0)
 	begin
 		if (rs_branch_taken0 ^ ex_take_branch_out0) begin
