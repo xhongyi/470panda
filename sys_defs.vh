@@ -303,8 +303,10 @@
  * LSQ
  *
  ****************************************/
-`define LEN_STQ			64
-`define BIT_STQ			6
+`define LEN_STQ			8
+`define BIT_STQ			3
+`define LEN_LDQ			2
+`define	BIT_LDQ		 	1
 `define	ZERO_VAL		64'b0 // zero values'
 
 /****************************************

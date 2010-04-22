@@ -17,11 +17,11 @@ suppress_message {"VER-130"}
 #/* The following five lines must be updated for every      */
 #/* new design                                              */
 #/***********************************************************/
-read_file -f verilog [list "../sys_defs.vh" "../verilog/cachemem.v"]
+read_file -f verilog [list "../sys_defs.vh" "../verilog/icachemem.v"]
 set design_name icachemem
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 10
+set CLK_PERIOD 30
 
 
 #/***********************************************************/
