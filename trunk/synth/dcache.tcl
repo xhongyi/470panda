@@ -21,7 +21,7 @@ read_file -f verilog [list "../sys_defs.vh" "../verilog/dcachemem.v"]
 set design_name dcachemem
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 10
+set CLK_PERIOD 30
 
 
 #/***********************************************************/

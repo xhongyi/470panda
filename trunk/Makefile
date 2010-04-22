@@ -63,7 +63,7 @@ VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench.v) \
 synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl synth/icachemem.vg synth/dcachemem.vg
 	cd synth && dc_shell-t -f ./pipeline.tcl | tee pipeline_synth.out 
 
-synth/icachemem.vg:  verilog/cachemem.v
+synth/icachemem.vg:  verilog/icachemem.v
 	cd synth && dc_shell-t -f ./icache.tcl | tee icachemem_synth.out
  
 synth/dcachemem.vg:  verilog/dcachemem.v
