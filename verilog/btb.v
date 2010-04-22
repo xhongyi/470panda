@@ -24,11 +24,11 @@ module btb(//inputs
 					if_pred_addr1
 					);
 `ifndef NUM_BTB_ENTRIES
-`define	NUM_BTB_ENTRIES	128
+`define	NUM_BTB_ENTRIES	1024
 `endif
 
 `ifndef	LOG_NUM_BTB_ENTRIES
-`define	LOG_NUM_BTB_ENTRIES	7
+`define	LOG_NUM_BTB_ENTRIES	10
 `endif
 
 input	clock;
