@@ -880,6 +880,9 @@
 								.reset(if_reset),
 								.bht_branch_taken0(bht_if_branch_taken0),
 								.bht_branch_taken1(bht_if_branch_taken1),
+//								.bht_branch_taken0(1'b1),//delete
+//								.bht_branch_taken1(1'b1),//delete
+								
 								.btb_pred_addr0(btb_if_pred_addr0),
 								.btb_pred_addr1(btb_if_pred_addr1),
 								.Imem2proc_data(Icache_data_out),
