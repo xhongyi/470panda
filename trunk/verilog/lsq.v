@@ -82,11 +82,11 @@ module lsq (// Inputs
 						);
 
 `ifndef LEN_STQ
-`define LEN_STQ 64
+//`define LEN_STQ 8
 `endif
 
 `ifndef BIT_STQ
-`define BIT_STQ 6
+//`define BIT_STQ 3
 `endif
 
 // LEN_LDQ must be larger than 1
@@ -285,6 +285,25 @@ generate
 		wire	[`BIT_STQ:0]		LD_AGE_EXT		= ld_age_ext[idx];
 	end
 endgenerate
+
+/*
+always @*
+begin
+	st_head_ext = {1'b0, st_head};
+	st_tail_ext = {1'b0, st_tail};
+	if (st_tail < st_head | (~st_empty && st_tail == st_head))
+		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
+
+	if (st_tail_ext - st_head_ext < `LEN_STQ - 2)
+		id_avail = 2'b10;
+	else if (st_tail_ext - st_head_ext < `LEN_STQ - 1)
+		id_avail = 2'b01;
+	else
+		id_avail = 2'b00;
+	//id_avail = 2'b10;
+end
+*/
+
 
 always @*
 begin

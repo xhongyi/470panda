@@ -878,8 +878,8 @@
 	if_mod if_mod0 (// Inputs
 								.clock(clock),
 								.reset(if_reset),
-								.bht_branch_taken0(1'b0),
-								.bht_branch_taken1(1'b0),
+								.bht_branch_taken0(bht_if_branch_taken0),
+								.bht_branch_taken1(bht_if_branch_taken1),
 								.btb_pred_addr0(btb_if_pred_addr0),
 								.btb_pred_addr1(btb_if_pred_addr1),
 								.Imem2proc_data(Icache_data_out),
@@ -1740,7 +1740,7 @@
 						.if_valid_cond0(if_bht_valid_cond0),
 						.if_valid_cond1(if_bht_valid_cond1),
 
-						.recover_cond(rob_recover_exception),
+						.recover_cond(recover_bht_recover),
 						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
 						
 						.rob_retire_cond0(rob_bht_recover_cond_branch0),
