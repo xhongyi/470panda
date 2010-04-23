@@ -38,6 +38,8 @@ module lsq (// Inputs
 						rs_wr_mem0_peer,
 						rs_wr_mem1_peer,
 
+						id_dispatch_num,
+
 						// Retire the stores
 						rob_retire_num,
 						rob_retire_wr_mem0,
@@ -82,11 +84,11 @@ module lsq (// Inputs
 						);
 
 `ifndef LEN_STQ
-//`define LEN_STQ 8
+`define LEN_STQ 64
 `endif
 
 `ifndef BIT_STQ
-//`define BIT_STQ 3
+`define BIT_STQ 6
 `endif
 
 // LEN_LDQ must be larger than 1
@@ -129,6 +131,8 @@ input					rob_retire_wr_mem1;
 
 input					rs_wr_mem0_peer;
 input					rs_wr_mem1_peer;
+
+input		[1:0]	id_dispatch_num;
 
 input					Dcache_avail;
 
@@ -286,35 +290,16 @@ generate
 	end
 endgenerate
 
-/*
-always @*
-begin
-	st_head_ext = {1'b0, st_head};
-	st_tail_ext = {1'b0, st_tail};
-	if (st_tail < st_head | (~st_empty && st_tail == st_head))
-		st_tail_ext = {1'b0, st_tail} + `LEN_STQ;
-
-	if (st_tail_ext - st_head_ext < `LEN_STQ - 2)
-		id_avail = 2'b10;
-	else if (st_tail_ext - st_head_ext < `LEN_STQ - 1)
-		id_avail = 2'b01;
-	else
-		id_avail = 2'b00;
-	//id_avail = 2'b10;
-end
-*/
-
-
 always @*
 begin
 	if (~ldq_avail)
 	begin
-		if (rs_wr_mem0_peer | rs_wr_mem1) rs_avail = 2'b01;
+		if (rs_wr_mem0_peer | rs_wr_mem1_peer) rs_avail = 2'b01;
 		else	rs_avail	= 2'b00;
 	end
 	else if (ldq_high_idx == ldq_low_idx)
 	begin
-		if (rs_wr_mem0_peer | rs_wr_mem1) rs_avail	= 2'b11;
+		if (rs_wr_mem0_peer | rs_wr_mem1_peer) rs_avail	= 2'b11;
 		else rs_avail = 2'b01;
 	end
 	else
@@ -322,7 +307,7 @@ begin
 		// If two st come and they can't be completed at the same time
 		// *Peering* is used since wr and rd mem don't depend on lsq avail
 		// This could be improved by adding another complete store queue
-		if (rs_wr_mem0_peer & rs_wr_mem1)
+		if (rs_wr_mem0_peer & rs_wr_mem1_peer)
 			rs_avail	= 2'b01;
 		else
 			rs_avail	= 2'b11;
@@ -426,26 +411,41 @@ begin
 	next_st_ready	= st_ready;
 
 	// Extend the stq at dispatch
-	if (id_wr_mem0 & id_wr_mem1)
+	if (id_dispatch_num[1])//if 2 dispatch
 	begin
-		next_st_ready[st_tail]		= 0;
-		next_st_ready[st_tail+1]	= 0;
-		next_st_tail 							= st_tail_ext + 2;
+		if (id_wr_mem0 & id_wr_mem1)//if both are stores
+		begin
+			next_st_ready[st_tail]		= 0;
+			next_st_ready[st_tail+1]	= 0;
+			next_st_tail 							= st_tail_ext + 2;
+		end
+		else if (id_wr_mem0 | id_wr_mem1)//if only one store is ready
+		begin
+			next_st_ready[st_tail]		= 0;
+			next_st_tail 							= st_tail_ext + 1;
+		end
+		else
+			next_st_tail	= st_tail_ext;
 	end
-	else if (id_wr_mem0 | id_wr_mem1)
+	else if (id_dispatch_num[0])//if only one store
 	begin
-		next_st_ready[st_tail]		= 0;
-		next_st_tail 							= st_tail_ext + 1;
+		if (id_wr_mem0)
+		begin
+			next_st_ready[st_tail]		= 0;
+			next_st_tail							= st_tail_ext + 1;
+		end
+		else
+			next_st_tail = st_tail_ext;
 	end
 	else
-		next_st_tail	= st_tail_ext;
+		next_st_tail = st_tail_ext;
 	
 	// Shrink the stq at retire
-	if (rob_retire_num[1])
+	if (rob_retire_num[1])//if retire 2
 	begin
-		if (rob_retire_wr_mem0 & rob_retire_wr_mem1)
+		if (rob_retire_wr_mem0 & rob_retire_wr_mem1)//if both are store
 			next_st_head	= st_head_ext + 2;
-		else if (rob_retire_wr_mem0 | rob_retire_wr_mem1)
+		else if (rob_retire_wr_mem0 | rob_retire_wr_mem1)//if only one is store
 			next_st_head	= st_head_ext + 1;
 		else
 			next_st_head 	= st_head_ext;
@@ -517,7 +517,7 @@ begin
 			cdb_prf_pr_idx		= 0;
 			cdb_ar_idx				= 0;
 			prf_pr_wr_enable	= 0;
-			prf_pr_value			= 0;
+			rf_pr_value			= 0;
 		end*/
 
 		if (next_ld_match[ldq_ready_high] & ~ld_cdb_wait)
