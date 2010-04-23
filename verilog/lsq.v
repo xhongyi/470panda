@@ -273,12 +273,12 @@ always @*
 begin
 	if (~ldq_avail)
 	begin
-		if (rs_wr_mem0_peer | rs_wr_mem1) rs_avail = 2'b01;
+		if (rs_wr_mem0_peer | rs_wr_mem1_peer) rs_avail = 2'b01;
 		else	rs_avail	= 2'b00;
 	end
 	else if (ldq_high_idx == ldq_low_idx)
 	begin
-		if (rs_wr_mem0_peer | rs_wr_mem1) rs_avail	= 2'b11;
+		if (rs_wr_mem0_peer | rs_wr_mem1_peer) rs_avail	= 2'b11;
 		else rs_avail = 2'b01;
 	end
 	else
@@ -286,7 +286,7 @@ begin
 		// If two st come and they can't be completed at the same time
 		// *Peering* is used since wr and rd mem don't depend on lsq avail
 		// This could be improved by adding another complete store queue
-		if (rs_wr_mem0_peer & rs_wr_mem1)
+		if (rs_wr_mem0_peer & rs_wr_mem1_peer)
 			rs_avail	= 2'b01;
 		else
 			rs_avail	= 2'b11;
