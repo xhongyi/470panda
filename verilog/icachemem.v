@@ -1,4 +1,4 @@
-module icachemem (// inputs
+module icachemem128x64 (// inputs
                        clock,
                        reset, 
                        wr1_en,

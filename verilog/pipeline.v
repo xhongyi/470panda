@@ -769,7 +769,7 @@
 	//assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
   // Actual cache (data and tag RAMs)
-  icachemem Icachememory (// inputs
+  icachemem128x64 Icachememory (// inputs
                               .clock(clock),
                               .reset(cachemem_reset),
                               .wr1_en(Icache_wr_en),
@@ -785,7 +785,7 @@
                               .rd1_valid(Icachemem_valid)
                              );
 	// Dcache
-	dcachemem Dcachememory (// inputs
+	dcachemem128x64 Dcachememory (// inputs
                        .clock(clock),
                        .reset(cachemem_reset), 
                        .wr1_en(dcache_wr_en1),
@@ -1740,7 +1740,7 @@
 						.if_valid_cond0(if_bht_valid_cond0),
 						.if_valid_cond1(if_bht_valid_cond1),
 
-						.recover_cond(recover_bht_recover),
+						.recover_cond(rob_recover_exception),
 						.recover_bhr(recover_bht_bhr),//stored by ROB to use in recovery.
 						
 						.rob_retire_cond0(rob_bht_recover_cond_branch0),
