@@ -769,7 +769,7 @@
 	//assign Dcache_cdb_prf_complete = Dcache_load_en & Dcache_valid_out;//Is this right??
 
   // Actual cache (data and tag RAMs)
-  icachemem128x64 Icachememory (// inputs
+  icachemem Icachememory (// inputs
                               .clock(clock),
                               .reset(cachemem_reset),
                               .wr1_en(Icache_wr_en),
@@ -785,7 +785,7 @@
                               .rd1_valid(Icachemem_valid)
                              );
 	// Dcache
-	dcachemem128x64 Dcachememory (// inputs
+	dcachemem Dcachememory (// inputs
                        .clock(clock),
                        .reset(cachemem_reset), 
                        .wr1_en(dcache_wr_en1),
